@@ -642,4 +642,8 @@ window.files['lang/en.json'] = `
 		"284" : "???"
 	}
 }
-`;
+`; 
+
+ if (!window.folderStructure) window.folderStructure = {}; 
+if (!window.folderStructure['lang']) window.folderStructure['lang'] = {}; 
+if (!window.folderStructure['lang']['en.json']) window.folderStructure['lang']['en.json'] = {}; 

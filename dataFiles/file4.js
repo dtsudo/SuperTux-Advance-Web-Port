@@ -5,4 +5,9 @@ window.files['contrib/extras/text.json'] = `
 		"old-7" : "The Ocean Bridge OLD",
 		"0-0B" : "Learning the slopes B-side"
 	}
-}`;
+}`; 
+
+ if (!window.folderStructure) window.folderStructure = {}; 
+if (!window.folderStructure['contrib']) window.folderStructure['contrib'] = {}; 
+if (!window.folderStructure['contrib']['extras']) window.folderStructure['contrib']['extras'] = {}; 
+if (!window.folderStructure['contrib']['extras']['text.json']) window.folderStructure['contrib']['extras']['text.json'] = {}; 

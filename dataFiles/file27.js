@@ -350,4 +350,8 @@ window.files['lang/bg.json'] = `
  		"214" : "",
  		"215" : ""
  	}
-}`;
+}`; 
+
+ if (!window.folderStructure) window.folderStructure = {}; 
+if (!window.folderStructure['lang']) window.folderStructure['lang'] = {}; 
+if (!window.folderStructure['lang']['bg.json']) window.folderStructure['lang']['bg.json'] = {}; 

@@ -126,4 +126,8 @@ window.files['res/credits.json'] = `
 		{"type":"normal","text":"Tuckles loves you!"}
 	]
 }
-`;
+`; 
+
+ if (!window.folderStructure) window.folderStructure = {}; 
+if (!window.folderStructure['res']) window.folderStructure['res'] = {}; 
+if (!window.folderStructure['res']['credits.json']) window.folderStructure['res']['credits.json'] = {}; 

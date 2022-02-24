@@ -3227,4 +3227,9 @@ window.files['contrib/frostlands/Fw-8.json'] = `
  "type":"map",
  "version":"1.8",
  "width":730
-}`;
+}`; 
+
+ if (!window.folderStructure) window.folderStructure = {}; 
+if (!window.folderStructure['contrib']) window.folderStructure['contrib'] = {}; 
+if (!window.folderStructure['contrib']['frostlands']) window.folderStructure['contrib']['frostlands'] = {}; 
+if (!window.folderStructure['contrib']['frostlands']['Fw-8.json']) window.folderStructure['contrib']['frostlands']['Fw-8.json'] = {}; 

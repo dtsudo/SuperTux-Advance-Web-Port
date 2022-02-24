@@ -1037,4 +1037,9 @@ window.files['res/map/overworld-0.json'] = `
  "type":"map",
  "version":"1.6",
  "width":40
-}`;
+}`; 
+
+ if (!window.folderStructure) window.folderStructure = {}; 
+if (!window.folderStructure['res']) window.folderStructure['res'] = {}; 
+if (!window.folderStructure['res']['map']) window.folderStructure['res']['map'] = {}; 
+if (!window.folderStructure['res']['map']['overworld-0.json']) window.folderStructure['res']['map']['overworld-0.json'] = {}; 

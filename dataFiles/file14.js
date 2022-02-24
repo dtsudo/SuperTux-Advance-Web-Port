@@ -2209,4 +2209,9 @@ window.files['contrib/frostlands/Fw-4.json'] = `
  "type":"map",
  "version":"1.8",
  "width":600
-}`;
+}`; 
+
+ if (!window.folderStructure) window.folderStructure = {}; 
+if (!window.folderStructure['contrib']) window.folderStructure['contrib'] = {}; 
+if (!window.folderStructure['contrib']['frostlands']) window.folderStructure['contrib']['frostlands'] = {}; 
+if (!window.folderStructure['contrib']['frostlands']['Fw-4.json']) window.folderStructure['contrib']['frostlands']['Fw-4.json'] = {}; 

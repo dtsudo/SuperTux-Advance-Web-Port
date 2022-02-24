@@ -356,4 +356,9 @@ window.files['res/map/shop.json'] = `
  "type":"map",
  "version":"1.6",
  "width":40
-}`;
+}`; 
+
+ if (!window.folderStructure) window.folderStructure = {}; 
+if (!window.folderStructure['res']) window.folderStructure['res'] = {}; 
+if (!window.folderStructure['res']['map']) window.folderStructure['res']['map'] = {}; 
+if (!window.folderStructure['res']['map']['shop.json']) window.folderStructure['res']['map']['shop.json'] = {}; 

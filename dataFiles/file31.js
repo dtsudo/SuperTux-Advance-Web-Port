@@ -280,4 +280,8 @@ window.files['lang/fr.json'] = `
 		"214" : "",
 		"215" : ""
 	}
-}`;
+}`; 
+
+ if (!window.folderStructure) window.folderStructure = {}; 
+if (!window.folderStructure['lang']) window.folderStructure['lang'] = {}; 
+if (!window.folderStructure['lang']['fr.json']) window.folderStructure['lang']['fr.json'] = {}; 

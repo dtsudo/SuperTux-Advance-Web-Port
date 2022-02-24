@@ -494,4 +494,8 @@ window.files['lang/bn.json'] = `
 		"215" : ""
 	}
 }
-`;
+`; 
+
+ if (!window.folderStructure) window.folderStructure = {}; 
+if (!window.folderStructure['lang']) window.folderStructure['lang'] = {}; 
+if (!window.folderStructure['lang']['bn.json']) window.folderStructure['lang']['bn.json'] = {}; 

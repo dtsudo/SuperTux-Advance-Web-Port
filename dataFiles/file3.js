@@ -2232,4 +2232,9 @@ window.files['contrib/extras/old-7.json'] = `
  "type":"map",
  "version":"1.8",
  "width":494
-}`;
+}`; 
+
+ if (!window.folderStructure) window.folderStructure = {}; 
+if (!window.folderStructure['contrib']) window.folderStructure['contrib'] = {}; 
+if (!window.folderStructure['contrib']['extras']) window.folderStructure['contrib']['extras'] = {}; 
+if (!window.folderStructure['contrib']['extras']['old-7.json']) window.folderStructure['contrib']['extras']['old-7.json'] = {}; 

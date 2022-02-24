@@ -1693,4 +1693,10 @@ window.files['contrib/frostlands/TBA/B-1.json'] = `
  "type":"map",
  "version":"1.6",
  "width":580
-}`;
+}`; 
+
+ if (!window.folderStructure) window.folderStructure = {}; 
+if (!window.folderStructure['contrib']) window.folderStructure['contrib'] = {}; 
+if (!window.folderStructure['contrib']['frostlands']) window.folderStructure['contrib']['frostlands'] = {}; 
+if (!window.folderStructure['contrib']['frostlands']['TBA']) window.folderStructure['contrib']['frostlands']['TBA'] = {}; 
+if (!window.folderStructure['contrib']['frostlands']['TBA']['B-1.json']) window.folderStructure['contrib']['frostlands']['TBA']['B-1.json'] = {}; 

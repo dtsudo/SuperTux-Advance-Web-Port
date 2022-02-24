@@ -57,6 +57,12 @@ window.files['contrib/frostlands/text.json'] = `
 		"Oh... where am i?? Last thing I remember, I was in some shitty scratch game that could crash on the title screen.  ",
 		"tuc" :
 		"im     evil                                          tuckles"
-		}
+		},
+	"_comments" : "// ORIGINAL MOD: https://github.com/JL0027/Sta-frostlands"
 }
-// ORIGINAL MOD: https://github.com/JL0027/Sta-frostlands `;
+`; 
+
+ if (!window.folderStructure) window.folderStructure = {}; 
+if (!window.folderStructure['contrib']) window.folderStructure['contrib'] = {}; 
+if (!window.folderStructure['contrib']['frostlands']) window.folderStructure['contrib']['frostlands'] = {}; 
+if (!window.folderStructure['contrib']['frostlands']['text.json']) window.folderStructure['contrib']['frostlands']['text.json'] = {}; 

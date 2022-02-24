@@ -241,4 +241,9 @@ window.files['res/map/flat.json'] = `
  "type":"map",
  "version":"1.6",
  "width":100
-}`;
+}`; 
+
+ if (!window.folderStructure) window.folderStructure = {}; 
+if (!window.folderStructure['res']) window.folderStructure['res'] = {}; 
+if (!window.folderStructure['res']['map']) window.folderStructure['res']['map'] = {}; 
+if (!window.folderStructure['res']['map']['flat.json']) window.folderStructure['res']['map']['flat.json'] = {}; 

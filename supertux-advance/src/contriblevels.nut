@@ -14,8 +14,8 @@
 						contribFolder = item
 						contribName = data["name"]
 						contribWorldmap = data["worldmap"]
-						name = function() { return contribName }
-						func = function() {
+						name = (function (x) { return function(){ return x } })(data["name"])
+						func = (function (contribFolder, contribWorldmap) { return function() {
 							game=clone(gameDefault)
 							game.completed.clear()
 							game.allcoins.clear()
@@ -41,7 +41,7 @@
 							}
 							if(fileExists("save/" + contribFolder + ".json")) loadGame(contribFolder)
 							else startOverworld("contrib/" + contribFolder + "/" + contribWorldmap)
-						}
+						} })(item, data["worldmap"])
 					}
 				)
 			}

@@ -1038,4 +1038,9 @@ window.files['contrib/extras/0-0B.json'] = `
  "type":"map",
  "version":"1.6",
  "width":320
-}`;
+}`; 
+
+ if (!window.folderStructure) window.folderStructure = {}; 
+if (!window.folderStructure['contrib']) window.folderStructure['contrib'] = {}; 
+if (!window.folderStructure['contrib']['extras']) window.folderStructure['contrib']['extras'] = {}; 
+if (!window.folderStructure['contrib']['extras']['0-0B.json']) window.folderStructure['contrib']['extras']['0-0B.json'] = {}; 

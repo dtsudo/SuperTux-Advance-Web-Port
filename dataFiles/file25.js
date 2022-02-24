@@ -1010,4 +1010,9 @@ window.files['contrib/frostlands/overworld-F.json'] = `
  "type":"map",
  "version":"1.8",
  "width":70
-}`;
+}`; 
+
+ if (!window.folderStructure) window.folderStructure = {}; 
+if (!window.folderStructure['contrib']) window.folderStructure['contrib'] = {}; 
+if (!window.folderStructure['contrib']['frostlands']) window.folderStructure['contrib']['frostlands'] = {}; 
+if (!window.folderStructure['contrib']['frostlands']['overworld-F.json']) window.folderStructure['contrib']['frostlands']['overworld-F.json'] = {}; 

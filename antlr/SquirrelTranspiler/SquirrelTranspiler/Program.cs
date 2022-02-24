@@ -109,6 +109,8 @@ namespace SquirrelTranspiler
 				WriteFileContents(mainDirectory + "../sample-brux-project/imageFiles/file" + i + ".png", fileContents);
 
 				imageJsFileContents += $"window.imageFiles.imageList.push({{ originalName: '{partialFileName}', fileLocation: 'imageFiles/file{i}.png' }}); \n";
+
+				imageJsFileContents += RegisterFileInFolderStructure(partialFileName);
 			}
 
 			WriteFileContents(
@@ -183,16 +185,35 @@ namespace SquirrelTranspiler
 			return TranspileEmbeddedSquirrelCodeInDataFile(modifiedDataFile, endIndex);
 		}
 
+		private static string RegisterFileInFolderStructure(string filePath)
+		{
+			string str = " if (!window.folderStructure) window.folderStructure = {}; \n";
+
+			string[] fileParts = filePath.Split('\\', '/');
+
+			for (int i = 1; i <= fileParts.Length; i++)
+			{
+				List<string> path = fileParts.Take(i).ToList();
+				
+				string pathString = path.Aggregate("", (x, y) => x + "['" + y + "']");
+				str += $"if (!window.folderStructure{pathString}) window.folderStructure{pathString} = {{}}; \n";
+			}
+
+			return str;
+		}
+
 		private static void CopyDataFile(string fileName, string partialFileName, string mainDirectory, int index)
 		{
 			string fileContents = GetFileContents(fileName);
 
 			fileContents = TranspileEmbeddedSquirrelCodeInDataFile(fileContents, 0);
-
+			
 			fileContents = "if (!window.files) window.files = {}; \n"
 				+ "window.files['" + partialFileName + "'] = ` \n"
 				+ fileContents.Replace(@"\", @"\\").Replace("`", @"\`")
-				+ "`;";
+				+ "`; \n\n";
+
+			fileContents += RegisterFileInFolderStructure(partialFileName);
 
 			WriteFileContents(mainDirectory + "../sample-brux-project/dataFiles/file" + index + ".js", fileContents);
 		}

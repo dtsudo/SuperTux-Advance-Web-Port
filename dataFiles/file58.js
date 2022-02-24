@@ -1608,4 +1608,9 @@ window.files['res/map/test.json'] = `
  "type":"map",
  "version":"1.6",
  "width":192
-}`;
+}`; 
+
+ if (!window.folderStructure) window.folderStructure = {}; 
+if (!window.folderStructure['res']) window.folderStructure['res'] = {}; 
+if (!window.folderStructure['res']['map']) window.folderStructure['res']['map'] = {}; 
+if (!window.folderStructure['res']['map']['test.json']) window.folderStructure['res']['map']['test.json'] = {}; 

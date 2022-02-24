@@ -275,9 +275,33 @@ window.loadSound = function (file) {
 window.stopSound = function (id) {
 };
 
-window.lsdir = function (string) {
-	// TODO
-	return [];
+window.lsdir = function (str) {
+
+	var split = str.split('/');
+	var index = 0;
+	var currentLocation = window.folderStructure;
+	while (true) {
+		if (index === split.length) {
+			break;
+		}
+		currentLocation = currentLocation[split[index]];
+		index++;
+		if (!currentLocation)
+			return [];
+	}
+	
+	var returnVal = [".", ".."];
+	
+	for (var x in currentLocation) {
+		if (currentLocation.hasOwnProperty(x))
+			returnVal.push(x);
+	}
+	
+	return returnVal;
+};
+
+window.isdir = function (str) {
+	return window.lsdir(str).filter(x => x !== "." && x !== "..").length > 0;
 };
 
 window.joyButtonDown = function (id, buttonNum) {
@@ -392,6 +416,22 @@ window.fileExists = function (name) {
 		return true;
 	if (window.imageFiles.imageDictionary[name])
 		return true;
+	
+	var split = name.split('/');
+	var index = 0;
+	var currentLocation = window.folderStructure;
+	while (true) {
+		if (index === split.length - 1) {
+			if (currentLocation[split[index]])
+				return true;
+			break;
+		}
+		currentLocation = currentLocation[split[index]];
+		index++;
+		if (!currentLocation)
+			break;
+	}
+	
 	return false;
 };
 

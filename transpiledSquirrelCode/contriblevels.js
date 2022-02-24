@@ -11,8 +11,9 @@ selectContrib =  function (  ) { meContribLevels =  [  ]  ;
   {     var foreachOutput = squirrelForEach ( contrib ) ;     while ( true )     {        foreachOutput . next ( ) ;        if ( foreachOutput . isDone ( ) ) break ; item = foreachOutput . getValue ( ) ;  { 
   if ( item != "." && item != ".." && isdir ( "contrib/" + item )  && fileExists ( "contrib/" + item + "/info.json" )  )  { 
   var data = jsonRead ( fileRead ( "contrib/" + item + "/info.json" )  )  ;
- meContribLevels . push (  { contribFolder : item , contribName : data [ "name" ]  , contribWorldmap : data [ "worldmap" ]  , name :  function (  ) {  return contribName ;
-  }  , func :  function (  ) { game = clone ( gameDefault )  ; 
+ meContribLevels . push (  { contribFolder : item , contribName : data [ "name" ]  , contribWorldmap : data [ "worldmap" ]  , name :  (  function ( x ) {  return  function (  ) {  return x ;
+  }  ;
+  }  )  ( data [ "name" ]  )  , func :  (  function ( contribFolder , contribWorldmap ) {  return  function (  ) { game = clone ( gameDefault )  ; 
 game . completed . clear (  )  ; 
 game . allcoins . clear (  )  ; 
 game . allenemies . clear (  )  ; 
@@ -44,7 +45,8 @@ contribDidRun [ contribFolder ] = true ;
  
   else startOverworld ( "contrib/" + contribFolder + "/" + contribWorldmap )  ; 
  
-  }  }  )  ; 
+  }  ;
+  }  )  ( item , data [ "worldmap" ]  )  }  )  ; 
  } 
   
   } 
