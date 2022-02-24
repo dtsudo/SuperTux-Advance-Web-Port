@@ -130,12 +130,79 @@ window.sqrt = function (x) {
 	return Math.sqrt(x);
 };
 
-window.drawSpriteEx = function (sprite, frame, x, y, angle, flip, xscale, yscale, alpha) {
-	drawSprite(sprite, frame, x, y);
+
+
+window.drawSprite = function (sprite, frameNum, x, y) {
+	window.drawSpriteExMod(sprite, frameNum, x, y, 0, 0, 1, 1, 1, 0xffffffff);
 };
 
-window.drawSpriteExMod = function( sprite, frame, x, y, angle, flip, xscale, yscale, alpha, color) {
-	drawSprite(sprite, frame, x, y);
+window.drawSpriteEx = function (sprite, frameNum, x, y, angle, flip, xscale, yscale, alpha) {
+	
+	window.drawSpriteExMod(sprite, frameNum, x, y, angle, flip, xscale, yscale, alpha, 0xffffffff);
+};
+
+window.drawSpriteExMod = function( sprite, frameNum, x, y, angle, flip, xscale, yscale, alpha, color) {
+
+	var context = window.superTuxAdvanceCanvasContext;
+	
+	if (window.canvasTarget !== 0)
+		context = window.canvasTextures[window.canvasTarget].getContext('2d');
+	
+	if (sprite.type === "sprite") {
+		
+		var radianConversion = 2.0 * Math.PI / 360.0;
+		
+		if (window.canvasTarget === 0)
+			context.translate(x * 3, y * 3);
+		else
+			context.translate(x, y);
+		
+		context.translate(-sprite.pivotX, -sprite.pivotY);
+		
+		context.scale(xscale, yscale);
+		
+		context.translate(sprite.pivotX, sprite.pivotY);
+		context.rotate(angle * radianConversion);
+		context.translate(-sprite.pivotX, -sprite.pivotY);
+				
+		if (flip) {
+			context.translate(sprite.width, 0);
+			context.scale(-1, 1);
+		}
+		
+		var sx = 0;
+		var sy = 0;
+		
+		var numTotalFrames = (sprite.img.naturalWidth / sprite.width) * (sprite.img.naturalHeight / sprite.height);
+		
+		frameNum = Math.floor(frameNum);
+		
+		frameNum = frameNum % numTotalFrames;
+		
+		var numFramesPerRow = sprite.img.naturalWidth / sprite.width;
+		
+		while (frameNum >= numFramesPerRow) {
+			frameNum -= numFramesPerRow;
+			sy += sprite.height;
+		}
+		while (frameNum > 0) {
+			frameNum -= 1;
+			sx += sprite.width;
+		}
+		
+		var sWidth = sprite.width;
+		var sHeight = sprite.height;
+		if (window.canvasTarget === 0)
+			context.drawImage(sprite.img, sx, sy, sWidth, sHeight, 0, 0, sWidth * 3, sHeight * 3);
+		else
+			context.drawImage(sprite.img, sx, sy, sWidth, sHeight, 0 , 0, sWidth, sHeight);
+		
+		context.setTransform(1, 0, 0, 1, 0, 0);
+	}
+	else if (sprite.type === "font") {
+		window.drawSprite(sprite.sprite, frameNum, x, y);
+	}
+
 };
 
 window.floor = function (num) {
@@ -383,47 +450,6 @@ window.findSprite = function (fileName) {
 };
 
 
-window.drawSprite = function (sprite, frameNum, x, y) {
-	
-		
-	var context = window.superTuxAdvanceCanvasContext;
-	
-	if (window.canvasTarget !== 0)
-		context = window.canvasTextures[window.canvasTarget].getContext('2d');
-	
-	if (sprite.type === "sprite") {
-		x = x - sprite.pivotX;
-		y = y - sprite.pivotY;
-		
-		var sx = 0;
-		var sy = 0;
-		
-		var numTotalFrames = (sprite.img.naturalWidth / sprite.width) * (sprite.img.naturalHeight / sprite.height);
-		
-		frameNum = frameNum % numTotalFrames;
-		
-		var numFramesPerRow = sprite.img.naturalWidth / sprite.width;
-		
-		while (frameNum >= numFramesPerRow) {
-			frameNum -= numFramesPerRow;
-			sy += sprite.height;
-		}
-		while (frameNum > 0) {
-			frameNum -= 1;
-			sx += sprite.width;
-		}
-		
-		var sWidth = sprite.width;
-		var sHeight = sprite.height;
-		if (window.canvasTarget === 0)
-			context.drawImage(sprite.img, sx, sy, sWidth, sHeight, x * 3, y * 3, sWidth * 3, sHeight * 3);
-		else
-			context.drawImage(sprite.img, sx, sy, sWidth, sHeight, x , y, sWidth, sHeight);
-	}
-	else if (sprite.type === "font") {
-		window.drawSprite(sprite.sprite, frameNum, x, y);
-	}
-};
 
 
 window.drawImage = function (img, x, y) {
@@ -746,6 +772,10 @@ Array.prototype.len = function () {
 
 String.prototype.len = function () {
 	return this.length;
+};
+
+String.prototype.tofloat = function () {
+	return parseFloat(this);
 };
 
 String.prototype.tostring = function () {

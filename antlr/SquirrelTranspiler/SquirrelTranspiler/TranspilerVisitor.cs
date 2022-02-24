@@ -248,6 +248,8 @@ namespace SquirrelTranspiler
 		{
 			if (context.openSquareBracket() != null)
 				return " squirrelTypeOf ( " + this.VisitId(context.id()) + " [ " + this.VisitExp(context.exp()) + " ] ) ";
+			if (context.openParen() != null)
+				return " squirrelTypeOf ( " + this.VisitId(context.id()) + " ( ) ) ";
 			return " squirrelTypeOf ( " + this.VisitId(context.id()) + " ) ";
 		}
 

@@ -121,6 +121,7 @@ openSquareBracket : '[' ;
 
 typeOf
 	: 'typeof' id openSquareBracket exp ']'
+	| 'typeof' id openParen closeParen
 	| 'typeof' id
 	;
 
