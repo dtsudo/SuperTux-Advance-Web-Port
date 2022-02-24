@@ -36,6 +36,28 @@
 			game.completed["0-3"]=true;
 			game.completed["0-4"]=true;
 			game.completed["0-5"]=true;
+			game.completed["0-6"]=true;
+			game.completed["0-5"]=true;
+			game.completed["0-5"]=true;
+			game.completed["0-6a"]=true;
+			game.completed["0-6b"]=true;
+			game.completed["0-7"]=true;
+			game.completed["0-8"]=true;
+			game.completed["0-9"]=true;
+			game.completed["Fw-1"]=true;
+			game.completed["Fw-2"]=true;
+			game.completed["Fw-3"]=true;
+			game.completed["Fw-3b"]=true;
+			game.completed["Fw-4"]=true;
+			game.completed["Fw-5"]=true;
+			game.completed["Fw-6"]=true;
+			game.completed["Fw-7"]=true;
+			game.completed["Fw-8"]=true;
+			game.completed["Fw-9"]=true;
+			game.completed["Fw-t0"]=true;
+			game.completed["Fw-t1"]=true;
+			game.completed["Fw-t2"]=true;
+			game.completed["Fw-t3"]=true;
 			config.light = false;
 				
 			setTimeout(computeAndRenderNextFrame, 0);
