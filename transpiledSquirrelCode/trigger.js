@@ -16,8 +16,15 @@ Trigger =  function ( ) { var returnVal = { constructor: function(){} } ;  retur
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
- } ;  returnVal . run = function (  ) {  if ( gvPlayer )  if ( hitTest ( shape , gvPlayer . shape )  ) dostr ( "x <- " + x + "; y <- " + y + "; id <- " + id + "; " + code )  ; 
+ } ;  returnVal . run = function (  ) {  if ( gvPlayer )  { 
+  if ( hitTest ( shape , gvPlayer . shape )  )  { 
+  if ( isWebBrowserVersion ) dostr ( "/*js*/ x = " + x + "; y = " + y + "; id = " + id + "; " + code )  ; 
  
+  else dostr ( "x <- " + x + "; y <- " + y + "; id <- " + id + "; " + code )  ; 
+ 
+  } 
+  
+  } 
   
   } ;  returnVal . _typeof = function (  ) {  return "Trigger" ;
   } ; 

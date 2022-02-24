@@ -659,8 +659,11 @@ ColorSwitch =  function ( ) { var returnVal = { constructor: function(){} } ;  r
  if ( gvPlayer )  if ( hitTest ( shape , gvPlayer . shape )  && gvPlayer . y < y - 16 && gvPlayer . vspeed > 0 )  { 
  gvPlayer . vspeed =  - 1.5 ; 
 game . colorswitch [ this . color ] = true ; 
-dostr ( "saveGame()" )  ; 
- if ( actor . rawin ( "ColorBlock" )  )  {     var foreachOutput = squirrelForEach ( actor [ "ColorBlock" ]  ) ;     while ( true )     {        foreachOutput . next ( ) ;        if ( foreachOutput . isDone ( ) ) break ; i = foreachOutput . getValue ( ) ;  { 
+ if ( isWebBrowserVersion ) dostr ( "/*js*/saveGame()" )  ; 
+ 
+  else dostr ( "saveGame()" )  ; 
+ 
+  if ( actor . rawin ( "ColorBlock" )  )  {     var foreachOutput = squirrelForEach ( actor [ "ColorBlock" ]  ) ;     while ( true )     {        foreachOutput . next ( ) ;        if ( foreachOutput . isDone ( ) ) break ; i = foreachOutput . getValue ( ) ;  { 
  i . filltile (  )  ; 
  } 
      }  }  

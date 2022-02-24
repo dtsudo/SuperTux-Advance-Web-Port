@@ -673,7 +673,11 @@
 			if(gvPlayer) if(hitTest(shape, gvPlayer.shape) && gvPlayer.y < y - 16 && gvPlayer.vspeed > 0) {
 				gvPlayer.vspeed = -1.5
 				game.colorswitch[this.color] = true
-				dostr("saveGame()")
+				
+				if (::isWebBrowserVersion)
+					dostr("/*js*/saveGame()")
+				else
+					dostr("saveGame()")
 				if(actor.rawin("ColorBlock")) foreach(i in actor["ColorBlock"]) {
 					i.filltile()
 				}

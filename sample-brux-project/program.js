@@ -1,6 +1,8 @@
 
 ((function () {
 	
+	window.isWebBrowserVersion = true;
+	
 	var startGame = function () {
 		var computeAndRenderNextFrame;
 		var fps = 60;
@@ -28,11 +30,13 @@
 			window.superTuxAdvanceCanvasContext.fillRect(0, 0, 960, 720);
 			gvGameMode();
 			window.update();
+			game.completed["0-0"]=true;
 			game.completed["0-1"]=true;
 			game.completed["0-2"]=true;
 			game.completed["0-3"]=true;
 			game.completed["0-4"]=true;
 			game.completed["0-5"]=true;
+			config.light = false;
 				
 			setTimeout(computeAndRenderNextFrame, 0);
 		};

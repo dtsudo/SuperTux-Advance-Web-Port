@@ -155,9 +155,39 @@ namespace SquirrelTranspiler
 				text: newHtmlFileContents);
 		}
 
+		private static string TranspileEmbeddedSquirrelCodeInDataFile(string fileContents, int searchStart)
+		{
+			string searchTerm = "\"name\":\"code\",\"type\":\"string\",\"value\":\"";
+
+			int index = fileContents.IndexOf(searchTerm, startIndex: searchStart);
+
+			if (index == -1)
+				return fileContents;
+
+			int startIndex = index + searchTerm.Length;
+			int endIndex = startIndex;
+			while (true)
+			{
+				if (fileContents[endIndex] == '"' && fileContents[endIndex - 1] != '\\')
+					break;
+				endIndex++;
+			}
+
+			string code = fileContents.Substring(startIndex, endIndex - startIndex)
+				.Replace(@"\n", "\n")
+				.Replace("\\\"", "\"");
+
+			string transpiledCode = "/*js*/" + TranspileSquirrelCode(code).Replace("\n", "\\n").Replace("\"", "\\\"");
+
+			string modifiedDataFile = fileContents.Substring(0, startIndex) + transpiledCode + fileContents.Substring(endIndex);
+			return TranspileEmbeddedSquirrelCodeInDataFile(modifiedDataFile, endIndex);
+		}
+
 		private static void CopyDataFile(string fileName, string partialFileName, string mainDirectory, int index)
 		{
 			string fileContents = GetFileContents(fileName);
+
+			fileContents = TranspileEmbeddedSquirrelCodeInDataFile(fileContents, 0);
 
 			fileContents = "if (!window.files) window.files = {}; \n"
 				+ "window.files['" + partialFileName + "'] = ` \n"

@@ -120,6 +120,18 @@ window.lendirY = function( length, direction ) {
 	return length * Math.sin(direction * Math.PI / 180);
 };
 
+window.sin = function (x) {
+	return Math.sin(x);
+};
+
+window.cos = function (x) {
+	return Math.cos(x);
+};
+
+window.tan = function (x) {
+	return Math.tan(x);
+};
+
 window.drawRec = function (x, y, width, height, solid) {
 	
 };
@@ -128,6 +140,10 @@ window.drawRect = window.drawRec;
 
 window.sqrt = function (x) {
 	return Math.sqrt(x);
+};
+
+window.stopChannel = function (channel) {
+	
 };
 
 
@@ -218,13 +234,16 @@ window.round = function (num) {
 };
 
 window.dostr = function (str) {
-	// TODO
+	if (str.startsWith("/*js*/"))
+		eval(str);
+	else
+		console.log("dostr: " + str);
 };
 
 window.squirrelForEach = function (expression) {
 	
 	if (Array.isArray(expression)) {
-		var arrayIndex = 0;
+		var arrayIndex = -1;
 		return {
 			next: function () { arrayIndex++; },
 			isDone: function () { return arrayIndex === expression.length; },
@@ -644,16 +663,23 @@ window.bm_sub = "bm_sub";
 window.bm_mult = "bm_mult";
 
 window.drawText = function (font, x, y, text) {
+	
+	var origX = x;
 		
 	for (var i = 0; i < text.length; i++) {
 		var charCode = text.charCodeAt(i);
 		
 		var frameNum = charCode - font.firstchar;
 		
-		if (charCode !== 32)
-			window.drawSprite(font.sprite, frameNum, x, y);
-		
-		x += font.sprite.width + font.kerning;
+		if (charCode === 10) {
+			y += font.sprite.height;
+			x = origX;
+		} else {
+			if (charCode !== 32)
+				window.drawSprite(font.sprite, frameNum, x, y);
+			
+			x += font.sprite.width + font.kerning;
+		}
 	}
 };
 
@@ -784,6 +810,10 @@ String.prototype.tostring = function () {
 
 String.prototype.tointeger = function () {
 	return parseInt(this);
+};
+
+Number.prototype.tointeger = function () {
+	return this;
 };
 
 Number.prototype.tostring = function () {

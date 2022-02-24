@@ -14,7 +14,14 @@
 	}
 
 	function run() {
-		if(gvPlayer) if(hitTest(shape, gvPlayer.shape)) dostr("x <- " + x + "; y <- " + y + "; id <- " + id + "; " + code)
+		if(gvPlayer) {
+			if(hitTest(shape, gvPlayer.shape)) {
+				if (::isWebBrowserVersion)
+					dostr("/*js*/ x = " + x + "; y = " + y + "; id = " + id + "; " + code)
+				else
+					dostr("x <- " + x + "; y <- " + y + "; id <- " + id + "; " + code)
+			}
+		}
 	}
 
 	function _typeof() { return "Trigger" }

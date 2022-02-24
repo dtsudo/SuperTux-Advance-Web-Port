@@ -10,6 +10,8 @@
 |                                 |
 \*===============================*/
 
+::isWebBrowserVersion <- 0
+
 //Game source
 donut("src/util.nut")
 donut("src/text.nut")
@@ -56,10 +58,6 @@ for(local i = 0; i < modlist.len(); i++) if(modlist[i] != "." && modlist[i] != "
 ////////////////
 //    MAIN    //
 ////////////////
-
-local aa = wrap(3, 1, 4);
-print("wrap test");
-print(aa);
 
 //Detect resolution
 //Aspects may not perfectly match, so the closest one will be picked
