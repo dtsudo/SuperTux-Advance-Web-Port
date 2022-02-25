@@ -542,7 +542,7 @@ window.jsonRead = function (string) {
 	return JSON.parse(string);
 };
 
-window.localStorageGuid = "23c39e3e40ae43e7884b2b058cf086c5";
+window.localStorageGuid = "23d39e3e40ae43e7884b2b058cf086c5";
 
 window.fileWrite = function (name, string) {
 	try {
