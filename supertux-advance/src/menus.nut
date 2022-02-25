@@ -84,10 +84,6 @@ const fontH = 14
 		name = function() { return gvLangObj["main-menu"]["credits"] },
 		func = function() { cursor = 0; startCredits(); }
     	}
-	{
-		name = function() { return gvLangObj["main-menu"]["quit"] },
-		func = function() { gvQuit = 1 }
-	}
 ]
 
 ::mePausePlay <- [
@@ -125,14 +121,6 @@ const fontH = 14
 ]
 
 ::meOptions <- [
-	{
-		name = function() { return gvLangObj["options-menu"]["keyboard"] },
-		func = function() { cursor = 0; menu = meKeybinds }
-	},
-	{
-		name = function() { return gvLangObj["options-menu"]["joystick"] },
-		func = function() { rebindGamepad() }
-	},
 	{
 		name = function() { return gvLangObj["options-menu"]["language"] },
 		func = function() { selectLanguage() }

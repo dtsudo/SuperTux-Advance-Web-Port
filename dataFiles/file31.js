@@ -1,64 +1,64 @@
 if (!window.files) window.files = {}; 
-window.files['lang/fr.json'] = ` 
+window.files['lang/es.json'] = ` 
 {
 	"main-menu" : {
-		"new" : "Nouveau jeu",
-		"load" : "Charger le jeu",
-		"options" : "Options",
-		"quit" : "Quitter le jeu"
+		"new" : "Nueva partida",
+		"load" : "Cargar partida",
+		"options" : "Opciones",
+		"quit" : "Salir del juego"
 	},
 
 	"options-menu" : {
-		"difficulty" : "Difficulté",
-		"language" : "Langue",
-		"keyboard" : "Définir les Contrôles du clavier",
-		"joystick" : "Définir les contrôles de la manette de jeu"
+		"difficulty" : "Dificultad",
+		"language" : "Idioma",
+		"keyboard" : "Configurar atajos de teclado",
+		"joystick" : "Configurar controles de mando"
 	},
 
 	"difficulty-levels" : {
-		"easy" : "Facile",
+		"easy" : "Fácil",
 		"normal" : "Normal",
-		"hard" : "Dur",
+		"hard" : "Difícil",
 		"super" : "Super Tux"
 	},
 
 	"info" : {
 		"welcome" :
-		"Bienvenue sur SuperTux Advance! Ce message ira\\nquand vous vous éloignez du bloc.\\n\\nAppuyez sur F1 si vous voulez voir les commentaires du jeu\\nde Kelvin Shadewing.",
+		"Bienvenido a SuperTux Advance! Este mensaje desparacerá\\ncuando te alejes del bloque\\n\\nPresiona F1 si quieres ver notas con comentarios\\nde Kelvin Shadewing.",
 		"tutWall" :
-		"Maintenez le SAUT et appuyez loin du mur pour effectuer un\\nsaut mural.",
+		"Presiona SALTAR y hacia afuera de la pared para hacer un\\nsalto de muro.",
 		"tutSlide" :
-		"Appuyez sur EN BAS tandis que en courant à diapositive.",
+		"Presiona ABAJO mientras corres para deslizarte.",
 		"waterjump" :
-		"Maintenez SAUT lorsque partant le eau à prendre de la hauteur."
+		"Mantén pulsado SALTAR cuando salgas del agua para ganar altura."
 	},
 
 	"devcom" : {
 		"welcome" :
-		"If you're seeing this, you have activated developer\\ncommentary mode. Touch the red scarves to read\\nnotes on the game's development.",
+		"Si estás viendo esto, has activado el modo desarrollador\\nToca las bufandas rojas para leer notas sobre\\nel desarrollo del juego.",
 		"hiff-0" :
-		"One of the many things that made me hiff was making\\ndeathcaps walk up this hill. For whatever reason,\\nhaving them check twice as far ahead made them\\nbehave properly...",
+		"Una de las muchas cosas que me enfadaron fue hacer que\\nlos deathcaps subieran esta colina. Por alguna\\nrazón, hacer que miren el doble de lejos los hace\\ncomportarse correctamente...",
 		"pipes" :
-		"I was going to have the pipes behave the same as\\nthe ones in Mario, but I found it annoying in those\\ngames having to tap up/down to find which ones were\\nopen, so instead, you just fall in.",
+		"Iba a hacer que las tuberías funcionaran igual que\\nlas de Mario, pero encontré molesto en los juegos\\nen los que hay que usar arriba/abajo en todas para comprobarlo\\n, así que, en vesz de eso, caes en ellas",
 		"firetux" :
-		"Originally, Fire Tux was going to have a helmet, as\\nin the original SuperTux. A member of the SuperTux\\nDiscord server suggested using the design by Rusty\\nBox. I agreed it looked better. The original can\\nstill be found on OpenGameArt.org.",
+		"Originalmente, Fire Tux iba a tener un casco, como\\nesn el SuperTux original. Un miembro del servidor de\\nDiscord de SuperTux sugirió usar las de Rusty\\nBox. Estuve de acuerdo en que parecían mejores. Los\\noriginales se pueden encontrara en OpenGameArt.org",
 		"coins" :
-		"Coins are purely for achievements. I never liked\\nthe extra lives mechanic, as it just means making a\\nplayer wait even longer to try a level again if\\nthey get a game over. I didn't want to get rid of\\ncoins entirely, though, since that would make the\\nlevels too barren.",
+		"Las monedas son puramente para logros. Nunca me gustó\\nla mecánica de vidas extra, ya que solo significa hacer\\nque el jugador espere aún más para reintenter\\nun nivel si pierde. Sin embargo, no quería deshacerme de\\nlas monedas del todo, ya que eso haría los\\n niveles demasiado estériles",
 		"sliding" :
-		"The mechanic of increasing speed from dropping off\\na ledge came from needing to compensate for slopes\\nnot accelerating the player enough. It's tech-\\nnically a glitch that I decided to throw in because\\nit was fun. Many mechanics are actually that.",
+		"La mecánica de aumentar la velocidad al caer de un\\nsaliente provino de la necesidad de compensar que las\\npendientes no acelerar al jugador lo suficiente.\\nEs técnicamente un glitch que decidí agregar porque\\nera divertido. Muchas mecánicas son en realidad eso.",
 		"trees" :
-		"Trees don't grow in Antarctica. That's why penguins\\ncarve them out of ice.",
+		"Los árboles no crecen en Antártica. Por eso los pinguinos\\nlos tallan en hielo",
 		"snakes" :
-		"I know it makes about as much sense to have snakes\\nin Antarctica as it does to have hungry plants.\\n",
+		"Ya sé que tener serpientes en la Antártida tiene\\ntanto sentido como tener plantas carnívoras.\\n",
 		"waterfalls" :
-		"This part of the cave looks especially nice to me.\\nI love the spacious background with waterfalls in\\nfront of it. I wanted the level to feel like you\\nwere meant to explore it, so a scene like this that\\nmakes it feel big is meant to convey a sense of\\nexploration.",
+		"Esta parte de la cueva se ve especialmente agradable para mí.\\nMe encanta el fondo espacioso con cascadas\\nen frente. Quería que el nivel pareciera que estabas\\ndestinado a explorarlo, así que una escena como esta\\nlo hace sentirse grande está destinado a transmitir una sensación de\\nexploración",
 		"loops" :
-		"Sorry, did you expect this loop to work? Ha! I'm\\nnowhere near good enough to program that... yet."
+		"Perdón, ¿esperabas que este bucle funcionara? ¡Ja!\\n No soy suficientemente bueno para programar algo así... aún"
 	},
 
 	"npc" : {
 		"rad0" :
-		"Hé, où est ta planche ? Est-ce que tu vas glisser sur\\nvotre ventre comme un carré ? Je parie que vous ne pourriez pas obtenir\\nchaque pièce de monnaie sur cette colline comme qui. Si vous le faites,\\nJe te donnerai quelque chose qui vous aidera vraiment\\ncprenez l'air !"
+		"Hey, dónde está tu tabla? ¿Vas a deslizarte\\nsobre tu barriga como un cuadrado? Apuesto a que no podrías coger\\ntodas la monedas de la colina así. Si lo haces,\\nte daré algo que realmente te ayudará a coger aire!"
 
 	},
 
@@ -280,8 +280,9 @@ window.files['lang/fr.json'] = `
 		"214" : "",
 		"215" : ""
 	}
-}`; 
+}
+`; 
 
  if (!window.folderStructure) window.folderStructure = {}; 
 if (!window.folderStructure['lang']) window.folderStructure['lang'] = {}; 
-if (!window.folderStructure['lang']['fr.json']) window.folderStructure['lang']['fr.json'] = {}; 
+if (!window.folderStructure['lang']['es.json']) window.folderStructure['lang']['es.json'] = {}; 

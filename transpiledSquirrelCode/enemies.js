@@ -796,7 +796,6 @@ SnowBounce =  function ( ) { var returnVal = { constructor: function(){} } ;  re
  returnVal . squish = false ; 
  returnVal . squishTime = 0.0 ; 
  returnVal . smart = false ; 
- returnVal . hurtfire = Deathcap . hurtfire ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
@@ -883,6 +882,14 @@ playSound ( sndSquish , 0 )  ;
   if ( icebox !=  - 1 )  { 
  mapDeleteSolid ( icebox )  ; 
 newActor ( IceChunks , x , y )  ; 
+ } 
+  
+  } ;  returnVal . hurtfire = function (  ) { newActor ( Flame , x , y - 1 )  ; 
+deleteActor ( id )  ; 
+playSound ( sndFlame , 0 )  ; 
+ if ( randInt ( 20 )  == 0 )  { 
+  var a = actor [ newActor ( MuffinBlue , x , y )  ]  ;
+ a . vspeed =  - 2 ; 
  } 
   
   } ;  returnVal . hurtice = function (  ) { frozen = 600 ; 
@@ -1594,7 +1601,6 @@ newActor ( Poof , x , y )  ;
 FlyAmanita =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . range = 0 ; 
  returnVal . dir = 0.5 ; 
  returnVal . flip = 0 ; 
- returnVal . hurtfire = Deathcap . hurtfire ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = 0 ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
@@ -1704,6 +1710,14 @@ gvPlayer . frame = gvPlayer . anJumpU [ 0 ]  ;
 gvPlayer . frame = gvPlayer . anJumpU [ 0 ]  ; 
  } 
   
+  } ;  returnVal . hurtfire = function (  ) { newActor ( Flame , x , y - 1 )  ; 
+deleteActor ( id )  ; 
+playSound ( sndFlame , 0 )  ; 
+ if ( randInt ( 20 )  == 0 )  { 
+  var a = actor [ newActor ( MuffinBlue , x , y )  ]  ;
+ a . vspeed =  - 2 ; 
+ } 
+  
   } ;  returnVal . hurtice = function (  ) { frozen = 600 ; 
  } ; 
  } 
@@ -1711,13 +1725,20 @@ gvPlayer . frame = gvPlayer . anJumpU [ 0 ]  ;
 Snail =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . dir = 0 ; 
  returnVal . squish = 0 ; 
  returnVal . hitTimer = 0 ; 
- returnVal . hurtfire = Deathcap . hurtfire ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
 
    baseConstructor  ( _x , _y )  ; 
- } ;  returnVal . hurtice = function (  ) { frozen = 600 ; 
+ } ;  returnVal . hurtfire = function (  ) { newActor ( Flame , x , y - 1 )  ; 
+deleteActor ( id )  ; 
+playSound ( sndFlame , 0 )  ; 
+ if ( randInt ( 20 )  == 0 )  { 
+  var a = actor [ newActor ( MuffinBlue , x , y )  ]  ;
+ a . vspeed =  - 2 ; 
+ } 
+  
+  } ;  returnVal . hurtice = function (  ) { frozen = 600 ; 
  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 

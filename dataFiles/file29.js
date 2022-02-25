@@ -1,371 +1,278 @@
 if (!window.files) window.files = {}; 
-window.files['lang/en.json'] = ` 
+window.files['lang/bn.json'] = ` 
 {
 	"main-menu" : {
-		"new" : "New Game",
-		"load" : "Load Game",
-		"contrib-levels" : "Contrib Levels",
-		"options" : "Options",
-		"credits" : "Credits",
-		"quit" : "Quit Game"
-	},
-
-	"new-game-menu" : {
-		"file-exists" : "[FILE EXISTS]"
+		"new" : "নতুন খেলা",
+		"load" : "লোড খেলা",
+		"contrib-levels" : "অবদান স্তর",
+		"options" : "অপশন",
+		"quit" : "খেলা প্রস্থান করার জন্য"
 	},
 
 	"contrib-menu" : {
-		"empty" : "[No contrib levels available]"
-	},
+		"empty" : "[কোন অবদানের মাত্রা উপলব্ধ নেই]"
+  },
 
 	"options-menu" : {
-		"difficulty" : "Difficulty",
-		"language" : "Language",
-		"keyboard" : "Keyboard Controls",
-		"joystick" : "Gamepad Controls",
-		"timers" : "Speedrun Timers",
-		"light" : "Lighting: "
-	},
-
-	"timers-menu" : {
-		"speedrun-timer-level" : "Level Speedrun Timer",
-		"speedrun-timer-global" : "Global Speedrun Timer"
-	},
-
-	"controls-menu" : {
-		"press-key-for" : "Press key for",
-		"press-button-for" : "Press button for",
-		"up" : "Up",
-		"down" : "Down",
-		"left" : "Left",
-		"right" : "Right",
-		"jump" : "Jump",
-		"shoot" : "Shoot",
-		"run" : "Run",
-		"sneak" : "Sneak",
-		"pause" : "Pause",
-		"item-swap" : "Item Swap",
-		"menu-accept" : "Menu Accept",
-		"cam-left-peek" : "Peek Left",
-		"cam-right-peek" : "Peek Right",
-		"cam-down-peek" : "Peek Down",
-		"cam-up-peek" : "Peek Up"
-	},
-
-	"menu-commons" : {
-		"yes" : "Yes",
-		"no" : "No",
-		"back" : "Back",
-		"cancel" : "Cancel",
-		"on" : "On",
-		"off" : "Off"
+		"difficulty" : "অসুবিধা",
+		"language" : "ভাষা",
+		"keyboard" : "কীবোর্ড নিয়ন্ত্রণ",
+		"joystick" : "গেমপ্যাড নিয়ন্ত্রণ",
+		"speedrun" : "স্পিডরান টাইমার"
 	},
 
 	"bool" : {
-		"on" : "On",
-		"off" : "Off"
+		"on" : "চালু",
+		"off" : "বন্ধ"
 	},
 
 	"difficulty-levels" : {
-		"easy" : "Easy",
-		"normal" : "Normal",
-		"hard" : "Hard",
-		"super" : "Super Tux"
+		"easy" : "সহজ",
+		"normal" : "স্বাভাবিক",
+		"hard" : "কঠিন",
+		"super" : "সুপার টাক্স"
 	},
 
 	"pause-menu" : {
-		"continue" : "Continue",
-		"character" : "Change Character",
-		"restart" : "Restart Level",
-		"quit-game" : "Quit Game",
-		"quit-level" : "Quit Level",
-		"save" : "Save Game"
+		"continue" : "চালিয়ে যান",
+		"character" : "চরিত্র পরিবর্তন করুন",
+		"restart" : "পুনর্সূচনা স্তর",
+		"quit-game" : "খেলা প্রস্থান করার জন্য",
+		"quit-level" : "প্রস্থান স্তর"
 	},
 
 	"info" : {
 		"welcome" :
-		"Welcome to SuperTux Advance! This message will go away when you walk away from the block. Press F1 if you would like to see developer commentary. Press UP near NPCs to talk to them. Some have more than one thing to say.",
+		"সুপারটাক্স অ্যাডভান্সে স্বাগতম! আপনি ব্লক থেকে দূরে চলে গেলে এই বার্তাটি চলে যাবে। আপনি যদি বিকাশকারীর মন্তব্য দেখতে চান তবে F1 টিপুন। তাদের সাথে কথা বলতে NPC-এর কাছে UP টিপুন। কারও কারও একাধিক কথা বলার আছে।",
 		"tutWall" :
-		"Press JUMP against the wall to do a wall jump.",
+		"দেয়ালে লাফ দিতে দেয়ালের বিপরীতে জাম্প টিপুন।",
 		"tutSlide" :
-		"Press DOWN while running or on a hill to slide.",
+		"দৌড়ানোর সময় বা পাহাড়ে স্লাইড করার জন্য নিচে চাপুন।",
 		"waterjump" :
-		"Hold JUMP when leaving the water to gain height. Mix it with the RUN button to go even higher.",
+		"উচ্চতা বাড়ানোর জন্য জল ছাড়ার সময় জাম্প ধরুন। আরও উপরে যেতে রান বোতামের সাথে এটি মিশ্রিত করুন।",
 		"noend" :
-		"Levels that you don't need to complete to move on also do not have normal exits. Use the pause menu to leave areas like this.",
+		"যে স্তরগুলিকে এগিয়ে যাওয়ার জন্য আপনাকে সম্পূর্ণ করতে হবে না সেখানেও স্বাভাবিক প্রস্থান নেই। এই মত এলাকা ছেড়ে বিরতি মেনু ব্যবহার করুন.",
 		"hills" :
-		"Hills are very important! Practice sliding every chance you get.",
+		"পাহাড় খুবই গুরুত্বপূর্ণ! প্রতিবার সুযোগ পেলে স্লাইডিং অনুশীলন করুন।",
 		"pipes" :
-		"Pipes can be entered just by falling in. You can also hold DOWN to funnel yourself into them.",
+		"পাইপগুলি কেবল পড়েই প্রবেশ করা যেতে পারে৷ আপনি সেগুলির মধ্যে নিজেকে ফানেল করার জন্য নিচে ধরে রাখতে পারেন৷",
 		"controls" :
-		"Don't forget to set your controls in the options menu on the main screen! If you really mess up setting them up, delete your config.json file.",
+		"প্রধান স্ক্রিনে বিকল্প মেনুতে আপনার নিয়ন্ত্রণ সেট করতে ভুলবেন না! আপনি যদি সত্যিই তাদের সেট আপ জগাখিচুড়ি, আপনার config.json ফাইল মুছে দিন.",
 		"secrets" :
-		"Secret passages are everywhere! Feel against the wall to reveal them, or watch for enemy movements.",
+		"গোপন প্যাসেজ সর্বত্র! তাদের প্রকাশ করার জন্য প্রাচীরের বিপরীতে অনুভব করুন বা শত্রুর গতিবিধি লক্ষ্য করুন।",
 		"coyotetime" :
-		"You have a brief moment after leaving the ground when you can still jump. Practice running off the edges and jumping just after your feet leave the ground.",
+		"মাটি ছেড়ে যাওয়ার পরে আপনার কাছে একটি সংক্ষিপ্ত মুহূর্ত আছে যখন আপনি এখনও লাফ দিতে পারেন। আপনার পা মাটি ছেড়ে যাওয়ার পরে প্রান্ত থেকে দৌড়ানো এবং লাফ দেওয়ার অনুশীলন করুন।",
 		"tntex" :
-		"TNT blocks explode a short time after coming in contact with one.",
+		"টিএনটি ব্লক একজনের সংস্পর্শে আসার পর অল্প সময়ের মধ্যেই বিস্ফোরিত হয়।",
 		"chainex" :
-		"TNT blocks are also set off by explosions, which can lead to a sort of chain reaction when many TNT blocks are close to one another.",
+		"টিএনটি ব্লকগুলিও বিস্ফোরণ দ্বারা বন্ধ হয়ে যায়, যা অনেকগুলি টিএনটি ব্লক একে অপরের কাছাকাছি থাকলে এক ধরণের চেইন প্রতিক্রিয়া হতে পারে।",
 		"fireex" :
-		"Fireballs can set off TNT blocks, get a fire flower and try it out!",
+		"ফায়ারবলগুলি টিএনটি ব্লক সেট করতে পারে, আগুনের ফুল পেতে এবং এটি চেষ্টা করে দেখতে পারে!",
 		"owplats" :
-		"One-way platforms can be dropped down from by pressing DOWN and JUMP at once. If you drop on accident, you have twice as long as when going over an edge to jump back up.",
+		"একমুখী প্ল্যাটফর্মগুলি একবারে ডাউন এবং জাম্প চেপে নিচে নামানো যেতে পারে। যদি আপনি দুর্ঘটনায় পড়ে যান, তবে আপনার কাছে দ্বিগুণ দীর্ঘ সময় আছে যখন আপনি একটি প্রান্তের উপর দিয়ে ফিরে যান।",
 		"slidewarn" :
-		"Levels like this will force you to slide! (It's going to be replaced with something else in the future.)",
-		"konqi" :
-		"Konqi can breath fire and stomp the ground, but he isn't as fast as Tux.",
-		"momentum" :
-		"You won't lose speed if you keep running! Be sure to hold the run button or keep the stick pressed all the way over, and you'll keep whatever speed you gain from sliding. Icy hills will speed you up even if you can't slide.",
-		"warned" :
-		"You were warned..."
+		"এই ধরনের স্তর আপনাকে স্লাইড করতে বাধ্য করবে! (এটি ভবিষ্যতে অন্য কিছু দিয়ে প্রতিস্থাপিত হবে।)"
 	},
 
 	"devcom" : {
 		"welcome" :
-		"KELVIN: If you're seeing this, you have activated developer commentary mode. Touch the red scarves to read notes on the game's development.",
+		"KELVIN: আপনি যদি এটি দেখতে পান, আপনি বিকাশকারী মন্তব্য মোড সক্রিয় করেছেন৷ গেমের বিকাশের নোট পড়তে লাল স্কার্ফ স্পর্শ করুন।",
 		"hiff-0" :
-		"KELVIN: One of the many things that made me hiff was making deathcaps walk up this hill. For whatever reason, having them check twice as far ahead made them behave properly...",
+		"KELVIN: অনেক কিছুর মধ্যে একটি যা আমাকে হিফ করে তুলেছিল তা হল ডেথক্যাপগুলিকে এই পাহাড়ে হাঁটা। যে কারণেই হোক না কেন, তাদের দ্বিগুণ এগিয়ে পরীক্ষা করা তাদের সঠিকভাবে আচরণ করেছে...",
 		"pipes" :
-		"KELVIN: I was going to have the pipes behave the same as the ones in Mario, but I found it annoying in those games having to tap up/down to find which ones were open, so instead, you just fall in.",
+		"KELVIN: আমি পাইপগুলিকে মারিওর মতোই আচরণ করতে যাচ্ছিলাম, কিন্তু কোনটি খোলা আছে তা খুঁজে পেতে সেই গেমগুলিতে ট্যাপ করতে/নিচে ট্যাপ করতে হচ্ছে, তাই এর পরিবর্তে, আপনি কেবল ভিতরে পড়ে যাবেন।",
 		"firetux" :
-		"KELVIN: Originally, Fire Tux was going to have a helmet, as in the original SuperTux. A member of the SuperTux Discord server suggested using the design by Rusty Box. I agreed it looked better. The original can still be found on OpenGameArt.org.",
+		"KELVIN: মূলত, ফায়ার টাক্সে একটি হেলমেট থাকবে, যেমনটি আসল সুপারটাক্সে ছিল। সুপারটাক্স ডিসকর্ড সার্ভারের একজন সদস্য রাস্টি বক্সের ডিজাইন ব্যবহার করার পরামর্শ দিয়েছেন। আমি এটা ভাল লাগছিল সম্মত. আসলটি এখনও OpenGameArt.org এ পাওয়া যাবে।",
 		"coins" :
-		"KELVIN: Coins are purely for achievements. I never liked the extra lives mechanic, as it just means making a player wait even longer to try a level again if they get a game over. I didn't want to get rid of coins entirely, though, since that would make the levels too barren.",
+		"KELVIN: কয়েন শুধুমাত্র অর্জনের জন্য। আমি কখনই অতিরিক্ত লাইফ মেকানিক পছন্দ করিনি, কারণ এর মানে হল একজন খেলোয়াড়কে খেলা শেষ হলে আবার একটি স্তর চেষ্টা করার জন্য আরও বেশি সময় অপেক্ষা করা। আমি সম্পূর্ণরূপে কয়েন পরিত্রাণ পেতে চাইনি, যদিও, যেহেতু এটি স্তরগুলিকে খুব অনুর্বর করে তুলবে।",
 		"sliding" :
-		"KELVIN: The mechanic of increasing speed from dropping off a ledge came from needing to compensate for slopes not accelerating the player enough. It's tech- nically a glitch that I decided to throw in because it was fun. Many mechanics are actually that.",
+		"KELVIN: একটি প্রান্ত থেকে ড্রপ থেকে গতি বৃদ্ধির মেকানিক প্লেয়ার যথেষ্ট ত্বরান্বিত না ঢাল জন্য ক্ষতিপূরণ প্রয়োজন থেকে এসেছিল. এটি প্রযুক্তিগতভাবে একটি ত্রুটি যা আমি নিক্ষেপ করার সিদ্ধান্ত নিয়েছি কারণ এটি মজার ছিল। অনেক মেকানিক্স আসলে যে.",
 		"trees" :
-		"KELVIN: Trees don't grow in Antarctica. That's why penguins carve them out of ice.",
+		"KELVIN: অ্যান্টার্কটিকায় গাছ জন্মায় না। এই কারণেই পেঙ্গুইনরা বরফ থেকে খোদাই করে।",
 		"snakes" :
-		"KELVIN: I know it makes about as much sense to have snakes in Antarctica as it does to have hungry plants. ",
+		"KELVIN: আমি জানি অ্যান্টার্কটিকায় সাপ থাকা যতটা ক্ষুধার্ত গাছপালা আছে ততটাই বোধগম্য। ",
 		"waterfalls" :
-		"KELVIN: This part of the cave looks especially nice to me. I love the spacious background with waterfalls in front of it. I wanted the level to feel like you were meant to explore it, so a scene like this that makes it feel big is meant to convey a sense of exploration.",
+		"KELVIN: গুহার এই অংশটা আমার কাছে বিশেষ সুন্দর লাগে। আমি এর সামনে জলপ্রপাত সহ প্রশস্ত পটভূমি পছন্দ করি। আমি চেয়েছিলাম যে স্তরটি এমন অনুভব করুক যেন আপনি এটিকে অন্বেষণ করতে চেয়েছিলেন, তাই এর মতো একটি দৃশ্য যা এটিকে বড় মনে করে তা অন্বেষণের অনুভূতি বোঝানোর জন্য।",
 		"loops" :
-		"KELVIN: Sorry, did you expect this loop to work? Ha! I'm nowhere near good enough to program that... yet.",
+		"KELVIN: দুঃখিত, আপনি কি এই লুপ কাজ করার আশা করেছিলেন? হা! আমি এটি প্রোগ্রাম করার জন্য যথেষ্ট ভাল কোথাও নেই... এখনও.",
 		"contrib" :
-		"FROSTC: hello! this is the first dev commentary not written by kelvin, as this is the first contrib level.",
+		"FROSTC: হ্যালো! এটিই প্রথম ডেভ ভাষ্য যা কেলভিন লিখেননি, কারণ এটিই প্রথম অবদান স্তর।",
 		"walldev" :
-		"FROSTC: I didn't actually know you could just wall jump to get up here when I first made this area. I later thought of adding something to keep you from doing that, but decided against it",
+		"FROSTC: আমি আসলে জানতাম না যে আমি যখন প্রথম এই এলাকাটি তৈরি করেছি তখন আপনি এখানে উঠতে দেয়াল লাফিয়ে যেতে পারেন। আমি পরে আপনাকে এটি করা থেকে বিরত রাখার জন্য কিছু যোগ করার কথা ভেবেছিলাম, কিন্তু এটির বিরুদ্ধে সিদ্ধান্ত নিয়েছিলাম",
 		"tnt" :
-		"FROSTC: I saw that TNT was used in Xtreme hills, so I decided to make a level showing it off. Also, fun fact, this level was competed before subsea",
+		"FROSTC: আমি দেখেছি যে টিএনটি পাহাড়ে ব্যবহার করা হয়েছে, তাই আমি এটি দেখানোর একটি স্তর তৈরি করার সিদ্ধান্ত নিয়েছি। এছাড়াও, মজার সত্য, এই স্তরটি উপসাগর আগে প্রতিদ্বন্দ্বিতা করা হয়েছিল",
 		"trans" :
-		"FROSTC: It took me a good while to get the background transition to work, as this was for the most part the first time I used triggers.",
+		"FROSTC: ব্যাকগ্রাউন্ড ট্রানজিশনের কাজ করতে আমার বেশ সময় লেগেছে, কারণ আমি প্রথমবার ট্রিগার ব্যবহার করার সময় বেশিরভাগ ক্ষেত্রেই এটি ছিল",
 		"lifenote" :
-		"FROSTC: For those who played the older versions, I hope you like the all new, much harder 1-up position! Hahahahahaha!!",
+		"FROSTC: যারা পুরানো ভার্সন খেলেছেন, আশা করি আপনি সব নতুন, অনেক কঠিন 1-আপ পজিশন পছন্দ করবেন! হাহাহাহাহাহাহা!!",
 		"signnote" :
-		"FROSTC: If you are feeling a little lazy, you can just blast the pipe with a fireball to open it instead of sliding. Maybe a good speedrunning strat??",
+		"FROSTC: আপনি যদি একটু অলস বোধ করেন, আপনি স্লাইডিংয়ের পরিবর্তে এটি খুলতে একটি ফায়ারবল দিয়ে পাইপটি বিস্ফোরিত করতে পারেন। সম্ভবত একটি ভাল গতিতে চলা স্ট্র্যাট??",
 		"sense":
-		"FROSTC: My 3rd level, just wanted to make a level losely inspired off of Grumbel's Sense of Snow from the classic SuperTux. The funny part is that level isn't even in modern versions of the classic SuperTux!",
+		"FROSTC: আমার 3য় স্তর, ক্লাসিক সুপারটাক্স থেকে গ্রম্বেলের তুষার অনুভূতি থেকে অনুপ্রাণিত একটি স্তর তৈরি করতে চেয়েছিলাম। মজার অংশ হল সেই স্তরটি ক্লাসিক সুপারটাক্সের আধুনিক সংস্করণেও নেই!",
 		"subsea" :
-		"KELVIN: I wasn't sure how I wanted to handle underwater levels at first. I thought of the levels from SMB 1 and 3, but they seemed like something Tux could just shoot right through. Then I remembered DKC's underwater levels, how they were more like mazes where you had to dodge dangerous enemies. I figured that would work well for this game, since Tux is fast under water, and Konqi and Midi retain offensive capabilities in their neutral forms.",
+		"KELVIN: আমি প্রথমে নিশ্চিত ছিলাম না কিভাবে আমি পানির নিচের স্তরগুলি পরিচালনা করতে চাই। আমি এসএমবি 1 এবং 3 এর স্তরের কথা ভেবেছিলাম, কিন্তু সেগুলি দেখে মনে হয়েছিল যে টাক্স সঠিকভাবে শুট করতে পারে। তখন আমার মনে পড়ে গেল DKC-এর পানির নিচের স্তরগুলি, কীভাবে সেগুলি গোলকধাঁধার মতো ছিল যেখানে আপনাকে বিপজ্জনক শত্রুদের এড়িয়ে যেতে হবে। আমি ভেবেছিলাম যে এই গেমটির জন্য ভাল কাজ করবে, যেহেতু টাক্স জলের নীচে দ্রুত, এবং কনকি এবং মিডি তাদের নিরপেক্ষ ফর্মগুলিতে আক্রমণাত্মক ক্ষমতা বজায় রাখে।",
 		"subsea-name" :
-		"KELVIN: The name, Subsea, comes from the track of the same name in SuperTuxKart. I was thinking it'd be cool to take areas from that game and reimagine them as platform levels instead of kart tracks. Candela City is planned as well, and the final level where you fight Nolok will be Fort Magma. Others from STK may appear as well.",
+		"KELVIN: নাম, উপসাগর, সুপারটাক্সকার্টের একই নামের ট্র্যাক থেকে এসেছে। আমি ভেবেছিলাম যে গেমটি থেকে এলাকাগুলি নেওয়া এবং কার্ট ট্র্যাকের পরিবর্তে প্ল্যাটফর্ম স্তর হিসাবে সেগুলিকে পুনরায় কল্পনা করা ভাল হবে৷ ক্যান্ডেলা সিটিও পরিকল্পনা করা হয়েছে, এবং চূড়ান্ত স্তর যেখানে আপনি নলোকের সাথে লড়াই করবেন সেটি হবে ফোর্ট ম্যাগমা। STK থেকে অন্যরাও উপস্থিত হতে পারে।",
 		"tutorial-zone" :
-		"KELVIN: After getting some playtest feedback from Aurora Sol, I decided I should make this tutorial area to more clearly demonstrate basic mechanics. In his playtest, he actually skipped the first pipe, despite it having a sign hinting there's something about it, which led to him skipping the spot to learn swimming, too. Sliding places weren't clearly marked, either, and were also missed. This area won't let you progress until you've learned each mechanic, but can still be skipped if you already know the basics.",
+		"KELVIN: অরোরা সোলের কাছ থেকে কিছু প্লেটেস্ট প্রতিক্রিয়া পাওয়ার পর, আমি সিদ্ধান্ত নিয়েছি যে আমার এই টিউটোরিয়াল এলাকাটি আরও স্পষ্টভাবে মৌলিক মেকানিক্স প্রদর্শনের জন্য করা উচিত। তার প্লে-টেস্টে, তিনি আসলে প্রথম পাইপটি এড়িয়ে গিয়েছিলেন, যদিও এটিতে একটি চিহ্ন রয়েছে যা ইঙ্গিত করে যে এটি সম্পর্কে কিছু আছে, যা তাকে সাঁতার শেখার জন্য স্পট এড়িয়ে যেতে বাধ্য করেছিল। স্লাইডিং স্থান স্পষ্টভাবে চিহ্নিত করা হয়নি, হয়, এবং এছাড়াও মিস করা হয়েছে. আপনি প্রতিটি মেকানিক না শেখা পর্যন্ত এই ক্ষেত্রটি আপনাকে অগ্রগতি করতে দেবে না, তবে আপনি যদি ইতিমধ্যে প্রাথমিক বিষয়গুলি জানেন তবে এখনও এড়িয়ে যেতে পারেন।",
 		"speedrunex":
-		"FROSTC: I had designed this level with the intention of people speedrunning it, so see how fast you can beat it! ",
+		"FROSTC: আমি এই স্তরটি লোকেদের গতিতে চালানোর অভিপ্রায়ে ডিজাইন করেছি, তাই দেখুন কত দ্রুত আপনি এটিকে হারাতে পারেন! ",
 		"secretredex":
-		"FROSTC: The current version of this secret is very diffrent compared to how it used to be. One diffrence is that it used to have a bend in it. however I couldn't get that to work properly, that being the reason I scrapped it.",
+		"FROSTC: এই গোপনের বর্তমান সংস্করণটি আগের তুলনায় খুবই ভিন্ন, একটি পার্থক্য হল এটিতে একটি বাঁক ছিল। তবে আমি এটি সঠিকভাবে কাজ করতে পারিনি, এই কারণেই আমি এটি বাতিল করে দিয়েছি।",
 		"fishex":
-		"FROSTC: Just like Tux 'N' Trouble, this level was made before some of the earlier levels were added.",
+		"FROSTC: ঠিক যেমন টাক্স সমস্যায়, এই স্তরটি তৈরি করা হয়েছিল আগের কিছু স্তর যোগ করার আগে।",
 		"mezex":
-		"FROSTC: I had to make a few custom tiles to make this maze look good. It was worth it, I think! It's for sure the best part of this level.",
+		"FROSTC: এই গোলকধাঁধাটিকে সুন্দর দেখানোর জন্য আমাকে কয়েকটি কাস্টম টাইল তৈরি করতে হয়েছিল, এটি মূল্যবান ছিল, আমি মনে করি! এটি নিশ্চিতভাবে এই স্তরের সেরা অংশ।",
 		"outage":
-		"FROSTC: this level was completly diffrent in earlier versions. you can find the old version in the extras world",
-		"oldxtreme":
-		"KELVIN: In previous versions of this level, the prize for getting all the coins was a powerup that isn't formally introduced until a few levels later. I thought it would be fun to earn the chance to break levels, but the design of them actually makes the powerup not as fun to use as I'd hoped. I instead decided to set up a collectible that could unlock new content later on.",
-		"fort-0":
-		"KELVIN: I wanted to teach players right away that if they wanted rewards, they had to take risks, so I put these coins over a fire chain. There's an even trickier secret in this room that's also risky.",
-		"fort-1":
-		"KELVIN: The sawblades here were originally the first challenge, but then I realized I was making players not only take one of the harder challenges first, but also leading them in a straight line down. Switching the order of the challenges made the learning curve a bit easier, and also make the map feel more metroidvania-like.",
-		"fort-2":
-		"KELVIN: I knew some players would come here with the earth shell, which makes the challenge for the gold key much harder, if not impossible. I added a room with a fire flower to make swimming easier without depowering the player. Placing it behind a silver lock, the same lock leading to the next challenge, means they'll have a chance to reach it when they need it.",
-		"fort-3":
-		"KELVIN: I really wanted a section where players would get chased by something indestructible. Messing around with fire chains, I found I could put four in one place to make them look like a wheel. Attaching them to my new path carriers makes them able to roll around just above the player's top speed makes this scene tense but manageable.",
-		"fort-4":
-		"KELVIN: I plan to revisit underwater sections in the future with spike mazes like this, but after using a giant fire chain in a secret treasure room, I thought it was too good not to use in one of the key challenges.",
-		"fort-5":
-		"KELVIN: Welcome to the freezer, the final platforming challenge for Fort Borealis. Given that this is the last level of the ice world, I wanted to give it a good, cold sendoff. Don't worry, ice tiles will be used again, but I wanted to test the player a bit harder with these.",
-		"fort-6":
-		"KELVIN: Checkpoints used to be just that, checkpoints. They didn't do anything but save your progress in a level. But with a level like this being so long, and health drops being a rare thing given that the game had been designed with short levels in mind up until now, I needed to give players a way to heal after long stretches. Since checkpoints are already a welcome sight to players, I decided to make them even more welcoming.",
-		"fort-7":
-		"KELVIN: This is it, the first boss of the game. Up until now, it's all been single-hit enemies and stage hazards. He hasn't been implemented yet, but I can't wait to see what I come up with for him.",
-		"fort-8":
-		"KELVIN: OK, I'll admit, I was just going crazy with this. I wanted to see if multiple ring carriers could be nested, and then I stuck the result onto a path carrier. The result is a storm of coins! One layer of slime later, and here we are. Have fun!",
-		"sunken":
-		"FROSTC: My original idea for this level was to have a gimmick where there's patches of deep snow that tux can talk or maybe even through. sorta like the powered snow from... the game minetest is based off of? Can I say that name here?..",
-		"secret-sunk":
-		"FROSTC: If I were you, I would keep an eye out for little dent in the land like this. they often lead to secrets."
+		"FROSTC: আরেকটি এলোমেলো সত্য... এই এবং শেষ স্তরটি মোট তৈরি করতে মাত্র 3 দিন লেগেছে! সম্ভবত সাহায্য করেছে যে স্কুলটি বাতিল করা হয়েছিল প্রথম দিন আমি বিদ্যুৎ বিভ্রাট বা অন্য কিছুর কারণে সেগুলিতে কাজ শুরু করেছি। "
 	},
 
 	"npc" : {
 		"null" : "",
 		"rad-0t" :
-		"Hey, where's your board? Are you gonna slide on your belly like a square? I bet you couldn't get every coin on this hill like that. If you do, I'll give ya something that'll really help you catch some air!",
+		"আরে, তোমার বোর্ড কোথায়? আপনি একটি বর্গাকার মত আপনার পেট উপর স্লাইড করতে যাচ্ছেন? আমি বাজি ধরে বলতে পারি যে আপনি এই পাহাড়ে প্রতিটি মুদ্রা পেতে পারবেন না। যদি আপনি তা করেন, আমি আপনাকে এমন কিছু দেব যা আপনাকে সত্যিই কিছু বাতাস ধরতে সাহায্য করবে!",
 		"rad-0k" :
-		"Hey, where's your board? You look way too slow for a course like this!",
+		"আরে, তোমার বোর্ড কোথায়? আপনি এই মত একটি কোর্সের জন্য খুব ধীর দেখাচ্ছে!",
 		"rad-0m" :
-		"Are you gonna use that ball of yourse for this course? Good luck.",
+		"আপনি কি এই কোর্সের জন্য আপনার সেই বলটি ব্যবহার করবেন? শুভকামনা।",
 		"rad-0d" :
-		"Get all the coins on this hill if you want a totally nautical prize!",
+		"আপনি যদি সম্পূর্ণ নটিক্যাল পুরষ্কার চান তবে এই পাহাড়ে সমস্ত কয়েন পান!",
 		"penny-0t" :
-		"Oh, Tux! I'm so happy to see you! Nolok has kidnapped our friends! Last I heard, they were being taken to his forts all around the world. I wish I knew why. Please save them, Tux!",
+		"ওহ, টাক্স! আমি তোমাকে দেখে খুব খুশি! নোলক আমাদের বন্ধুদের অপহরণ করেছে! শেষবার শুনেছিলাম, সারা বিশ্বে তাদের কেল্লায় নিয়ে যাওয়া হচ্ছে। আমি কেন জানতাম. দয়া করে তাদের বাঁচান, টাক্স!",
 		"penny-0k" :
-		"Konqi! It's so good to see you! I'm sure Plasma Breeze is fine. Please help Tux. I know you two can beat Nolok together!",
+		"কনকি ! তোমাকে দেখে খুব ভালো লাগছে! আমি নিশ্চিত প্লাজমা ব্রীজ ঠিক আছে। দয়া করে টাক্সকে সাহায্য করুন। আমি জানি তোমরা দুজন মিলে নোলককে হারাতে পারবে!",
 		"penny-0m" :
-		"So you're Midi. I've heard you're quite a capable fighter. I'm so glad to hear you're helping Tux. I'll be sure to reward you well.",
+		"তাই তুমি মিডি। আমি শুনেছি আপনি বেশ দক্ষ যোদ্ধা। আপনি টাক্সকে সাহায্য করছেন শুনে আমি খুব খুশি। আমি আপনাকে ভাল প্রতিদান নিশ্চিত করা হবে.",
 		"penny-0d" :
-		"Pleased to meet you. Are you helping Tux save our friends? I'm so happy to hear that.",
+		"তোমার সাথে আলাপ করে খুব ভালো লাগলো. আপনি কি টাক্সকে আমাদের বন্ধুদের বাঁচাতে সাহায্য করছেন? আমি এটা শুনে খুব খুশি.",
 		"rad-t0t" :
-		"Yo, Tux! Mayor Penny is looking for ya. By the way, catch me on the slopes sometime. I wanna see if you live up to your rep as a snow racer.",
+		"ইয়ো, টাক্স! মেয়র পেনি তোমাকে খুঁজছেন। যাইহোক, ঢালে আমাকে ধরো কখনো। আমি দেখতে চাই আপনি একজন স্নো রেসার হিসাবে আপনার প্রতিনিধির মতো বেঁচে আছেন কিনা।",
 		"rad-t0k" :
-		"Hey, you're Konqi, right? Man, watch the fire around here. Doesn't really mix well with ice, ya feel me?",
+		"আরে, তুমি কনকি, তাই না? মানুষ, চারপাশে আগুন দেখুন। সত্যিই কি বরফের সাথে মিশে যায় না, তুমি আমাকে অনুভব কর?",
 		"rad-t0m" :
-		"What's a squirrel doing this far south? Ain't it too cold for ya? Get inside before ya freeze your fuzzy little toes off, heheh.",
+		"এত দক্ষিণে কাঠবিড়ালি কী করছে? এটা তোমার জন্য খুব ঠান্ডা না? আপনার অস্পষ্ট ছোট পায়ের আঙ্গুলগুলি বন্ধ করার আগে ভিতরে যান, হেহেহ।",
 		"rad-t0d" :
-		"Whoa, new face. I dunno about you. If you're looking for Mayor Penny, she's in the big igloo in the middle of town. I like to call it the bigloo. Ha ha!",
+		"ওহ, নতুন মুখ। আমি আপনার সম্পর্কে জানি না. আপনি যদি মেয়র পেনিকে খুঁজছেন, তিনি শহরের মাঝখানে বড় ইগলুতে আছেন। আমি এটাকে বিগ্লু বলতে পছন্দ করি। হা হা!",
 		"xue-c" :
-		"Thanks for saving me, chu! I'll see you back in Pennyton!",
+		"আমাকে বাঁচানোর জন্য ধন্যবাদ, চু! পেনিটনে আবার দেখা হবে!",
 		"xue-pt-t" :
-		"Next time I see that Nolok, I'll give him a face full of exploding cupcakes! That'll teach him for messing with us, chu!",
+		"পরের বার যখন আমি সেই নোলককে দেখব, তখন আমি তাকে বিস্ফোরিত কাপকেক দিয়ে ভরা মুখ দেব! এটা তাকে আমাদের সাথে জগাখিচুড়ি শেখাবে, চু!",
 		"xue-pt-k" :
-		"Hey, Konqi! Give Nolok a good torching when you see him! No one messes with us, on or off the kart track, chu!",
+		"আরে কনকি! নোলককে দেখলেই তাকে ভালো করে টর্চিং দিন! কার্ট ট্র্যাকের উপর বা বাইরে কেউ আমাদের সাথে ঝামেলা করে না, চু!",
 		"xue-pt-m" :
-		"Whoa, a fellow rodent who also likes explosions! (And pretty cute, chu...) Whah? N-nothing, chu! I, uh, was wondering if you'd like to go cart racing! N-not as a date or anything! (Shut up, Xue, shut up!)",
+		"ওহ, একজন সহকর্মী ইঁদুর যিনি বিস্ফোরণও পছন্দ করেন! (এবং বেশ সুন্দর, চু...) বাহ? এন-কিছু না, চু! আমি, আহ, ভাবছিলাম আপনি যদি কার্ট রেসিংয়ে যেতে চান! এন-তারিখ বা কিছু হিসেবে নয়! (চুপ কর, জু, চুপ কর!)",
 		"xue-pt-d" :
-		"Thanks for your help, chu! Let's really stick it to Nolok so he never messes with us again!",
+		"আপনার সাহায্যের জন্য ধন্যবাদ, চু! আসুন সত্যিই এটিকে নোলোকের সাথে আটকে রাখি যাতে সে আর কখনও আমাদের সাথে ঝামেলা না করে!",
 		"fireguin-0" :
-		"Not much use for a firefighter here, huh? Ice can melt, sure, but it takes the fire out with it, and then we just put new ice in.",
+		"এখানে একটি অগ্নিনির্বাপক জন্য খুব বেশি ব্যবহার না, হাহ? বরফ গলে যেতে পারে, নিশ্চিত, কিন্তু এটা দিয়ে আগুন নিভে যায় এবং তারপরে আমরা নতুন বরফ রাখি।",
 		"fireguin-1" :
-		"Maybe I'd be better off in a town with wood houses. Hard to find wood out here, so even the trees are made of ice!",
+		"হয়তো আমি কাঠের ঘর সহ একটি শহরে ভালো থাকতাম। এখানে কাঠ খুঁজে পাওয়া কঠিন, তাই গাছগুলোও বরফ দিয়ে তৈরি!",
 		"fireguin-2" :
-		"A lot of the houses here are empty. I'm sure our friends will return once they're safe from Nolok.",
+		"এখানকার অনেক বাড়ি খালি। আমি নিশ্চিত যে আমাদের বন্ধুরা নোলোক থেকে নিরাপদে ফিরে আসবে।",
 		"fireguin-3" :
-		"Blocks of weak, uncompacted ice will melt if you hit them with a fireball. You can also break them by sliding.",
+		"আপনি যদি একটি ফায়ারবল দিয়ে আঘাত করেন তবে দুর্বল, কম্প্যাক্টেড বরফের ব্লকগুলি গলে যাবে। আপনি স্লাইড করে তাদের ভাঙ্গতে পারেন।",
 		"fireguin-4" :
-		"Look out for thin ice! It'll break if you stand on it too long.",
+		"পাতলা বরফ জন্য দেখুন! আপনি যদি এটির উপর বেশিক্ষণ দাঁড়িয়ে থাকেন তবে এটি ভেঙে যাবে।",
 		"fireguin-5" :
-		"If you need to brush up on your skills, head to the obstacle course just outside of town. You'll find it to the right from here.",
+		"আপনি যদি আপনার দক্ষতার উপর ব্রাশ করতে চান তবে শহরের বাইরে বাধা কোর্সে যান। আপনি এখান থেকে এটি ডানদিকে পাবেন।",
 		"konqi-c" :
-		"Hey, thanks for getting me out of here. I got caught trying to find Plasma Breeze. I hope she's alright. Nolok's probably got her in another fort. I'll join you to help get her back!",
+		"আরে, আমাকে এখান থেকে বের করার জন্য ধন্যবাদ। প্লাজমা ব্রীজ খুঁজতে গিয়ে ধরা পড়লাম। আমি আশা করি সে ঠিক আছে নোলোক সম্ভবত তাকে অন্য একটি দুর্গে পেয়েছে। আমি তাকে ফিরে পেতে সাহায্য করার জন্য আপনার সাথে যোগ দেব!",
 		"rocky-c" :
-		"Alright, I'm saved! Man, Nolok is the kind of trash even I wouldn't wanna touch. Good luck against him!",
+		"ঠিক আছে, আমি রক্ষা পেয়েছি! ম্যান, নোলোক এক ধরনের আবর্জনা এমনকি আমি স্পর্শ করতে চাই না। তার বিরুদ্ধে সৌভাগ্য!",
 		"rocky-pt-t" :
-		"Hey, Tux! Catch me later. I'll buy ya a fish.",
+		"আরে, টাক্স! পরে আমাকে ধর। আমি তোমাকে একটা মাছ কিনে দেব।",
 		"rocky-pt-k" :
-		"Nolok's a crocodile, right? Man, I hope your scales are harder than his. I'd hate to be chomped by that guy!",
+		"নলোক একটা কুমির, তাই না? ম্যান, আমি আশা করি তোমার দাঁড়িপাল্লা তার চেয়ে কঠিন। আমি ঐ লোক দ্বারা chomped করা ঘৃণা চাই!",
 		"rocky-pt-m" :
-		"You remind me of me. Small, fast, good at picking up garbage. You're braver than me, though. Show Nolok no mercy!",
+		"তুমি আমার কথা মনে করিয়ে দাও। ছোট, দ্রুত, আবর্জনা তুলতে ভালো। যদিও তুমি আমার থেকে অনেক সাহসী। নোলোকে করুণা দেখাও না!",
 		"rocky-pt-d" :
-		"Yeah, this place is pretty cold, but it's a lot safer. The worst of Nolok's minions are on the mainland and other areas, so I'm gonna stay in Pennyton for now.",
+		"হ্যাঁ, এই জায়গাটা বেশ ঠান্ডা, কিন্তু এটা অনেক বেশি নিরাপদ। নোলোকের মিনিয়নদের মধ্যে সবচেয়ে খারাপ মেইনল্যান্ড এবং অন্যান্য এলাকায়, তাই আমি আপাতত পেনিটনে থাকব।",
 		"python-c" :
-		"Thankssss for the sssave! I'll ssssee you back in town.",
+		"সংরক্ষণের জন্য ধন্যবাদ! আমি শহরে ফিরে দেখা হবে.",
 		"python-pt-t" :
-		"Hey there Tuxss. I hope it'ssss sssafe to go back home sssoon. I'm freezing here!",
+		"আরে টাক্স। আমি আশা করি সসসসসসসসসসসসসসসসসসসসসসেই বাড়ি ফিরে যাব। আমি এখানে জমে আছি!",
 		"python-pt-k" :
-		"Any chance you should usssse that flame of yoursss on me? I'm sssso cold here...",
+		"কোন সুযোগ তুমি আমার উপর তোমার সেই শিখা ব্যবহার করবে? আমার এখানে খুব ঠান্ডা...",
 		"python-pt-m" :
-		"I wish you and Xue would ssstop looking at me like that. Even if I got hungry, I wouldn't consssider either of you a sssnack!",
+		"আমি আশা করি আপনি এবং জু আমার দিকে এমনভাবে তাকানো বন্ধ করবেন। আমার খিদে পেলেও, আমি তোমাদের দুজনের কাউকেই খাবার খাই না!",
 		"python-pt-d" :
-		"I sssure hope you're better with the cold than I am. No wonder Nolok hatesss thisss place.",
+		"আমি নিশ্চিত আশা করি আপনি আমার চেয়ে ঠান্ডার সাথে ভাল আছেন। আশ্চর্যের কিছু নেই নলোক ঘৃণা করে এই জায়গাটি।",
 		"garuda-c" :
-		"Alright! Thanks for getting rid of that guy! I can't wait to get out of this place and stretch my wings again.",
+		"ঠিক আছে! যে লোক পরিত্রাণ জন্য ধন্যবাদ! আমি এই জায়গা থেকে বেরিয়ে আবার আমার ডানা প্রসারিত করার জন্য অপেক্ষা করতে পারি না।",
 		"garuda-pt-t" :
-		"I used to feel sorry for penguins not being able to fly, but then I saw the way they move under water. Their swimming is just like flying!",
+		"পেঙ্গুইনরা উড়তে না পারার জন্য আমি দুঃখিত বোধ করতাম, কিন্তু তারপরে আমি দেখেছি যে তারা কীভাবে পানির নিচে চলে যায়। ওদের সাঁতার তো উড়ে যাওয়ার মতোই!",
 		"garuda-pt-k" :
-		"I hear dragons love gold as much as gryphons do. Lucky for us, there's lots of coins around! I wonder what makes them float, though...",
+		"আমি শুনেছি ড্রাগনরা গ্রাইফনের মতো সোনাকে ভালবাসে। আমাদের জন্য ভাগ্যবান, চারপাশে প্রচুর কয়েন আছে! আমি ভাবছি কি তাদের ভাসিয়ে দেয়, যদিও...",
 		"garuda-pt-m" :
-		"You use bombs, eh? I bet if I carried you, we could make a great aerial strike team! Except... I'm afraid I'll get shot down again. That's how Nolok caught me the first time.",
+		"আপনি বোমা ব্যবহার করেন, তাই না? আমি বাজি ধরতে পারি যদি আমি আপনাকে বহন করি, আমরা একটি দুর্দান্ত বিমান হামলা দল তৈরি করতে পারতাম! ছাড়া... আমি ভয় পাচ্ছি আমি আবার গুলিবিদ্ধ হয়ে যাব। এভাবেই প্রথম নোলোক আমাকে ধরেছে।",
 		"garuda-pt-d" :
-		"Thanks for your help. It feels so good being able to fly again.",
+		"আপনার সাহায্যের জন্য ধন্যবাদ. আবার উড়তে পেরে খুব ভালো লাগছে।",
 		"breeze-c-k" :
-		"Konqi! I knew you'd come for me! I'm so happy to see you! Let's get out of here! I'll be right behind you.",
+		"কনকি ! আমি জানতাম তুমি আমার জন্য আসবে! আমি তোমাকে দেখে খুব খুশি! চলো, এখান থেকে চলে যাই! আমি ঠিক আপনার পিছনে থাকব.",
 		"breeze-c-d" :
-		"Thanks for getting me out of here. I'll head back to Pennyton. Kick Nolok's flank for me!",
+		"আমাকে এখান থেকে বের করার জন্য ধন্যবাদ। আমি পেনিটনে ফিরে যাব। আমার জন্য কিক নলোক এর ফ্ল্যাঙ্ক!",
 		"breeze-pt-t" :
-		"Aww, you're such a cute little penguin! I know a mare who's really good with birds. You'd probably like her.",
+		"ওহ, তুমি এত সুন্দর ছোট্ট পেঙ্গুইন! আমি একটি ঘোড়াকে চিনি যে পাখিদের সাথে সত্যিই ভাল। আপনি সম্ভবত তাকে পছন্দ করবেন.",
 		"breeze-pt-k" :
-		"I'm always happy to see you, Konqi! Good luck against Nolok. I'll be rooting for you the loudest!",
+		"আমি আপনাকে দেখে সবসময় খুশি, কনকি! নলোকের বিপক্ষে শুভকামনা। আমি আপনার জন্য জোরে রুট করা হবে!",
 		"breeze-pt-m" :
-		"Your magic is really unusual. I've never seen a nut bomb spell before. And that ball too... oh, that's not magic? Strange.",
+		"আপনার জাদু সত্যিই অস্বাভাবিক. আমি আগে কখনও একটি বাদাম বোমা বানান দেখেনি. এবং সেই বলটিও... ওহ, এটা জাদু নয়? অদ্ভুত।",
 		"breeze-pt-d" :
-		"It'll take all kinds to defeat Nolok. I'm glad to have you on our side.",
+		"নোলককে পরাজিত করতে সব ধরনের লাগবে। আপনাকে আমাদের পাশে পেয়ে আমি আনন্দিত।",
 		"gnu-c" :
-		"I regret getting captured by Nolok once more. Thank you for releasing me.",
+		"আমি আরও একবার নোলোকের হাতে ধরা পড়ার জন্য দুঃখিত। আমাকে মুক্তি দেওয়ার জন্য আপনাকে ধন্যবাদ.",
 		"gnu-pt-0" :
-		"It is good to excel, but better to do so with vim.",
+		"এক্সেল করা ভাল, তবে ভিমের সাথে এটি করা ভাল।",
 		"gnu-pt-1" :
-		"A pacman frog is an apt hunter.",
+		"একটি প্যাকম্যান ব্যাঙ একটি উপযুক্ত শিকারী।",
 		"gnu-pt-2" :
-		"True freedom is found by blazing a gnu trail.",
+		"সত্যিকারের স্বাধীনতা পাওয়া যায় একটি জিএনইউ ট্রেইল জ্বালিয়ে..",
 		"gnu-pt-3" :
-		"Some mysteries are solved by finding prints, others by making them.",
+		"কিছু রহস্য প্রিন্ট খুঁজে বের করে সমাধান করা হয়, অন্যগুলো তৈরি করে।",
 		"gnu-pt-4" :
-		"When walking with a fork, thread lightly.",
+		"একটি কাঁটাচামচ দিয়ে হাঁটার সময়, হালকাভাবে থ্রেড।",
 		"gnu-pt-5" :
-		"Don't use a cat if you could do more or less.",
+		"আপনি যদি কম বা বেশি করতে পারেন তবে বিড়াল ব্যবহার করবেন না।",
 		"gnu-pt-6" :
-		"If the info doesn't work for you, man up.",
+		"তথ্য আপনার জন্য কাজ না হলে, মানুষ আপ.",
 		"gnu-pt-7" :
-		"007 has all the permissions you'd need.",
+		"007 এর কাছে আপনার প্রয়োজনীয় সমস্ত অনুমতি রয়েছে।",
 		"gnu-pt-8" :
-		"That young guin, Rad, has such spirit. He lives life to Emacs.",
-		"gnu-pt-9" :
-		"If you see nothing but zeros, remember, the dev'null's in the details.",
-		"gnu-pt-10" :
-		"Before you can push on, you must be committed.",
-		"gnu-pt-11" :
-		"Wisdom compiled from many sources makes a plan executable.",
+		"সেই তরুণ গিনের, রাডের এমন চেতনা আছে। সে ইম্যাক্সের জন্য জীবন যাপন করে।",
 		"midi-c" :
-		"Yo! I was just minding my own business, and these weird mushroom things started swarming me. I'm sick of sitting around in here. How's about I join ya and kick that Nolok guy's tail?",
+		"ইয়ো! আমি শুধু আমার নিজের ব্যবসা নিয়ে চিন্তা করছিলাম, এবং এই অদ্ভুত মাশরুম জিনিসগুলি আমাকে ঝাঁকুনি দিতে শুরু করেছে। এখানে বসে থাকতে আমার মন খারাপ। আমি আপনার সাথে যোগ দিতে এবং সেই নোলক লোকটির লেজে লাথি মারতে পারি?",
 		"sam-0" :
-		"Plenty of adventure gear at fair... wait, you're fighting Nolok? Let me help. Take whatever you need, no charge.",
+		"মেলায় প্রচুর অ্যাডভেঞ্চার গিয়ার... অপেক্ষা করুন, আপনি সোনা ব্যবহার করেন? আপনার যদি পান্না থাকে তবে এই জিনিসগুলি অনেক সস্তা হবে।",
 		"sam-1" :
-		"Don't get me wrong, gold's great, but it's just so common. I can't imagine having to carry that much around to use as money!",
+		"আমাকে ভুল বুঝবেন না, সোনা দারুণ, কিন্তু এটা খুবই সাধারণ। টাকা হিসেবে ব্যবহার করার জন্য এত কিছু বহন করার কথা ভাবতে পারি না!",
 		"sam-2" :
-		"You think us overworlders love emeralds? Try even letting a hedgehog near them!",
+		"আপনি আমাদের বিশ্বব্যাপী মানুষ পান্না ভালোবাসি মনে হয়? এমনকি তাদের কাছাকাছি একটি হেজহগ লেট করার চেষ্টা করুন!",
 		"sam-3" :
-		"Yeah, I dug for and crafted all these items, and now I sell them. So what does my boss do to earn his cut? He owns the company!",
+		"আমি অভদ্র হতে চাই না, কিন্তু আপনি কিছু কিনতে যাচ্ছেন? আমি কথা বলার জন্য বেতন পাই না।",
 		"sam-4" :
-		"Can you believe the guy who does the least work gets the most money? What a world we live in. I say let him pay for your saving-the-world items!",
+		"হ্যাঁ, আমি এই সমস্ত আইটেমগুলি খনন করেছি এবং তৈরি করেছি এবং এখন আমি সেগুলি বিক্রি করি৷ তাহলে আমার বস তার কাট উপার্জন করতে কি করেন? তিনি কোম্পানির মালিক!",
 		"sam-5" :
-		"While we're on the subject of money, this game we're in? Totally free, even to edit and sell what you make. So please, consider donating to the people who worked on it!",
-		"tuckles-0" :
-		"Even in the ice, it's easy to work up a sweat down here.",
-		"tuckles-1" :
-		"Why fish for fish, when you can mine it from the ice? That's what I'm here for!",
-		"tuckles-2" :
-		"Lift fish and eat weights!... No, hang on.",
-		"tuckles-3" :
-		"If you wanna get strong, you gotta get strong. If you wanna get big, you gotta get big. If you wanna get tough, you gotta get tough.",
-		"tuckles-4" :
-		"The key to the best hugs is big muscles and a soft belly. Fish'll give ya both!",
-		"tuckles-5" :
-		"All those muffins you eat can't compare to the fish we mine. They're bigger, stronger, and more delicious.",
-		"tuckles-6" :
-		"Have you seen Duke? He likes to get fish the lazy way: by pretending his rod's broken and bumming fish off others. I'd ignore him if he wasn't able to block roads just by sitting on them."
+		"আমরা যখন টাকার বিষয় নিয়ে আছি, এই খেলায় আমরা আছি? সম্পূর্ণ বিনামূল্যে, এমনকি আপনি যা তৈরি করেন তা সম্পাদনা এবং বিক্রি করতে। তাই যারা এটা কাজ করে অনুদান বিবেচনা করুন!"
 	},
 
 	"level" : {
-		"shop" : "Sam's Trade Post",
-		"overworld-0" : "Aurora Isles",
-		"overworld-1" : "Antarctica",
-		"0-t0" : "Pennyton",
-		"0-t1" : "Fish Mines",
-		"0-0" : "Learning the Slopes",
-		"0-1" : "Crystal Pass",
-		"0-2" : "Slip and Slide",
-		"0-3" : "Subsea",
-		"0-4" : "Tux 'N' Trouble",
-		"0-5" : "Frost's Sense of Snow",
-		"0-6a" : "Frozen Paradise",
-		"0-6b" : "Branching Path",
-		"0-7" : "The Ocean Bridge",
-		"0-8" : "Artic Wind",
-		"0-9" : "Guarded Steps",
-		"0-x" : "Xtreme Hills",
-		"0-c" : "Fort Borealis",
-		"0-s" : "Red Switch Trial"
+		"shop" : "স্যাম এর ট্রেড পোস্ট",
+		"overworld-0" : "অরোরা দ্বীপপুঞ্জ",
+		"overworld-1" : "অ্যান্টার্কটিকা",
+		"0-t0" : "পেনিটন",
+		"0-0" : "ঢাল শেখা",
+		"0-1" : "ক্রিস্টাল পাস",
+		"0-2" : "স্লিপ এবং স্লাইড",
+		"0-3" : "উপসাগর",
+		"0-4" : "টাক্স 'এন' সমস্যা",
+		"0-5" : "তুষারপাতের সংবেদন",
+		"0-6a" : "হিমায়িত স্বর্গ",
+		"0-6b" : "শাখার পথ",
+		"0-7" : "সমুদ্র সেতু",
+		"0-8" : "আর্কটিক বায়ু",
+		"0-9" : "নিমজ্জিত পদক্ষেপ",
+		"0-x" : "এক্সট্রিম হিলস",
+		"0-c" : "ফোর্ট বোরিয়ালিস"
 	},
 
 	"key" : {
@@ -584,66 +491,11 @@ window.files['lang/en.json'] = `
 		"212" : "",
 		"213" : "",
 		"214" : "",
-		"215" : "",
-		"216" : "",
-		"217" : "",
-		"218" : "",
-		"219" : "",
-		"220" : "",
-		"221" : "",
-		"222" : "",
-		"223" : "",
-		"224" : "L Ctrl",
-		"225" : "L Shift",
-		"226" : "L Alt",
-		"227" : "L Super",
-		"228" : "R Ctrl",
-		"229" : "R Shift",
-		"230" : "R Alt",
-		"231" : "R Super",
-		"232" : "Menu",
-		"233" : "",
-		"234" : "",
-		"235" : "",
-		"236" : "",
-		"237" : "",
-		"238" : "",
-		"239" : "",
-		"240" : "",
-		"241" : "",
-
-		"257" : "Mode",
-		"258" : "Next Track",
-		"259" : "Previous Track",
-		"260" : "Stop",
-		"261" : "Play/Pause",
-		"262" : "Mute",
-		"263" : "Media Select",
-		"264" : "WWW",
-		"265" : "Mail",
-		"266" : "Calculator",
-		"267" : "Computer",
-		"268" : "AC Search",
-		"269" : "AC Home",
-		"270" : "AC Back",
-		"271" : "AC Forward",
-		"272" : "AC Stop",
-		"273" : "AC Refresh",
-		"274" : "AC Bookmarks",
-		"275" : "Brightness Up",
-		"276" : "Brightness Down",
-		"277" : "Display Switch",
-		"278" : "Keyboard Light",
-		"279" : "Keyboard Brightness Up",
-		"280" : "Keyboard Brightness Down",
-		"281" : "Eject",
-		"282" : "Sleep",
-		"283" : "Wake Up",
-		"284" : "???"
+		"215" : ""
 	}
 }
 `; 
 
  if (!window.folderStructure) window.folderStructure = {}; 
 if (!window.folderStructure['lang']) window.folderStructure['lang'] = {}; 
-if (!window.folderStructure['lang']['en.json']) window.folderStructure['lang']['en.json'] = {}; 
+if (!window.folderStructure['lang']['bn.json']) window.folderStructure['lang']['bn.json'] = {}; 

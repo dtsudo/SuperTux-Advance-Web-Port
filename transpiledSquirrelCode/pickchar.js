@@ -22,7 +22,7 @@ resetDrawTarget (  )  ;
   var charslot = 0 ;
   for (  var i = 0 ;
  i < charlist . len (  )  ; i ++  )  { 
-  if ( charlist [ i ]  [ 0 ]  == game . playerchar )  { 
+  if ( charlist [ i ]  [ 0 ]  == game . playerChar )  { 
  charslot = i ; 
  break ;  } 
   
@@ -38,7 +38,7 @@ resetDrawTarget (  )  ;
   if ( charslot >= charlist . len (  )  ) charslot = 0 ; 
  
   if ( getcon ( "accept" , "press" )  || getcon ( "jump" , "press" )  )  { 
- game . playerchar = charlist [ charslot ]  [ 0 ]  ; 
+ game . playerChar = charlist [ charslot ]  [ 0 ]  ; 
 didpick = true ; 
  } 
   

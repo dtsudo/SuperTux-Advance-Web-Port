@@ -803,7 +803,16 @@
 		}
 	}
 
-	hurtfire = Deathcap.hurtfire
+	function hurtfire () {
+		newActor(Flame, x, y - 1)
+		deleteActor(id)
+		playSound(sndFlame, 0)
+
+		if(randInt(20) == 0) {
+			local a = actor[newActor(MuffinBlue, x, y)]
+			a.vspeed = -2
+		}
+	}
 
 	function hurtice() { frozen = 600 }
 }
@@ -1590,7 +1599,16 @@
 		}
 	}
 
-	hurtfire = Deathcap.hurtfire
+	function hurtfire () {
+		newActor(Flame, x, y - 1)
+		deleteActor(id)
+		playSound(sndFlame, 0)
+
+		if(randInt(20) == 0) {
+			local a = actor[newActor(MuffinBlue, x, y)]
+			a.vspeed = -2
+		}
+	}
 
 	function hurtice() { frozen = 600 }
 }
@@ -1604,7 +1622,16 @@
 		base.constructor(_x, _y)
 	}
 
-	hurtfire = Deathcap.hurtfire
+	function hurtfire () {
+		newActor(Flame, x, y - 1)
+		deleteActor(id)
+		playSound(sndFlame, 0)
+
+		if(randInt(20) == 0) {
+			local a = actor[newActor(MuffinBlue, x, y)]
+			a.vspeed = -2
+		}
+	}
 
 	function hurtice() { frozen = 600 }
 }

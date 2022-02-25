@@ -29,22 +29,22 @@ debugTickIndex ++  ;
  
   if ( keyPress ( k_2 )  )  { 
  game . weapon = 1 ; 
-game . maxenergy = 4 - game . difficulty ; 
+game . maxEnergy = 4 - game . difficulty ; 
  } 
   
   if ( keyPress ( k_3 )  )  { 
  game . weapon = 2 ; 
-game . maxenergy = 4 - game . difficulty ; 
+game . maxEnergy = 4 - game . difficulty ; 
  } 
   
   if ( keyPress ( k_4 )  )  { 
  game . weapon = 3 ; 
-game . maxenergy = 4 - game . difficulty ; 
+game . maxEnergy = 4 - game . difficulty ; 
  } 
   
   if ( keyPress ( k_5 )  )  { 
  game . weapon = 4 ; 
-game . maxenergy = 4 - game . difficulty ; 
+game . maxEnergy = 4 - game . difficulty ; 
  } 
   
   if ( keyPress ( k_equals )  ) game . lives ++  ; 

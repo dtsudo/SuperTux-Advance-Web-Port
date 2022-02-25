@@ -18,7 +18,7 @@
 	firetime = 0
 	hurt = 0
 	swimming = false
-	endmode = false
+	endMode = false
 	canstomp = true //If they can use jumping as an attack
 	sprite = sprKonqi
 	invincible = 0
@@ -70,7 +70,7 @@
 		if(!gvPlayer) gvPlayer = this
 		startx = _x.tofloat()
 		starty = _y.tofloat()
-		energy = game.maxenergy
+		energy = game.maxEnergy
 		anFall = anFallN
 	}
 
@@ -97,15 +97,15 @@
 			firetime--
 		}
 
-		if(firetime == 0 && energy < game.maxenergy) {
+		if(firetime == 0 && energy < game.maxEnergy) {
 			energy++
 			firetime = 60
 		}
 
 
-		if(game.weapon == 0) game.maxenergy = 0
-		if(game.weapon == 3) game.maxenergy = 4
-		if(energy > game.maxenergy) energy = game.maxenergy
+		if(game.weapon == 0) game.maxEnergy = 0
+		if(game.weapon == 3) game.maxEnergy = 4
+		if(energy > game.maxEnergy) energy = game.maxEnergy
 
 		/////////////
 		// ON LAND //
@@ -531,8 +531,8 @@
 
 
 			} else {
-				if(hspeed < 1 && endmode) hspeed += 0.2
-				if(endmode && placeFree(x + 2, y)) rspeed = hspeed
+				if(hspeed < 1 && endMode) hspeed += 0.2
+				if(endMode && placeFree(x + 2, y)) rspeed = hspeed
 				else rspeed = 0
 			}
 
@@ -1019,8 +1019,8 @@
 		local swap = game.subitem
 
 		if(game.weapon == game.subitem) {
-			if(game.maxenergy < 4 - game.difficulty) {
-				game.maxenergy++
+			if(game.maxEnergy < 4 - game.difficulty) {
+				game.maxEnergy++
 				game.subitem = 0
 				tftime = 0
 				playSound(sndHeal, 0)
@@ -1070,16 +1070,11 @@
 ::KonqiDie <- class extends Actor {
 	vspeed = -4.0
 	timer = 150
-	mywep = 0
 
 	constructor(_x, _y, _arr = null) {
 		base.constructor(_x, _y)
 		stopMusic()
 		playSound(sndDie, 0)
-		mywep = game.weapon
-		if(game.lives == 0 || game.check == false) game.weapon = 0
-		if(game.lives == 0) game.check = false
-		if(game.lives > 0) game.lives--
 	}
 
 	function run() {
@@ -1088,11 +1083,9 @@
 		timer--
 		if(timer == 0) {
 			startPlay(gvMap.file)
-			if(game.check == true || game.difficulty > 0) if(game.lives > 0) game.lives--
-			if(game.lives == 0) game.check = false
 			if(game.check == false) gvIGT = 0
 		}
-		switch(mywep) {
+		switch(game.weapon) {
 			case 0:
 				drawSprite(sprKonqi, wrap(getFrames() / 15, 12, 13), floor(x - camx), floor(y - camy))
 				break

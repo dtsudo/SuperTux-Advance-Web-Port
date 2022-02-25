@@ -21,7 +21,7 @@ shape = Rec ( x , y , 7 , 9 , 0 )  ;
 slideshape = Rec ( x , y - 1 , 16 , 8 , 0 )  ; 
  if ( _arr != null && _arr != "" ) coins = _arr . tointeger (  )  ; 
  
- game . maxcoins += coins ; 
+ game . maxCoins += coins ; 
  } ;  returnVal . run = function (  ) {  if ( gvPlayer )  { 
   if ( v == 0 )  { 
  vspeed = 0 ; 

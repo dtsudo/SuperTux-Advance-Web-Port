@@ -8,8 +8,18 @@
 	var unlockAllLevels = urlParams.get('unlocklevels') !== null
 		? (urlParams.get('unlocklevels') === 'true')
 		: false;
+		
+	var invulnerable = urlParams.get('invulnerable') !== null
+		? (urlParams.get('invulnerable') === 'true')
+		: false;
 	
 	var debugCommands = function () {
+		
+		if (invulnerable) {
+			if (game.health > 0)
+				game.health = game.maxHealth;
+		}
+		
 		if (unlockAllLevels) {
 			game.completed["0-0"]=true;
 			game.completed["0-1"]=true;

@@ -65,11 +65,11 @@ newstr += "\n" ;
   } 
      }  } drawText ( _f , _x , _y , newstr )  ; 
  }  ; 
-formatTime =  function ( time ) {  var seconds =  ( time % 6000 )  . tofloat (  )  / 60.0 ;
+formatTime =  function ( time ) {  var seconds =  ( time % 3600 )  . tofloat (  )  / 60.0 ;
  seconds *= 100.0 ; 
 seconds = floor ( seconds )  . tofloat (  )  ; 
 seconds /= 100 ; 
- var minutes = floor ( time / 6000 )  ;
+ var minutes = floor ( time / 3600 )  ;
   var val = minutes . tostring (  )  + ":" ;
   if ( seconds < 10 ) val += "0" ; 
  

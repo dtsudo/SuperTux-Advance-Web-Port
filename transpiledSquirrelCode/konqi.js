@@ -19,7 +19,7 @@ Konqi =  function ( ) { var returnVal = { constructor: function(){} } ;  returnV
  returnVal . firetime = 0 ; 
  returnVal . hurt = 0 ; 
  returnVal . swimming = false ; 
- returnVal . endmode = false ; 
+ returnVal . endMode = false ; 
  returnVal . canstomp = true ; 
  returnVal . sprite = sprKonqi ; 
  returnVal . invincible = 0 ; 
@@ -72,7 +72,7 @@ shape = shapeStand ;
  
  startx = _x . tofloat (  )  ; 
 starty = _y . tofloat (  )  ; 
-energy = game . maxenergy ; 
+energy = game . maxEnergy ; 
 anFall = anFallN ; 
  } ;  returnVal . run = function (  ) { shapeSlide . setPos ( x , y )  ; 
 shapeStand . setPos ( x , y )  ; 
@@ -92,16 +92,16 @@ shapeStand . setPos ( x , y )  ;
  firetime --  ; 
  } 
   
-  if ( firetime == 0 && energy < game . maxenergy )  { 
+  if ( firetime == 0 && energy < game . maxEnergy )  { 
  energy ++  ; 
 firetime = 60 ; 
  } 
   
-  if ( game . weapon == 0 ) game . maxenergy = 0 ; 
+  if ( game . weapon == 0 ) game . maxEnergy = 0 ; 
  
-  if ( game . weapon == 3 ) game . maxenergy = 4 ; 
+  if ( game . weapon == 3 ) game . maxEnergy = 4 ; 
  
-  if ( energy > game . maxenergy ) energy = game . maxenergy ; 
+  if ( energy > game . maxEnergy ) energy = game . maxEnergy ; 
  
   if (  ! inWater ( x , y )  || game . weapon == 4 )  { 
  swimming = false ; 
@@ -567,9 +567,9 @@ shape = shapeSlide ;
   } 
   
   else  { 
-  if ( hspeed < 1 && endmode ) hspeed += 0.2 ; 
+  if ( hspeed < 1 && endMode ) hspeed += 0.2 ; 
  
-  if ( endmode && placeFree ( x + 2 , y )  ) rspeed = hspeed ; 
+  if ( endMode && placeFree ( x + 2 , y )  ) rspeed = hspeed ; 
  
   else rspeed = 0 ; 
  
@@ -1102,8 +1102,8 @@ game . health = 0 ;
   
   var swap = game . subitem ;
   if ( game . weapon == game . subitem )  { 
-  if ( game . maxenergy < 4 - game . difficulty )  { 
- game . maxenergy ++  ; 
+  if ( game . maxEnergy < 4 - game . difficulty )  { 
+ game . maxEnergy ++  ; 
 game . subitem = 0 ; 
 tftime = 0 ; 
 playSound ( sndHeal , 0 )  ; 
@@ -1138,7 +1138,6 @@ game . subitem = 0 ;
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
 KonqiDie =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . vspeed =  - 4.0 ; 
  returnVal . timer = 150 ; 
- returnVal . mywep = 0 ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
@@ -1146,28 +1145,16 @@ KonqiDie =  function ( ) { var returnVal = { constructor: function(){} } ;  retu
    baseConstructor  ( _x , _y )  ; 
 stopMusic (  )  ; 
 playSound ( sndDie , 0 )  ; 
-mywep = game . weapon ; 
- if ( game . lives == 0 || game . check == false ) game . weapon = 0 ; 
- 
-  if ( game . lives == 0 ) game . check = false ; 
- 
-  if ( game . lives > 0 ) game . lives --  ; 
- 
-  } ;  returnVal . run = function (  ) { vspeed += 0.1 ; 
+ } ;  returnVal . run = function (  ) { vspeed += 0.1 ; 
 y += vspeed ; 
 timer --  ; 
  if ( timer == 0 )  { 
  startPlay ( gvMap . file )  ; 
- if ( game . check == true || game . difficulty > 0 )  if ( game . lives > 0 ) game . lives --  ; 
- 
-  
-  if ( game . lives == 0 ) game . check = false ; 
- 
-  if ( game . check == false ) gvIGT = 0 ; 
+ if ( game . check == false ) gvIGT = 0 ; 
  
   } 
   
-  switch ( mywep )  {  case 0 : drawSprite ( sprKonqi , wrap ( getFrames (  )  / 15 , 12 , 13 )  , floor ( x - camx )  , floor ( y - camy )  )  ; 
+  switch ( game . weapon )  {  case 0 : drawSprite ( sprKonqi , wrap ( getFrames (  )  / 15 , 12 , 13 )  , floor ( x - camx )  , floor ( y - camy )  )  ; 
  break ;  case 1 : drawSprite ( sprKonqiFire , wrap ( getFrames (  )  / 15 , 12 , 13 )  , floor ( x - camx )  , floor ( y - camy )  )  ; 
  break ;  case 2 : drawSprite ( sprKonqiIce , wrap ( getFrames (  )  / 15 , 12 , 13 )  , floor ( x - camx )  , floor ( y - camy )  )  ; 
  break ;  case 3 : drawSprite ( sprKonqiAir , wrap ( getFrames (  )  / 15 , 12 , 13 )  , floor ( x - camx )  , floor ( y - camy )  )  ; 

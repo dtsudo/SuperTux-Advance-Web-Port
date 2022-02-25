@@ -11,12 +11,52 @@ Coin =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVa
 
    baseConstructor  ( _x , _y )  ; 
 frame = randFloat ( 4 )  ; 
-game . maxcoins ++  ; 
+game . maxCoins ++  ; 
  } ;  returnVal . run = function (  ) { frame += 0.2 ; 
 drawSprite ( sprCoin , frame , x - camx , y - camy )  ; 
  if ( gvPlayer )  if ( distance2 ( x , y , gvPlayer . x , gvPlayer . y + 2 )  <= 16 )  { 
  deleteActor ( id )  ; 
 newActor ( CoinEffect , x , y )  ; 
+ } 
+  
+  
+  } ;  returnVal . _typeof = function (  ) {  return "Coin" ;
+  } ; 
+ } 
+ returnVal.constructor(...arguments); return returnVal ;  }  ; 
+Coin5 =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
+frame = randFloat ( 4 )  ; 
+game . maxCoins ++  ; 
+ } ;  returnVal . run = function (  ) { frame += 0.2 ; 
+drawSprite ( sprCoin5 , frame , x - camx , y - camy )  ; 
+ if ( gvPlayer )  if ( distance2 ( x , y , gvPlayer . x , gvPlayer . y + 2 )  <= 16 )  { 
+ deleteActor ( id )  ; 
+newActor ( CoinEffect , x , y , 5 )  ; 
+ } 
+  
+  
+  } ;  returnVal . _typeof = function (  ) {  return "Coin" ;
+  } ; 
+ } 
+ returnVal.constructor(...arguments); return returnVal ;  }  ; 
+Coin10 =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
+frame = randFloat ( 4 )  ; 
+game . maxCoins ++  ; 
+ } ;  returnVal . run = function (  ) { frame += 0.2 ; 
+drawSprite ( sprCoin10 , frame , x - camx , y - camy )  ; 
+ if ( gvPlayer )  if ( distance2 ( x , y , gvPlayer . x , gvPlayer . y + 2 )  <= 16 )  { 
+ deleteActor ( id )  ; 
+newActor ( CoinEffect , x , y , 10 )  ; 
  } 
   
   
@@ -52,12 +92,12 @@ FlowerFire =  function ( ) { var returnVal = { constructor: function(){} } ;  re
  deleteActor ( id )  ; 
  if ( game . weapon == 0 )  { 
  game . weapon = 1 ; 
-game . maxenergy = 4 - game . difficulty ; 
+game . maxEnergy = 4 - game . difficulty ; 
  } 
   
   else  { 
  game . subitem = game . weapon ; 
-game . maxenergy = 4 - game . difficulty ; 
+game . maxEnergy = 4 - game . difficulty ; 
 game . weapon = 1 ; 
  } 
   
@@ -81,12 +121,12 @@ FlowerIce =  function ( ) { var returnVal = { constructor: function(){} } ;  ret
  deleteActor ( id )  ; 
  if ( game . weapon == 0 )  { 
  game . weapon = 2 ; 
-game . maxenergy = 4 - game . difficulty ; 
+game . maxEnergy = 4 - game . difficulty ; 
  } 
   
   else  { 
  game . subitem = game . weapon ; 
-game . maxenergy = 4 - game . difficulty ; 
+game . maxEnergy = 4 - game . difficulty ; 
 game . weapon = 2 ; 
  } 
   
@@ -441,7 +481,7 @@ drawSprite ( sprAirFeather , frame , x - camx , y - camy )  ;
  
   else  { 
  game . subitem = game . weapon ; 
-game . maxenergy = 1 ; 
+game . maxEnergy = 1 ; 
 game . weapon = 3 ; 
  } 
   
@@ -494,13 +534,13 @@ OneUp =  function ( ) { var returnVal = { constructor: function(){} } ;  returnV
  
  shape . setPos ( x , y )  ; 
  if ( gvPlayer )  if ( distance2 ( x , y , gvPlayer . x , gvPlayer . y )  <= 16 )  { 
- game . lives ++  ; 
+ game . levelCoins += 50 ; 
 playSound ( snd1up , 0 )  ; 
 deleteActor ( id )  ; 
  } 
   
   
- drawSprite ( getroottable (  )  [ game . characters [ game . playerchar ]  [ 1 ]  ]  , game . weapon , x - camx , y + 8 - camy )  ; 
+ drawSprite ( getroottable (  )  [ game . characters [ game . playerChar ]  [ 1 ]  ]  , game . weapon , x - camx , y + 8 - camy )  ; 
  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
@@ -598,12 +638,12 @@ EarthShell =  function ( ) { var returnVal = { constructor: function(){} } ;  re
  deleteActor ( id )  ; 
  if ( game . weapon == 0 )  { 
  game . weapon = 4 ; 
-game . maxenergy = 4 - game . difficulty ; 
+game . maxEnergy = 4 - game . difficulty ; 
  } 
   
   else  { 
  game . subitem = game . weapon ; 
-game . maxenergy = 4 - game . difficulty ; 
+game . maxEnergy = 4 - game . difficulty ; 
 game . weapon = 4 ; 
  } 
   
@@ -617,9 +657,25 @@ game . weapon = 4 ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-SpecialBall =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  
- with ( returnVal ) { 
+SpecialBall =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . num = 0 ; 
+ returnVal . shape = null ; 
  
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
+shape = Cir ( x , y , 8 )  ; 
+num = _arr ; 
+ if ( game . secretOrbs [ num ]  ) deleteActor ( id )  ; 
+ 
+  } ;  returnVal . run = function (  ) {  if ( gvPlayer )  if ( distance2 ( x , y , gvPlayer . x , gvPlayer . y )  <= 16 )  { 
+ game . secretOrbs [ num ] = true ; 
+deleteActor ( id )  ; 
+ } 
+  
+  
+ drawSprite ( sprSpecialBall , getFrames (  )  / 4 , x - camx , y - camy )  ; 
+ } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
 CoinRing =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . r = 0.0 ; 

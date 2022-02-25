@@ -122,28 +122,30 @@ frame += 0.25 ;
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
 CoinEffect =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . vspeed =  - 5.0 ; 
+ returnVal . value = 1 ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
 
-   baseConstructor  ( _x , _y )  ; 
-game . levelcoins ++  ; 
-game . coins ++  ; 
- if ( game . coins >= 100 )  { 
- playSoundChannel ( snd1up , 0 , 2 )  ; 
-game . lives ++  ; 
-game . coins = 0 ; 
- } 
+   if ( _arr == 5 ) value = 5 ; 
+ 
+  else  if ( _arr == 10 ) value = 10 ; 
+ 
   
-  else  { 
- stopSound ( sndCoin )  ; 
+ game . levelCoins += value ; 
+ baseConstructor  ( _x , _y )  ; 
+stopSound ( sndCoin )  ; 
 playSound ( sndCoin , 0 )  ; 
- } 
-  
-  } ;  returnVal . run = function (  ) { vspeed += 0.5 ; 
+ } ;  returnVal . run = function (  ) { vspeed += 0.5 ; 
 y += vspeed ; 
-drawSpriteZ ( 4 , sprCoin , getFrames (  )  / 2 , x - camx , y - camy )  ; 
- if ( vspeed >= 3 )  { 
+ if ( value == 10 ) drawSpriteZ ( 4 , sprCoin10 , getFrames (  )  / 2 , x - camx , y - camy )  ; 
+ 
+  else  if ( value == 5 ) drawSpriteZ ( 4 , sprCoin5 , getFrames (  )  / 2 , x - camx , y - camy )  ; 
+ 
+  else drawSpriteZ ( 4 , sprCoin , getFrames (  )  / 2 , x - camx , y - camy )  ; 
+ 
+  
+  if ( vspeed >= 3 )  { 
  deleteActor ( id )  ; 
 newActor ( Spark , x , y )  ; 
  } 

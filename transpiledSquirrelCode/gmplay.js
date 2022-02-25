@@ -13,8 +13,8 @@ startPlay =  function ( level ) {  if (  ! fileExists ( level )  )  return ;
 actor . clear (  )  ; 
 actlast = 0 ; 
 game . health = game . maxHealth ; 
-game . levelcoins = 0 ; 
-game . maxcoins = 0 ; 
+game . levelCoins = 0 ; 
+game . maxCoins = 0 ; 
 game . secrets = 0 ; 
 game . enemies = 0 ; 
 gvInfoBox = "" ; 
@@ -61,13 +61,13 @@ tilef = gvMap . tilef [ i ]  ;
   if ( i . rawin ( "gid" )  )  { 
   var n = i . gid - tilef ;
   var c = 0 ;
-  switch ( n )  {  case 0 :  if (  ! gvPlayer && getroottable (  )  . rawin ( game . playerchar )  )  { 
+  switch ( n )  {  case 0 :  if (  ! gvPlayer && getroottable (  )  . rawin ( game . playerChar )  )  { 
   if ( game . check == false )  { 
- c = actor [ newActor ( getroottable (  )  [ game . playerchar ]  , i . x + 8 , i . y - 16 )  ]  ; 
+ c = actor [ newActor ( getroottable (  )  [ game . playerChar ]  , i . x + 8 , i . y - 16 )  ]  ; 
  } 
   
   else  { 
- c = actor [ newActor ( getroottable (  )  [ game . playerchar ]  , game . chx , game . chy )  ]  ; 
+ c = actor [ newActor ( getroottable (  )  [ game . playerChar ]  , game . chx , game . chy )  ]  ; 
  } 
   
   } 
@@ -78,13 +78,14 @@ camy = c . y -  ( screenH (  )  / 2 )  ;
  
   break ;  case 1 : c = newActor ( Coin , i . x + 8 , i . y - 8 )  ; 
  break ;  case 2 : c = newActor ( ItemBlock , i . x + 8 , i . y - 8 , 0 )  ; 
-game . maxcoins ++  ; 
+game . maxCoins ++  ; 
  break ;  case 3 : c = newActor ( ItemBlock , i . x + 8 , i . y - 8 , 1 )  ; 
  break ;  case 4 : c = newActor ( ItemBlock , i . x + 8 , i . y - 8 , 2 )  ; 
  break ;  case 5 : c = newActor ( ItemBlock , i . x + 8 , i . y - 8 , 3 )  ; 
  break ;  case 6 : c = newActor ( ItemBlock , i . x + 8 , i . y - 8 , 5 )  ; 
  break ;  case 7 : c = newActor ( ItemBlock , i . x + 8 , i . y - 8 , 4 )  ; 
- break ;  case 8 : c = newActor ( ItemBlock , i . x + 8 , i . y - 8 , 6 )  ; 
+ break ;  case 8 : game . maxCoins += 50 ; 
+c = newActor ( ItemBlock , i . x + 8 , i . y - 8 , 6 )  ; 
  break ;  case 9 : c = newActor ( BadCannon , i . x + 8 , i . y - 8 )  ; 
  break ;  case 10 : c = newActor ( PipeSnake , i . x , i . y , 1 )  ; 
 game . enemies ++  ; 
@@ -192,9 +193,14 @@ game . enemies ++  ;
 game . enemies ++  ; 
  break ;  case 67 : c = newActor ( Blazeborn , i . x + 8 , i . y - 8 )  ; 
 game . enemies ++  ; 
+ break ;  case 68 : c = newActor ( Coin5 , i . x + 8 , i . y - 8 )  ; 
+game . maxCoins += 5 ; 
+ break ;  case 69 : c = newActor ( Coin10 , i . x + 8 , i . y - 8 )  ; 
+game . maxCoins += 10 ; 
  break ;  case 73 : c = newActor ( Jumpy , i . x + 8 , i . y - 8 , i . name )  ; 
 game . enemies ++  ; 
  break ;  case 75 : c = newActor ( EvilBlock , i . x + 8 , i . y - 8 )  ; 
+ break ;  case 77 : c = newActor ( SpecialBall , i . x + 8 , i . y - 8 , i . name . tointeger (  )  )  ; 
  break ;  case 78 : c = newActor ( Berry , i . x + 8 , i . y - 8 )  ; 
  break ;  case 79 : c = newActor ( BossDoor , i . x , i . y - 16 )  ; 
  break ;  }  if (  squirrelTypeOf ( c )  == "integer" ) mapActor [ i . id ] = c ; 
@@ -385,9 +391,9 @@ drawImage ( gvPlayScreen , 0 , 0 )  ;
  
   } 
   for (  var i = 0 ;
- i < game . maxenergy ; i ++  )  { 
+ i < game . maxEnergy ; i ++  )  { 
   if ( gvPlayer )  { 
-  if ( gvPlayer . rawin ( "energy" )  && game . maxenergy > 0 )  { 
+  if ( gvPlayer . rawin ( "energy" )  && game . maxEnergy > 0 )  { 
   if ( i < floor ( gvPlayer . energy )  ) drawSprite ( sprEnergy , 1 , 8 +  ( 16 * i )  , 24 )  ; 
  
   else drawSprite ( sprEnergy , 0 , 8 +  ( 16 * i )  , 24 )  ; 
@@ -398,9 +404,11 @@ drawImage ( gvPlayScreen , 0 , 0 )  ;
   
   } 
  drawSprite ( sprCoin , 0 , 16 , screenH (  )  - 16 )  ; 
-drawText ( font2 , 24 , screenH (  )  - 23 , game . coins . tostring (  )  )  ; 
-drawSprite ( getroottable (  )  [ game . characters [ game . playerchar ]  [ 1 ]  ]  , game . weapon , screenW (  )  - 16 , screenH (  )  - 12 )  ; 
-drawText ( font2 , screenW (  )  - 26 -  ( game . lives . tostring (  )  . len (  )  * 8 )  , screenH (  )  - 23 , game . lives . tostring (  )  )  ; 
+ if ( game . maxCoins > 0 ) drawText ( font2 , 24 , screenH (  )  - 23 , game . levelCoins . tostring (  )  + "/" + game . maxCoins . tostring (  )  )  ; 
+ 
+  else drawText ( font2 , 24 , screenH (  )  - 23 , game . coins . tostring (  )  )  ; 
+ 
+ drawSprite ( getroottable (  )  [ game . characters [ game . playerChar ]  [ 1 ]  ]  , game . weapon , screenW (  )  - 16 , screenH (  )  - 12 )  ; 
 drawSprite ( sprSubItem , 0 , screenW (  )  - 18 , 18 )  ; 
  switch ( game . subitem )  {  case 1 : drawSprite ( sprFlowerFire , 0 , screenW (  )  - 18 , 18 )  ; 
  break ;  case 2 : drawSprite ( sprFlowerIce , 0 , screenW (  )  - 18 , 18 )  ; 
@@ -412,7 +420,7 @@ drawSprite ( sprSubItem , 0 , screenW (  )  - 18 , 18 )  ;
  break ;  }  if ( gvDoIGT && config . showleveligt ) drawText ( font2 , 8 , 32 , formatTime ( gvIGT )  )  ; 
  
   if ( gvPlayer )  if ( gvPlayer . y <  - 8 )  { 
- drawSprite ( getroottable (  )  [ game . characters [ game . playerchar ]  [ 1 ]  ]  , game . weapon , gvPlayer . x - camx , 8 -  ( gvPlayer . y / 4 )  )  ; 
+ drawSprite ( getroottable (  )  [ game . characters [ game . playerChar ]  [ 1 ]  ]  , game . weapon , gvPlayer . x - camx , 8 -  ( gvPlayer . y / 4 )  )  ; 
  } 
   
   
@@ -426,13 +434,13 @@ playSoundChannel ( sndWarning , 0 , 4 )  ;
 gvWarning += 1.5 ; 
  } 
   
-  if ( gvKeyCopper ) drawSprite ( sprKeyCopper , 0 , screenW (  )  - 36 , 16 )  ; 
+  if ( gvKeyCopper ) drawSprite ( sprKeyCopper , 0 , screenW (  )  - 32 , screenH (  )  - 16 )  ; 
  
-  if ( gvKeySilver ) drawSprite ( sprKeySilver , 0 , screenW (  )  - 50 , 16 )  ; 
+  if ( gvKeySilver ) drawSprite ( sprKeySilver , 0 , screenW (  )  - 46 , screenH (  )  - 16 )  ; 
  
-  if ( gvKeyGold ) drawSprite ( sprKeyGold , 0 , screenW (  )  - 64 , 16 )  ; 
+  if ( gvKeyGold ) drawSprite ( sprKeyGold , 0 , screenW (  )  - 60 , screenH (  )  - 16 )  ; 
  
-  if ( gvKeyMythril ) drawSprite ( sprKeyMythril , 0 , screenW (  )  - 78 , 16 )  ; 
+  if ( gvKeyMythril ) drawSprite ( sprKeyMythril , 0 , screenW (  )  - 74 , screenH (  )  - 16 )  ; 
  
   } 
   

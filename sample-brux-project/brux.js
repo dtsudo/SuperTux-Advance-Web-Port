@@ -765,6 +765,11 @@ window.wrap = function (num, low, high) {
 	return 0;
 };
 
+
+window.fadeMusic = function( time ) {
+	
+};
+
 window.stopMusic = function () {
 	// TODO
 };
@@ -967,7 +972,7 @@ String.prototype.tointeger = function () {
 };
 
 Number.prototype.tointeger = function () {
-	return this;
+	return parseInt(this.toString());
 };
 
 Number.prototype.tostring = function () {
