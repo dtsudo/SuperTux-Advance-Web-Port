@@ -31,7 +31,7 @@ selectLoadGame =  function (  ) { meLoadGame =  [  ]  ;
  dir . sort (  )  ; 
  for (  var i = 0 ;
  i < dir . len (  )  ; i ++  )  { 
-  var f = "" ;
+  let f = "" ;
   if ( dir [ i ]  != "." && i != ".." && dir [ i ]  != "delete.me" && dir [ i ]  . find ( ".json" )  == dir [ i ]  . len (  )  - 5 && canint ( dir [ i ]  )  ) f = dir [ i ]  . slice ( 0 ,  - 5 )  ; 
  
   else continue ; 
