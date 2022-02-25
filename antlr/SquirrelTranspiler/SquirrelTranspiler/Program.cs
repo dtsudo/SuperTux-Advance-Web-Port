@@ -26,9 +26,44 @@ namespace SquirrelTranspiler
 		private static void DoEverything()
 		{
 			CopyImageFiles();
+			CopyAudioFiles();
 			CopyDataFiles();
 			TranspileAllSquirrelCode();
 			TranspileTopLevelCode();
+		}
+
+		private static void CopyAudioFiles()
+		{
+			string mainDirectory = GetMainDirectory();
+
+			List<string> files = new List<string>();
+
+			files.AddRange(Directory.GetFiles(mainDirectory + "res/snd/"));
+
+			if (!Directory.Exists(mainDirectory + "../sample-brux-project/audioFiles/"))
+				Directory.CreateDirectory(mainDirectory + "../sample-brux-project/audioFiles/");
+
+			string audioJsFileContents = "if (!window.audioFiles) window.audioFiles = {}; \n";
+			audioJsFileContents += "window.audioFiles.audioFileList = []; \n";
+
+			for (int i = 0; i < files.Count; i++)
+			{
+				string file = files[i];
+				string partialFileName = file.Substring(mainDirectory.Length);
+
+				string fileContents = GetFileContents(file);
+				WriteFileContents(mainDirectory + "../sample-brux-project/audioFiles/file" + i + ".ogg", fileContents);
+
+				string isSound = (new FileInfo(file)).Length < 30 * 1000 ? "true" : "false";
+
+				audioJsFileContents += $"window.audioFiles.audioFileList.push({{ originalName: '{partialFileName}', fileLocation: 'audioFiles/file{i}.ogg', isSound: {isSound} }}); \n";
+
+				audioJsFileContents += RegisterFileInFolderStructure(partialFileName);
+			}
+
+			WriteFileContents(
+				fileName: mainDirectory + "../sample-brux-project/audio.js",
+				text: audioJsFileContents);
 		}
 
 		private static void TranspileTopLevelCode()

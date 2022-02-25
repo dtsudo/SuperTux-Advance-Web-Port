@@ -21,6 +21,46 @@
 	}
 })());
 
+
+
+((function () {
+	window.audioFiles.audioDictionary = {};
+	
+	window.audioFiles.numFilesLoaded = 0;
+	window.audioFiles.extraCount = 0;
+	window.audioFiles.loadingComplete = false;
+	
+	for (var i = 0; i < window.audioFiles.audioFileList.length; i++) {
+		var fileName = window.audioFiles.audioFileList[i].fileLocation;
+		var isSound = window.audioFiles.audioFileList[i].isSound;
+		
+		window.audioFiles.audioDictionary[window.audioFiles.audioFileList[i].originalName] = [];
+		
+		var iterationNum = isSound ? 8 : 1;
+		
+		var soundPath = fileName;
+		for (var j = 0; j < iterationNum; j++) {
+			if (j > 0)
+				window.audioFiles.extraCount++;
+			var audio = new Audio(soundPath);
+			audio.addEventListener('canplaythrough', function () {
+				window.audioFiles.numFilesLoaded++;
+				if (window.audioFiles.numFilesLoaded === window.audioFiles.audioFileList.length + window.audioFiles.extraCount)
+					window.audioFiles.loadingComplete = true;
+			});
+			window.audioFiles.audioDictionary[window.audioFiles.audioFileList[i].originalName].push(audio);
+		}
+	}
+})());
+
+
+
+
+
+
+
+
+
 ((function(){
 	var keysBeingPressed = [];
 	var keysBeingPressedLastFrame = [];
@@ -162,8 +202,12 @@ window.sqrt = function (x) {
 	return Math.sqrt(x);
 };
 
-window.stopChannel = function (channel) {
+window.setMaxChannels = function ( i ) {
 	
+};
+
+window.stopChannel = function (channel) {
+	console.log("stopping channel: " + channel);
 };
 
 
@@ -291,11 +335,92 @@ window.squirrelForEach = function (expression) {
 	};
 };
 
+window.soundIndex = 1;
+window.soundIndexMapping = {};
 window.loadSound = function (file) {
-	// TODO
+	var index = window.soundIndex;
+	window.soundIndex++;
+	
+	window.soundIndexMapping[index] = file;
+	
+	return index;
 };
 
+window.playSound = function (sound, loops) {
+	var file = window.soundIndexMapping[sound];
+	var audioArray = window.audioFiles.audioDictionary[file];
+	var audio = audioArray[0];
+	for (var i = 0; i < audioArray.length; i++) {
+		if (i === audioArray.length - 1)
+			audioArray[i] = audio;
+		else
+			audioArray[i] = audioArray[i+1];
+	}
+	audio.play();
+};
+
+window.deleteSound = function (sound) {
+	consle.log("deleting sound: " + sound);
+};
+
+window.checkSound = function (channel) {
+	console.log("check sound: " + channel);
+};
+
+
 window.stopSound = function (id) {
+	console.log("stopping sound: " + id);
+};
+
+
+
+
+window.fadeMusic = function( time ) {
+	if (window.currentlyPlayingMusic !== null) {
+		window.currentlyPlayingMusic.pause();
+		window.currentlyPlayingMusic.currentTime = 0;
+	}
+	window.currentlyPlayingMusic = null;
+};
+
+window.stopMusic = function () {
+	if (window.currentlyPlayingMusic !== null) {
+		window.currentlyPlayingMusic.pause();
+		window.currentlyPlayingMusic.currentTime = 0;
+	}
+	window.currentlyPlayingMusic = null;
+};
+
+window.deleteMusic = function (music) {
+	
+};
+
+window.currentlyPlayingMusic = null;
+window.playMusic = function (music, loops) {
+	var musicFile = window.musicIndexMapping[music];
+	var music = window.audioFiles.audioDictionary[musicFile][0];
+	
+	if (window.currentlyPlayingMusic !== null) {
+		window.currentlyPlayingMusic.pause();
+		window.currentlyPlayingMusic.currentTime = 0;
+	}
+	window.currentlyPlayingMusic = music;
+	try
+	{
+		music.play();
+	} catch (error) {
+	}
+};
+
+window.musicIndex = 1;
+window.musicIndexMapping = {};
+window.loadMusic = function (file) {
+	var index = window.musicIndex;
+	window.musicIndex++;
+	
+	window.musicIndexMapping[index] = file;
+	
+	return index;
 };
 
 
@@ -386,11 +511,6 @@ window.chint = function (s) {
 	return s;
 };
 
-window.playSound = function (sound, loops) {
-	
-};
-
-
 
 window.jsonWrite = function (table) {
 	return JSON.stringify(table);
@@ -422,7 +542,7 @@ window.jsonRead = function (string) {
 	return JSON.parse(string);
 };
 
-window.localStorageGuid = "24c39e3e40ae43e7884b2b058cf086c5";
+window.localStorageGuid = "23c39e3e40ae43e7884b2b058cf086c5";
 
 window.fileWrite = function (name, string) {
 	try {
@@ -765,26 +885,6 @@ window.wrap = function (num, low, high) {
 	return 0;
 };
 
-
-window.fadeMusic = function( time ) {
-	
-};
-
-window.stopMusic = function () {
-	// TODO
-};
-
-window.deleteMusic = function (music) {
-	
-};
-
-window.playMusic = function (music, loops) {
-	// TODO
-};
-
-window.loadMusic = function (file) {
-	// TODO
-};
 
 window.randInt = function (max) {
 	return Math.floor(Math.random() * max);

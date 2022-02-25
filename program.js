@@ -100,7 +100,7 @@
 			window.superTuxAdvanceCanvasContext = window.superTuxAdvanceCanvas.getContext('2d');
 		}
 		
-		if (window.imageFiles.loadingComplete) {
+		if (window.imageFiles.loadingComplete && window.audioFiles.loadingComplete) {
 			for (var i = 0 ; i < window.jsFiles.length; i++)
 				window.jsFiles[i]();
 			

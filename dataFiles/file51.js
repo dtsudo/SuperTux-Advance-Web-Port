@@ -1390,7 +1390,7 @@ window.files['res/map/0-x.json'] = `
                  "gid":209,
                  "height":16,
                  "id":176,
-                 "name":"if(game.levelCoins == game.maxCoins) newActor(BadExplode, 4952, 1128)",
+                 "name":"/*js*/if(game.levelCoins == game.maxCoins) newActor(BadExplode, 4952, 1128)",
                  "rotation":0,
                  "type":"",
                  "visible":true,
