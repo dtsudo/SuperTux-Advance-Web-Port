@@ -2092,7 +2092,7 @@ window.files['contrib/extras/old-7.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgOcean\\nsongPlay(musAirship)"
+         "value":"/*js*/drawBG = dbgOcean ; \\nsongPlay ( musAirship )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.8.0",

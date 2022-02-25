@@ -183,7 +183,7 @@ game . enemies ++  ;
   else  if ( arg . len (  )  == 0 ) arg = null ; 
  
   
-  if ( getroottable (  )  . rawin ( n )  )  if (  squirrelTypeOf ( getroottable ( ) )  [ n ]  == "class" ) c = newActor ( getroottable (  )  [ n ]  , i . x + 8 , i . y - 8 , arg )  ; 
+  if ( getroottable (  )  . rawin ( n )  )  if (  squirrelTypeOf ( getroottable ( ) [ n ] )  == "class" ) c = newActor ( getroottable (  )  [ n ]  , i . x + 8 , i . y - 8 , arg )  ; 
  
   
   break ;  case 65 : c = newActor ( Haywire , i . x + 8 , i . y - 8 )  ; 
@@ -217,7 +217,7 @@ game . enemies ++  ;
  
   } 
  arg [ 0 ] = poly ; 
- if ( getroottable (  )  . rawin ( n )  )  if (  squirrelTypeOf ( getroottable ( ) )  [ n ]  == "class" ) newActor ( getroottable (  )  [ n ]  , i . x , i . y , arg )  ; 
+ if ( getroottable (  )  . rawin ( n )  )  if (  squirrelTypeOf ( getroottable ( ) [ n ] )  == "class" ) newActor ( getroottable (  )  [ n ]  , i . x , i . y , arg )  ; 
  
   
   } 
@@ -234,7 +234,7 @@ game . enemies ++  ;
   for (  var j = 0 ;
  j < i . polyline . len (  )  ; j ++  ) poly . push (  [ i . x + i . polyline [ j ]  . x , i . y + i . polyline [ j ]  . y ]  )  ; 
 arg [ 0 ] = poly ; 
- if ( getroottable (  )  . rawin ( n )  )  if (  squirrelTypeOf ( getroottable ( ) )  [ n ]  == "class" ) newActor ( getroottable (  )  [ n ]  , i . x , i . y , arg )  ; 
+ if ( getroottable (  )  . rawin ( n )  )  if (  squirrelTypeOf ( getroottable ( ) [ n ] )  == "class" ) newActor ( getroottable (  )  [ n ]  , i . x , i . y , arg )  ; 
  
   
   } 

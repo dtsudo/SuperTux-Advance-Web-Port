@@ -2032,7 +2032,7 @@ window.files['contrib/frostlands/Fw-2.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgAuroraF\\nsongPlay(musIceland)"
+         "value":"/*js*/drawBG = dbgAuroraF ; \\nsongPlay ( musIceland )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

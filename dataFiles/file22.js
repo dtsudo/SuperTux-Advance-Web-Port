@@ -201,7 +201,7 @@ window.files['contrib/frostlands/fw-t2.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgForest\\nsongPlay(musSnowTown)"
+         "value":"/*js*/drawBG = dbgForest ; \\nsongPlay ( musSnowTown )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

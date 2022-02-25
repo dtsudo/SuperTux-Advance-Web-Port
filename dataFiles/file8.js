@@ -345,7 +345,7 @@ window.files['contrib/frostlands/TBA/GT.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgSnowNight\\nsongPlay(musGTN)\\n\\nforeach(i in actor[\\"NPC\\"]) {\\n if(i.sprite == sprXue && !game.friends.rawin(\\"Xue\\")) deleteActor(i.id)\\n if(i.sprite == sprPygame && !game.friends.rawin(\\"Pygame\\")) deleteActor(i.id)\\n}"
+         "value":"/*js*/drawBG = dbgSnowNight ; \\nsongPlay ( musGTN )  ; \\n {     var foreachOutput = squirrelForEach ( actor [ \\"NPC\\" ]  ) ;     while ( true )     {        foreachOutput . next ( ) ;        if ( foreachOutput . isDone ( ) ) break ; i = foreachOutput . getValue ( ) ;  { \\n  if ( i . sprite == sprXue &&  ! game . friends . rawin ( \\"Xue\\" )  ) deleteActor ( i . id )  ; \\n \\n  if ( i . sprite == sprPygame &&  ! game . friends . rawin ( \\"Pygame\\" )  ) deleteActor ( i . id )  ; \\n \\n  } \\n     }  } "
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

@@ -1895,7 +1895,7 @@ window.files['contrib/frostlands/Fw-5.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgForest\\nsongPlay(musDisko)"
+         "value":"/*js*/drawBG = dbgForest ; \\nsongPlay ( musDisko )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

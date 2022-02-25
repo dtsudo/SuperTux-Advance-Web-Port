@@ -117,7 +117,7 @@ window.files['res/map/template.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":""
+         "value":"/*js*/"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

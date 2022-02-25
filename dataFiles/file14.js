@@ -2082,7 +2082,7 @@ window.files['contrib/frostlands/Fw-4.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgSnowNight\\nsongPlay(musRace)"
+         "value":"/*js*/drawBG = dbgSnowNight ; \\nsongPlay ( musRace )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.8.0",

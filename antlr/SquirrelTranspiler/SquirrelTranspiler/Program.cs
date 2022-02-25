@@ -159,14 +159,17 @@ namespace SquirrelTranspiler
 
 		private static string TranspileEmbeddedSquirrelCodeInDataFile(string fileContents, int searchStart)
 		{
-			string searchTerm = "\"name\":\"code\",\"type\":\"string\",\"value\":\"";
+			string searchTerm = "\"name\":\"code\"";
 
 			int index = fileContents.IndexOf(searchTerm, startIndex: searchStart);
 
 			if (index == -1)
 				return fileContents;
 
-			int startIndex = index + searchTerm.Length;
+			string searchTerm2 = "\"value\":\"";
+			int index2 = fileContents.IndexOf(searchTerm2, index);
+
+			int startIndex = index2 + searchTerm2.Length;
 			int endIndex = startIndex;
 			while (true)
 			{
@@ -283,6 +286,33 @@ namespace SquirrelTranspiler
 					+ "});";
 
 				string outputFileName = "transpiledSquirrelCode/" + GetNonQualifiedName(fullyQualifiedName).Replace(".nut", ".js");
+				outputFileNames.Add(outputFileName);
+
+				WriteFileContents(
+					fileName: mainDirectory + "../sample-brux-project/" + outputFileName,
+					text: transpiledCode);
+			}
+
+			List<string> contribScriptFiles = new List<string>();
+
+			contribScriptFiles.AddRange(Directory.GetFiles(mainDirectory + "contrib/extras/", "*.nut"));
+			contribScriptFiles.AddRange(Directory.GetFiles(mainDirectory + "contrib/frostlands/", "*.nut"));
+
+			for (int i = 0; i < contribScriptFiles.Count; i++)
+			{
+				string fullyQualifiedName = contribScriptFiles[i];
+				string partialFileName = fullyQualifiedName.Substring(mainDirectory.Length);
+
+				string fileContents = GetFileContents(fileName: fullyQualifiedName);
+
+				string transpiledCode = TranspileSquirrelCode(str: fileContents);
+
+				transpiledCode = "if (!window.contribScripts) \n \t window.contribScripts = {}; \n\n"
+					+ "window.contribScripts['" + partialFileName + "'] = function () {" + "\n\n\n"
+					+ transpiledCode + "\n\n\n"
+					+ "};";
+
+				string outputFileName = "transpiledSquirrelCode/contribScript" + i + ".js";
 				outputFileNames.Add(outputFileName);
 
 				WriteFileContents(

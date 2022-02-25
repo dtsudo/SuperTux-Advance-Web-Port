@@ -246,6 +246,8 @@ namespace SquirrelTranspiler
 
 		public override string VisitTypeOf(SquirrelParser.TypeOfContext context)
 		{
+			if (context.openSquareBracket() != null && context.openParen() != null)
+				return " squirrelTypeOf ( " + this.VisitId(context.id()) + " ( ) [ " + this.VisitExp(context.exp()) + " ] ) ";
 			if (context.openSquareBracket() != null)
 				return " squirrelTypeOf ( " + this.VisitId(context.id()) + " [ " + this.VisitExp(context.exp()) + " ] ) ";
 			if (context.openParen() != null)

@@ -2516,7 +2516,7 @@ window.files['res/map/0-6b.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgIceForest\\nsongPlay(musDisko)"
+         "value":"/*js*/drawBG = dbgIceForest ; \\nsongPlay ( musDisko )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.8.0",

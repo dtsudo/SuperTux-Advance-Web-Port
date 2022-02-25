@@ -1903,7 +1903,7 @@ window.files['contrib/frostlands/TBA/lost.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgAurora\\nsongPlay(musRace)"
+         "value":"/*js*/drawBG = dbgAurora ; \\nsongPlay ( musRace )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

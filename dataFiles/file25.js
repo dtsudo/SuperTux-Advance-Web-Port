@@ -339,7 +339,7 @@ window.files['contrib/frostlands/overworld-F.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"songPlay(musOverworld)"
+         "value":"/*js*/songPlay ( musOverworld )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.8.0",

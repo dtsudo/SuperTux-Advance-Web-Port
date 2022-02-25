@@ -1566,7 +1566,7 @@ window.files['contrib/frostlands/TBA/B-1.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgNever\\nsongPlay(musball)"
+         "value":"/*js*/drawBG = dbgNever ; \\nsongPlay ( musball )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

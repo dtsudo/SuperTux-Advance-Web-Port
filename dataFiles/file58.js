@@ -1333,7 +1333,7 @@ window.files['res/map/test.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgForest"
+         "value":"/*js*/drawBG = dbgForest ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

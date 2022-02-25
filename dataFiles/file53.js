@@ -1920,7 +1920,7 @@ window.files['res/map/mario0.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgMountain\\nsongPlay(musAirship)"
+         "value":"/*js*/drawBG = dbgMountain ; \\nsongPlay ( musAirship )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

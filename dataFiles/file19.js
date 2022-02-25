@@ -3497,7 +3497,7 @@ window.files['contrib/frostlands/Fw-9.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgAuroraF\\nsongPlay(musDisko)"
+         "value":"/*js*/drawBG = dbgAuroraF ; \\nsongPlay ( musDisko )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

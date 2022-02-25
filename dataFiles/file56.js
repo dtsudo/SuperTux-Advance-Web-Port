@@ -58,7 +58,7 @@ window.files['res/map/template-overworld.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"songPlay(musOverworld)"
+         "value":"/*js*/songPlay ( musOverworld )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

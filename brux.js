@@ -103,9 +103,6 @@
 	window.keyboardHelper.update = update;
 })());
 
-window.setDrawColor = function (color) {
-	
-};
 
 window.pointAngle = function( x1, y1, x2, y2 ) {
 	return Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
@@ -132,8 +129,31 @@ window.tan = function (x) {
 	return Math.tan(x);
 };
 
+
+window.graphicsDrawColor = 0x000000ff;
+window.setDrawColor = function (color) {
+	window.graphicsDrawColor = color;
+};
+
 window.drawRec = function (x, y, width, height, solid) {
 	
+	var context = window.superTuxAdvanceCanvasContext;
+	
+	if (window.canvasTarget !== 0)
+		context = window.canvasTextures[window.canvasTarget].getContext('2d');
+	
+	var red = (window.graphicsDrawColor >> 24) & 0xff;
+	var green = (window.graphicsDrawColor >> 16) & 0xff;
+	var blue = (window.graphicsDrawColor >> 8) & 0xff;
+	var alpha = window.graphicsDrawColor & 0xff;
+	
+	context.fillStyle = 'rgba(' + red.toString() + ', ' + green.toString() + ', ' + blue.toString() + ', ' + (alpha / 255).toString() + ')';
+	context.strokeStyle = 'rgba(' + red.toString() + ', ' + green.toString() + ', ' + blue.toString() + ', ' + (alpha / 255).toString() + ')';
+	
+	if (solid)
+		context.fillRect(x, y, width, height);
+	else
+		context.strokeRect(x, y, width, height);
 };
 
 window.drawRect = window.drawRec;
@@ -158,6 +178,9 @@ window.drawSpriteEx = function (sprite, frameNum, x, y, angle, flip, xscale, ysc
 };
 
 window.drawSpriteExMod = function( sprite, frameNum, x, y, angle, flip, xscale, yscale, alpha, color) {
+	
+	x = Math.floor(x);
+	y = Math.floor(y);
 
 	var context = window.superTuxAdvanceCanvasContext;
 	
@@ -275,30 +298,6 @@ window.loadSound = function (file) {
 window.stopSound = function (id) {
 };
 
-window.lsdir = function (str) {
-
-	var split = str.split('/');
-	var index = 0;
-	var currentLocation = window.folderStructure;
-	while (true) {
-		if (index === split.length) {
-			break;
-		}
-		currentLocation = currentLocation[split[index]];
-		index++;
-		if (!currentLocation)
-			return [];
-	}
-	
-	var returnVal = [".", ".."];
-	
-	for (var x in currentLocation) {
-		if (currentLocation.hasOwnProperty(x))
-			returnVal.push(x);
-	}
-	
-	return returnVal;
-};
 
 window.isdir = function (str) {
 	return window.lsdir(str).filter(x => x !== "." && x !== "..").length > 0;
@@ -382,9 +381,6 @@ window.clone = function (x) {
 	return x;
 };
 
-window.fileWrite = function (name, string) {
-	
-};
 
 window.chint = function (s) {
 	return s;
@@ -409,6 +405,56 @@ window.squirrelTypeOf = function (obj) {
 		return "table";
 	if (typeof obj === "string")
 		return "string";
+	if (typeof obj === "function" && (obj+"").indexOf("constructor") >= 0)
+		return "class";
+};
+
+window.max = function (a, b) {
+	return a > b ? a : b;
+};
+
+window.min = function (a, b) {
+	return a < b ? a : b;
+};
+
+
+window.jsonRead = function (string) {
+	return JSON.parse(string);
+};
+
+window.localStorageGuid = "23c39e3e40ae43e7884b2b058cf086c5";
+
+window.fileWrite = function (name, string) {
+	try {
+		localStorage.setItem(window.localStorageGuid + name, string);
+		
+		var localStorageFileKey = window.localStorageGuid + "localStorageFiles";
+		var localStorageFiles = localStorage.getItem(localStorageFileKey);
+		if (localStorageFiles === null)
+			localStorage.setItem(localStorageFileKey, name);
+		else
+			localStorage.setItem(localStorageFileKey, localStorageFiles + " " + name);
+	} catch (error) {
+		// do nothing
+	}
+};
+
+window.fileRead = function (string) {
+	if (!window.files)
+		window.files = {};
+	
+	if (window.files[string])
+		return window.files[string];
+	
+	try {
+		var localStorageResult = localStorage.getItem(window.localStorageGuid + string);
+		if (localStorageResult !== null)
+			return localStorageResult;
+	} catch (error) {
+		// do nothing
+	}
+	
+	throw 'fileRead: did not find file "' + string + '"';
 };
 
 window.fileExists = function (name) {
@@ -432,21 +478,69 @@ window.fileExists = function (name) {
 			break;
 	}
 	
+	try {
+		var localStorageResult = localStorage.getItem(window.localStorageGuid + name);
+		if (localStorageResult !== null)
+			return true;
+	} catch (error) {
+		// do nothing
+	}
+	
+	if (name.endsWith(".nut")) {
+		if (window.contribScripts[name])
+			return true;
+	}
+	
 	return false;
 };
 
-window.jsonRead = function (string) {
-	return JSON.parse(string);
+window.donut = function (script) {
+	window.contribScripts[script]();
 };
 
-window.fileRead = function (string) {
-	if (!window.files)
-		window.files = {};
+window.lsdir = function (str) {
+
+	try {
+		var localStorageArray = [];
+		var localStorageFileKey = window.localStorageGuid + "localStorageFiles";
+		var localStorageFiles = localStorage.getItem(localStorageFileKey);
+		if (localStorageFiles !== null) {
+			var localStorageList = localStorageFiles.split(" ");
+			for (var i = 0; i < localStorageList.length; i++) {
+				if (localStorageList[i].indexOf(str) === 0)
+					localStorageArray.push( localStorageList[i].substring( str.length + 1 ) );
+			}
+		}
+		
+		if (localStorageArray.length > 0) {
+			localStorageArray.push(".");
+			localStorageArray.push("..");
+			return localStorageArray;
+		}
+	} catch (error) {
+	}
+
+	var split = str.split('/');
+	var index = 0;
+	var currentLocation = window.folderStructure;
+	while (true) {
+		if (index === split.length) {
+			break;
+		}
+		currentLocation = currentLocation[split[index]];
+		index++;
+		if (!currentLocation)
+			return [];
+	}
 	
-	if (window.files[string])
-		return window.files[string];
+	var returnVal = [".", ".."];
 	
-	throw 'fileRead: did not find file "' + string + '"';
+	for (var x in currentLocation) {
+		if (currentLocation.hasOwnProperty(x))
+			returnVal.push(x);
+	}
+	
+	return returnVal;
 };
 
 window.loadedSprites = [];
@@ -836,8 +930,19 @@ Array.prototype.len = function () {
 	return this.length;
 };
 
+String.prototype.tochar = function () {
+	return this;
+};
+
 String.prototype.len = function () {
 	return this.length;
+};
+
+String.prototype.find = function (s) {
+	var returnVal = this.indexOf(s);
+	if (returnVal >= 0)
+		return returnVal;
+	return null;
 };
 
 String.prototype.tofloat = function () {

@@ -2452,7 +2452,7 @@ window.files['contrib/frostlands/Fw-8.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgForest\\nsongPlay(musIceland)"
+         "value":"/*js*/drawBG = dbgForest ; \\nsongPlay ( musIceland )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.8.0",

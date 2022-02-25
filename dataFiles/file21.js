@@ -212,7 +212,7 @@ window.files['contrib/frostlands/fw-t1.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgAuroraF\\nsongPlay(musSnowTown)\\n\\n"
+         "value":"/*js*/drawBG = dbgAuroraF ; \\nsongPlay ( musSnowTown )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

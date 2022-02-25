@@ -3463,7 +3463,7 @@ window.files['contrib/frostlands/TBA/B-3.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgbad\\nsongPlay(musrace)"
+         "value":"/*js*/drawBG = dbgbad ; \\nsongPlay ( musrace )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

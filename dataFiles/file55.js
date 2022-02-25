@@ -189,7 +189,7 @@ window.files['res/map/shop.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgStarSky\\nsongPlay(musSnowTown)\\nsetLight(0xffffffff)"
+         "value":"/*js*/drawBG = dbgStarSky ; \\nsongPlay ( musSnowTown )  ; \\nsetLight ( 0xffffffff )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

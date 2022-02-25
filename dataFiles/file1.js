@@ -128,7 +128,7 @@ window.files['contrib/extras/extra.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"songPlay(musOverworld)\\nfreeKonqi()"
+         "value":"/*js*/songPlay ( musOverworld )  ; \\nfreeKonqi (  )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.8.0",

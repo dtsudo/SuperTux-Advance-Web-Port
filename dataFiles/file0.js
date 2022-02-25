@@ -898,7 +898,7 @@ window.files['contrib/extras/0-0B.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgAurora\\nsongPlay(musDisko)"
+         "value":"/*js*/drawBG = dbgAurora ; \\nsongPlay ( musDisko )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

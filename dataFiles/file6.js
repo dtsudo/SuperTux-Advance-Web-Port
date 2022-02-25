@@ -1723,7 +1723,7 @@ window.files['contrib/frostlands/TBA/B-2.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgRace\\nsongPlay(musrace)"
+         "value":"/*js*/drawBG = dbgRace ; \\nsongPlay ( musrace )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

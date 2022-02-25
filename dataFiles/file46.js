@@ -3657,7 +3657,7 @@ window.files['res/map/0-c.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"songPlay(musCastle)\\ndrawBG = dbgCastle\\ndrawWeather = dweRain\\ngame.colorswitch[7] = false"
+         "value":"/*js*/songPlay ( musCastle )  ; \\ndrawBG = dbgCastle ; \\ndrawWeather = dweRain ; \\ngame . colorswitch [ 7 ] = false ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

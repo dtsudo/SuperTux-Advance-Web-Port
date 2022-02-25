@@ -1998,7 +1998,7 @@ window.files['contrib/frostlands/Fw-3.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgSnowPlainF\\nsongPlay(musDisko)"
+         "value":"/*js*/drawBG = dbgSnowPlainF ; \\nsongPlay ( musDisko )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

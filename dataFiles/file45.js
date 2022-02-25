@@ -2970,7 +2970,7 @@ window.files['res/map/0-9.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgSnowNight\\nsongPlay(musretro2)\\ndrawWeather = dweRain"
+         "value":"/*js*/drawBG = dbgSnowNight ; \\nsongPlay ( musretro2 )  ; \\ndrawWeather = dweRain ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.8.0",

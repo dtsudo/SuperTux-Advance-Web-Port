@@ -7469,7 +7469,7 @@ window.files['contrib/frostlands/Fw-3b.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgSnowPlainF\\nsongPlay(musRace)"
+         "value":"/*js*/drawBG = dbgSnowPlainF ; \\nsongPlay ( musRace )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

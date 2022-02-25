@@ -919,7 +919,7 @@ window.files['contrib/frostlands/Fw-6.json'] = `
         {
          "name":"code",
          "type":"string",
-         "value":"drawBG = dbgForest\\nsongPlay(musRace)"
+         "value":"/*js*/drawBG = dbgForest ; \\nsongPlay ( musRace )  ; \\n"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

@@ -3,13 +3,51 @@
 	
 	window.isWebBrowserVersion = true;
 	
+	var urlParams = (new URL(document.location)).searchParams;
+				
+	var unlockAllLevels = urlParams.get('unlocklevels') !== null
+		? (urlParams.get('unlocklevels') === 'true')
+		: false;
+	
+	var debugCommands = function () {
+		if (unlockAllLevels) {
+			game.completed["0-0"]=true;
+			game.completed["0-1"]=true;
+			game.completed["0-2"]=true;
+			game.completed["0-3"]=true;
+			game.completed["0-4"]=true;
+			game.completed["0-5"]=true;
+			game.completed["0-6"]=true;
+			game.completed["0-5"]=true;
+			game.completed["0-5"]=true;
+			game.completed["0-6a"]=true;
+			game.completed["0-6b"]=true;
+			game.completed["0-7"]=true;
+			game.completed["0-8"]=true;
+			game.completed["0-9"]=true;
+			game.completed["Fw-1"]=true;
+			game.completed["Fw-2"]=true;
+			game.completed["Fw-3"]=true;
+			game.completed["Fw-3b"]=true;
+			game.completed["Fw-4"]=true;
+			game.completed["Fw-5"]=true;
+			game.completed["Fw-6"]=true;
+			game.completed["Fw-7"]=true;
+			game.completed["Fw-8"]=true;
+			game.completed["Fw-9"]=true;
+			game.completed["Fw-t0"]=true;
+			game.completed["Fw-t1"]=true;
+			game.completed["Fw-t2"]=true;
+			game.completed["Fw-t3"]=true;
+		}
+	};
+	
 	var startGame = function () {
 		var computeAndRenderNextFrame;
 		var fps = 60;
 							
 		var nextTimeToAct = Date.now() + (1000.0 / fps);
-
-
+		
 		computeAndRenderNextFrame = function () {
 			var now = Date.now();
 			
@@ -30,12 +68,8 @@
 			window.superTuxAdvanceCanvasContext.fillRect(0, 0, 960, 720);
 			gvGameMode();
 			window.update();
-			game.completed["0-0"]=true;
-			game.completed["0-1"]=true;
-			game.completed["0-2"]=true;
-			game.completed["0-3"]=true;
-			game.completed["0-4"]=true;
-			game.completed["0-5"]=true;
+			
+			debugCommands();
 			config.light = false;
 				
 			setTimeout(computeAndRenderNextFrame, 0);
