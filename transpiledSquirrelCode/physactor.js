@@ -4,7 +4,7 @@ if (!window.jsFiles)
 window.jsFiles.push(function () {
 
 
-PhysAct =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . hspeed = 0.0 ; 
+PhysAct =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . hspeed = 0.0 ; 
  returnVal . vspeed = 0.0 ; 
  returnVal . box =  [ 0 , 0 , 0 , 0 ]  ; 
  returnVal . xstart = 0.0 ; 
@@ -14,7 +14,9 @@ PhysAct =  function ( ) { var returnVal = { constructor: function(){} } ;  retur
  returnVal . shape = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 xstart = _x ; 
 ystart = _y ; 
  } ;  returnVal . run = function (  ) { xprev = x ; 
@@ -427,7 +429,7 @@ gvMap . shape . h = 4.0 ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-PathCrawler =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . path = null ; 
+PathCrawler =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . path = null ; 
  returnVal . speed = 0.0 ; 
  returnVal . tx = 0 ; 
  returnVal . ty = 0 ; 
@@ -438,7 +440,9 @@ PathCrawler =  function ( ) { var returnVal = { constructor: function(){} } ;  r
  returnVal . moving = true ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y , _arr )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y , _arr )  ; 
 path = _arr [ 0 ]  ; 
 speed = _arr [ 1 ]  . tofloat (  )  ; 
 shape = Rec ( x , y , 6 , 6 , 0 )  ; 

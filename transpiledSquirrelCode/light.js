@@ -65,11 +65,13 @@ drawAmbientLight =  function (  ) {  if ( config . light ) drawImage ( gvLightSc
 setLight =  function ( color ) { gvLightTarget = color ; 
 gvLight = color ; 
  }  ; 
-StaticLight =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . sprite = 0 ; 
+StaticLight =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . sprite = 0 ; 
  returnVal . scale = 1.0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
  if ( getroottable (  )  . rawin ( _arr [ 0 ]  )  ) sprite = getroottable (  )  [ _arr [ 0 ]  ]  ; 
  
   else deleteActor ( id )  ; 

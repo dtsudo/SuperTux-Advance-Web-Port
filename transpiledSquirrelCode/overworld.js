@@ -5,9 +5,11 @@ window.jsFiles.push(function () {
 
 
 gvLevel = "" ; 
-OverPlayer =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  
+OverPlayer =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
  if ( game . owx == 0 && game . owy == 0 )  { 
  x = _x ; 
 y = _y ; 
@@ -209,11 +211,13 @@ y += vspeed ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-StageIcon =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . level = "" ; 
+StageIcon =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . level = "" ; 
  returnVal . visible = true ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y , 8 , 8 , 0 )  ; 
  } ;  returnVal . run = function (  ) {  if ( visible )  { 
   if ( game . completed . rawin ( level )  ) drawSprite ( sprLevels , 1 , x - camx , y - camy )  ; 
@@ -244,11 +248,13 @@ startPlay ( game . path + level + ".json" )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-TownIcon =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . level = "" ; 
+TownIcon =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . level = "" ; 
  returnVal . visible = true ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y , 8 , 8 , 0 )  ; 
  } ;  returnVal . run = function (  ) {  if ( getcon ( "jump" , "press" )  || getcon ( "accept" , "press" )  || getcon ( "shoot" , "press" )  )  { 
   if ( gvPlayer )  if ( hitTest ( shape , gvPlayer . shape )  && gvPlayer . hspeed == 0 && gvPlayer . vspeed == 0 )  if ( level != "" )  { 
@@ -268,14 +274,16 @@ startPlay ( game . path + level + ".json" )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-WorldIcon =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . level = "" ; 
+WorldIcon =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . level = "" ; 
  returnVal . world = "" ; 
  returnVal . visible = true ; 
  returnVal . px = 0 ; 
  returnVal . py = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y , 8 , 8 , 0 )  ; 
  } ;  returnVal . run = function (  ) {  if ( world == "" && level != "" )  { 
   var arr = split ( level , "," )  ;

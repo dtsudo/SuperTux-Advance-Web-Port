@@ -22,7 +22,9 @@ AnimTile =  function ( ) { var returnVal = { constructor: function(){} } ;  retu
  returnVal . sprite = null ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( animList , _sprite ) { frameID = animList . id ; 
+  returnVal . constructor = function ( animList , _sprite ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+  frameID = animList . id ; 
 frameList =  [  ]  ; 
 frameTime =  [  ]  ; 
  for (  var i = 0 ;
@@ -77,7 +79,9 @@ Tilemap =  function ( ) { var returnVal = { constructor: function(){} } ;  retur
  returnVal . solidLayer = null ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( filename ) { tileset =  [  ]  ; 
+  returnVal . constructor = function ( filename ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+  tileset =  [  ]  ; 
 tilef =  [  ]  ; 
 geo =  [  ]  ; 
 data =  {  }  ; 

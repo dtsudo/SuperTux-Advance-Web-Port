@@ -431,9 +431,11 @@ window.fileWrite = function (name, string) {
 		var localStorageFileKey = window.localStorageGuid + "localStorageFiles";
 		var localStorageFiles = localStorage.getItem(localStorageFileKey);
 		if (localStorageFiles === null)
-			localStorage.setItem(localStorageFileKey, name);
-		else
-			localStorage.setItem(localStorageFileKey, localStorageFiles + " " + name);
+			localStorage.setItem(localStorageFileKey, " " + name + " ");
+		else {
+			if (localStorageFiles.indexOf(" " + name + " ") < 0)
+				localStorage.setItem(localStorageFileKey, localStorageFiles + " " + name + " ");
+		}
 	} catch (error) {
 		// do nothing
 	}
@@ -653,7 +655,7 @@ window.getFPS = function () {
 };
 
 window.bruxVersion = function () {
-	return "0.1";
+	return "v.0.2.4";
 };
 
 window.k_up = "ArrowUp";
@@ -860,6 +862,7 @@ window.countActors = function () {
 	return count;
 };
 
+window.pi = Math.PI;
 
 window.newActor = function (type, x, y, arr) {
 	if (arr === undefined)
@@ -867,14 +870,20 @@ window.newActor = function (type, x, y, arr) {
 	
 	var actorArgs = [x, y];
 	
-	if (Array.isArray(arr)) {
-		for (var i = 0; i < arr.length; i++)
-			actorArgs.push(arr[i]);
-	}
-	else
-		actorArgs.push(arr);
+	//if (Array.isArray(arr)) {
+	//	for (var i = 0; i < arr.length; i++)
+	//		actorArgs.push(arr[i]);
+	//}
+	//else
+	//	actorArgs.push(arr);
 		
-	var newActor = type(...actorArgs);
+	//var newActor = type(...actorArgs);
+	
+	var newActor;
+	if (arr !== undefined && arr !== null)
+		newActor = type(x, y, arr);
+	else
+		newActor = type(x, y);
 	
 	var id = window.actorIdGenerator;
 	window.actorIdGenerator++;
@@ -1006,7 +1015,8 @@ window.split = function (stringToDivide, separatorChar) {
 		}
 		
 		if (index < 0) {
-			arr.push(stringToDivide);
+			if (stringToDivide.length > 0)
+				arr.push(stringToDivide);
 			break;
 		}
 		if (index !== 0)

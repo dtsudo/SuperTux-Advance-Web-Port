@@ -4,11 +4,13 @@ if (!window.jsFiles)
 window.jsFiles.push(function () {
 
 
-Spark =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
+Spark =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
  returnVal . angle = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 angle = 45 * randInt ( 8 )  ; 
  } ;  returnVal . run = function (  ) { frame += 0.25 ; 
  if ( frame >= 6 ) deleteActor ( id )  ; 
@@ -18,11 +20,13 @@ angle = 45 * randInt ( 8 )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-Glimmer =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
+Glimmer =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
  returnVal . angle = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 angle = 45 * randInt ( 8 )  ; 
  } ;  returnVal . run = function (  ) { frame += 0.25 ; 
  if ( frame >= 3 ) deleteActor ( id )  ; 
@@ -32,11 +36,13 @@ angle = 45 * randInt ( 8 )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-Poof =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
+Poof =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
  returnVal . angle = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 angle =  ( 360 / 8 )  * randInt ( 8 )  ; 
  } ;  returnVal . run = function (  ) { frame += 0.125 ; 
  if ( frame >= 4 ) deleteActor ( id )  ; 
@@ -46,11 +52,13 @@ angle =  ( 360 / 8 )  * randInt ( 8 )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-PoofTiny =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
+PoofTiny =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
  returnVal . angle = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 angle =  ( 360 / 8 )  * randInt ( 8 )  ; 
  } ;  returnVal . run = function (  ) { frame += 0.25 ; 
  if ( frame >= 4 ) deleteActor ( id )  ; 
@@ -60,11 +68,13 @@ angle =  ( 360 / 8 )  * randInt ( 8 )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-Flame =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
+Flame =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
  returnVal . angle = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 angle =  ( 360 / 8 )  * randInt ( 8 )  ; 
  } ;  returnVal . run = function (  ) { frame += 0.25 ; 
  if ( frame >= 8 ) deleteActor ( id )  ; 
@@ -75,11 +85,13 @@ angle =  ( 360 / 8 )  * randInt ( 8 )  ;
  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-Splash =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
+Splash =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
  returnVal . angle = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 angle =  ( 360 / 8 )  * randInt ( 8 )  ; 
  } ;  returnVal . run = function (  ) { frame += 0.25 ; 
  if ( frame >= 4 ) deleteActor ( id )  ; 
@@ -89,13 +101,15 @@ angle =  ( 360 / 8 )  * randInt ( 8 )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-FlameTiny =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
+FlameTiny =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
  returnVal . angle = 0 ; 
  returnVal . hspeed = 0.0 ; 
  returnVal . vspeed = 0.0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
  } ;  returnVal . run = function (  ) { x += hspeed ; 
 y += vspeed ; 
 frame += 0.25 ; 
@@ -107,10 +121,12 @@ frame += 0.25 ;
  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-CoinEffect =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . vspeed =  - 5.0 ; 
+CoinEffect =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . vspeed =  - 5.0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 game . levelcoins ++  ; 
 game . coins ++  ; 
  if ( game . coins >= 100 )  { 
@@ -135,14 +151,16 @@ newActor ( Spark , x , y )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-IceChunks =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . h = 0.0 ; 
+IceChunks =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . h = 0.0 ; 
  returnVal . v = 0.0 ; 
  returnVal . vspeed =  - 3.0 ; 
  returnVal . timer = 30 ; 
  returnVal . a = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 playSound ( sndIceBreak , 0 )  ; 
  } ;  returnVal . run = function (  ) { vspeed += 0.2 ; 
 v += vspeed ; 
@@ -158,10 +176,12 @@ timer --  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-Heal =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
+Heal =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
  } ;  returnVal . run = function (  ) {  if ( frame < 1 ) frame += 0.02 ; 
  
  frame += 0.05 ; 

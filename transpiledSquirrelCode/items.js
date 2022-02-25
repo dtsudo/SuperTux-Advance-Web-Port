@@ -4,10 +4,12 @@ if (!window.jsFiles)
 window.jsFiles.push(function () {
 
 
-Coin =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
+Coin =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 frame = randFloat ( 4 )  ; 
 game . maxcoins ++  ; 
  } ;  returnVal . run = function (  ) { frame += 0.2 ; 
@@ -22,9 +24,11 @@ newActor ( CoinEffect , x , y )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-Berry =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  
+Berry =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
  } ;  returnVal . run = function (  ) { drawSprite ( sprBerry , 0 , x - camx , y - camy +  (  ( getFrames (  )  / 16 )  % 2 == 0 )  . tointeger (  )  )  ; 
  if ( gvPlayer )  if ( distance2 ( x , y , gvPlayer . x , gvPlayer . y + 2 )  <= 16 )  { 
  deleteActor ( id )  ; 
@@ -38,9 +42,11 @@ playSound ( sndGulp , 0 )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-FlowerFire =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  
+FlowerFire =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
  } ;  returnVal . run = function (  ) { drawSprite ( sprFlowerFire , getFrames (  )  / 16 , x - camx , y - camy )  ; 
  if ( gvPlayer )  if ( distance2 ( x , y , gvPlayer . x , gvPlayer . y + 2 )  <= 14 )  { 
  deleteActor ( id )  ; 
@@ -65,9 +71,11 @@ game . weapon = 1 ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-FlowerIce =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  
+FlowerIce =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
  } ;  returnVal . run = function (  ) { drawSprite ( sprFlowerIce , getFrames (  )  / 16 , x - camx , y - camy )  ; 
  if ( gvPlayer )  if ( distance2 ( x , y , gvPlayer . x , gvPlayer . y + 2 )  <= 14 )  { 
  deleteActor ( id )  ; 
@@ -92,11 +100,13 @@ game . weapon = 2 ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-MuffinBlue =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . flip = false ; 
+MuffinBlue =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . flip = false ; 
  returnVal . willwrite = false ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y , 6 , 7 , 0 )  ; 
  if ( gvPlayer )  { 
   if ( x < gvPlayer . x ) flip = true ; 
@@ -182,10 +192,12 @@ playSoundChannel ( sndHeal , 0 , 1 )  ;
  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-MuffinRed =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . flip = false ; 
+MuffinRed =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . flip = false ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y , 4 , 7 , 0 )  ; 
  if ( gvPlayer )  { 
   if ( x < gvPlayer . x ) flip = true ; 
@@ -277,10 +289,12 @@ playSoundChannel ( sndHeal , 0 , 1 )  ;
  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-MuffinEvil =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . flip = false ; 
+MuffinEvil =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . flip = false ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y , 4 , 7 , 0 )  ; 
  if ( gvPlayer )  { 
   if ( x > gvPlayer . x ) flip = true ; 
@@ -354,11 +368,13 @@ deleteActor ( id )  ;
  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-Starnyan =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . hspeed = 0 ; 
+Starnyan =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . hspeed = 0 ; 
  returnVal . vspeed =  - 4 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
  if ( gvPlayer )  if ( gvPlayer . x > x ) hspeed =  - 1 ; 
  
   else hspeed = 1 ; 
@@ -391,12 +407,14 @@ gvLastSong = "" ;
  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-AirFeather =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . vspeed =  - 2.0 ; 
+AirFeather =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . vspeed =  - 2.0 ; 
  returnVal . hspeed = 0.0 ; 
  returnVal . frame = 1.5 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
  if ( gvPlayer )  if ( x > gvPlayer . x ) frame = 3.5 ; 
  
   
@@ -436,7 +454,7 @@ game . weapon = 3 ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-FlyRefresh =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  
+FlyRefresh =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  
  with ( returnVal ) { 
   returnVal . run = function (  ) {  if ( gvPlayer )  if ( distance2 ( gvPlayer . x , gvPlayer . y , x , y )  <= 16 )  if ( gvPlayer . rawin ( "energy" )  && game . weapon == 3 ) gvPlayer . energy = 4 ; 
  
@@ -448,11 +466,13 @@ drawSprite ( sprFlyRefresh , getFrames (  )  / 8 , x - camx , y - camy )  ;
  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-OneUp =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . hspeed = 0 ; 
+OneUp =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . hspeed = 0 ; 
  returnVal . vspeed =  - 2 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
  if ( gvPlayer )  if ( gvPlayer . x > x ) hspeed =  - 1 ; 
  
   else hspeed = 1 ; 
@@ -484,10 +504,12 @@ deleteActor ( id )  ;
  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-MuffinBomb =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . flip = false ; 
+MuffinBomb =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . flip = false ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y , 4 , 7 , 0 )  ; 
  if ( gvPlayer )  { 
   if ( x > gvPlayer . x ) flip = true ; 
@@ -566,9 +588,11 @@ deleteActor ( id )  ;
  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-EarthShell =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  
+EarthShell =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
  } ;  returnVal . run = function (  ) { drawSprite ( sprEarthShell , getFrames (  )  / 16 , x - camx , y - camy )  ; 
  if ( gvPlayer )  if ( distance2 ( x , y , gvPlayer . x , gvPlayer . y + 2 )  <= 14 )  { 
  deleteActor ( id )  ; 
@@ -593,19 +617,21 @@ game . weapon = 4 ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-SpecialBall =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  
+SpecialBall =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  
  with ( returnVal ) { 
  
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-CoinRing =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . r = 0.0 ; 
+CoinRing =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . r = 0.0 ; 
  returnVal . c = 0.0 ; 
  returnVal . s = 0.0 ; 
  returnVal . a = 0.0 ; 
  returnVal . l = null ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) { x = _x ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+  x = _x ; 
 y = _y ; 
  baseConstructor  ( _x , _y )  ; 
 r = _arr [ 0 ]  . tofloat (  )  ; 
@@ -633,10 +659,12 @@ actor [ l [ i ]  ]  . y = y + r * sin (  ( i * 2 * pi / c )  + a )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-MagicKey =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . color = 0 ; 
+MagicKey =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . color = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
  if ( _arr != null ) color = _arr . tointeger (  )  ; 
  
   } ;  returnVal . run = function (  ) {  if ( gvPlayer )  if ( distance2 ( x , y , gvPlayer . x , gvPlayer . y )  <= 16 )  { 

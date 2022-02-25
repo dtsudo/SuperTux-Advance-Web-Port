@@ -5,10 +5,12 @@ window.jsFiles.push(function () {
 
 
 levelEndRunner = 0 ; 
-LevelEnder =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . timer = 180 ; 
+LevelEnder =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . timer = 180 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( 0 , 0 )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( 0 , 0 )  ; 
  } ;  returnVal . run = function (  ) { timer --  ; 
  if ( timer == 0 || getcon ( "pause" , "press" )  )  { 
  stopChannel (  - 1 )  ; 

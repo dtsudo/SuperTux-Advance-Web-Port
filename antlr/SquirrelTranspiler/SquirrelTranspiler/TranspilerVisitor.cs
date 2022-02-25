@@ -295,7 +295,7 @@ namespace SquirrelTranspiler
 		public override string VisitClassConstructorDeclaration(SquirrelParser.ClassConstructorDeclarationContext context)
 		{
 			string str = " returnVal . constructor = function ( " + this.VisitClassConstructorArgs(context.classConstructorArgs())
-				+ " ) { " + this.VisitStats(context.stats()) + " } ; ";
+				+ " ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;\n\n  " + this.VisitStats(context.stats()) + " } ; ";
 
 			return str;
 		}
@@ -360,7 +360,7 @@ namespace SquirrelTranspiler
 				string str = " function ( ) { var returnVal = { constructor: function(){} } ; ";
 
 				if (context.id() != null)
-					str += " returnVal = " + this.VisitId(context.id()) + " ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor; ";
+					str += " returnVal = " + this.VisitId(context.id()) + " ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor; ";
 
 				str += this.VisitClassStatements(context.classStatements());
 				str += " returnVal.constructor(...arguments); return returnVal ; ";

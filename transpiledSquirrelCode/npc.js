@@ -4,7 +4,7 @@ if (!window.jsFiles)
 window.jsFiles.push(function () {
 
 
-NPC =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
+NPC =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
  returnVal . text = "" ; 
  returnVal . useflip = false ; 
  returnVal . flip = 0 ; 
@@ -14,7 +14,9 @@ NPC =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal
  returnVal . talki = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y - 16 , 20 , 16 , 0 )  ; 
 flip = randInt ( 2 )  ; 
  if ( _arr != null )  { 

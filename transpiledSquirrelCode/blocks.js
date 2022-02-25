@@ -4,7 +4,7 @@ if (!window.jsFiles)
 window.jsFiles.push(function () {
 
 
-WoodBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
+WoodBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
  returnVal . slideshape = 0 ; 
  returnVal . coins = 0 ; 
  returnVal . v = 0.0 ; 
@@ -12,7 +12,9 @@ WoodBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  ret
  returnVal . oldsolid = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 oldsolid = tileGetSolid ( x , y )  ; 
 tileSetSolid ( x , y , 1 )  ; 
 shape = Rec ( x , y , 7 , 9 , 0 )  ; 
@@ -166,13 +168,15 @@ drawSpriteZ ( 2 , sprWoodBox , 0 , x - 8 - camx , y - 8 - camy + v )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-IceBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
+IceBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
  returnVal . slideshape = 0 ; 
  returnVal . fireshape = 0 ; 
  returnVal . oldsolid = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y , 7 , 9 , 0 )  ; 
 slideshape = Rec ( x , y - 1 , 16 , 8 , 0 )  ; 
 fireshape = Rec ( x , y , 12 , 12 , 0 )  ; 
@@ -248,7 +252,7 @@ playSound ( sndFlame , 0 )  ;
  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-WoodChunks =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . h = 0.0 ; 
+WoodChunks =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . h = 0.0 ; 
  returnVal . v = 0.0 ; 
  returnVal . vspeed =  - 3.0 ; 
  returnVal . timer = 30 ; 
@@ -269,14 +273,16 @@ timer --  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-ItemBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
+ItemBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
  returnVal . full = true ; 
  returnVal . v = 0.0 ; 
  returnVal . vspeed = 0.0 ; 
  returnVal . item = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 item = _arr ; 
 shape = Rec ( x , y + 2 , 8 , 8 , 0 )  ; 
 tileSetSolid ( x , y , 1 )  ; 
@@ -335,7 +341,7 @@ playSound ( sndBump , 0 )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-TriggerBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
+TriggerBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
  returnVal . full = true ; 
  returnVal . v = 0.0 ; 
  returnVal . vspeed = 0.0 ; 
@@ -343,7 +349,9 @@ TriggerBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  
  returnVal . code = "" ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = "" ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = "" ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 code = _arr ; 
 shape = Rec ( x , y + 2 , 8 , 8 , 0 )  ; 
 tileSetSolid ( x , y , 1 )  ; 
@@ -375,7 +383,7 @@ playSound ( sndBump , 0 )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-InfoBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
+InfoBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
  returnVal . full = true ; 
  returnVal . v = 0.0 ; 
  returnVal . vspeed = 0.0 ; 
@@ -383,7 +391,9 @@ InfoBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  ret
  returnVal . text = "" ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = "" ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = "" ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 text = _arr ; 
 shape = Rec ( x , y + 2 , 8 , 8 , 0 )  ; 
 tileSetSolid ( x , y , 1 )  ; 
@@ -416,11 +426,13 @@ drawSpriteZ ( 2 , sprBoxInfo , getFrames (  )  / 8 , x - 8 - camx , y - 8 - camy
  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-KelvinScarf =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
+KelvinScarf =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
  returnVal . text = "" ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = "" ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = "" ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 text = _arr ; 
 shape = Rec ( x , y , 8 , 8 , 0 )  ; 
  } ;  returnVal . run = function (  ) {  if ( gvPlayer )  { 
@@ -444,7 +456,7 @@ shape = Rec ( x , y , 8 , 8 , 0 )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-BounceBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
+BounceBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
  returnVal . full = true ; 
  returnVal . v = 0.0 ; 
  returnVal . vspeed = 0.0 ; 
@@ -452,7 +464,9 @@ BounceBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  r
  returnVal . text = "" ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y , 8 , 9 , 0 )  ; 
 tileSetSolid ( x , y , 1 )  ; 
  } ;  returnVal . run = function (  ) {  if ( v == 0 )  { 
@@ -499,11 +513,13 @@ drawSpriteZ ( 2 , sprBoxBounce , getFrames (  )  / 8 , x - 8 - camx , y - 8 - ca
  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-Checkpoint =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = null ; 
+Checkpoint =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = null ; 
  returnVal . found = false ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y + 16 , 10 , 16 , 0 )  ; 
  } ;  returnVal . run = function (  ) {  if ( gvPlayer && found == false )  if ( hitTest ( shape , gvPlayer . shape )  )  { 
   {     var foreachOutput = squirrelForEach ( actor [ "Checkpoint" ]  ) ;     while ( true )     {        foreachOutput . next ( ) ;        if ( foreachOutput . isDone ( ) ) break ; i = foreachOutput . getValue ( ) ;  { 
@@ -533,14 +549,16 @@ playSoundChannel ( sndBell , 0 , 4 )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-TNT =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = null ; 
+TNT =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = null ; 
  returnVal . gothit = false ; 
  returnVal . hittime = 0.0 ; 
  returnVal . frame = 0.0 ; 
  returnVal . fireshape = null ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y , 10 , 10 , 0 )  ; 
 tileSetSolid ( x , y , 1 )  ; 
 fireshape = Rec ( x , y , 14 , 12 , 0 )  ; 
@@ -594,13 +612,15 @@ deleteActor ( i . id )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-C4 =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = null ; 
+C4 =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = null ; 
  returnVal . gothit = false ; 
  returnVal . hittime = 0.0 ; 
  returnVal . frame = 0.0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y , 10 , 10 , 0 )  ; 
 tileSetSolid ( x , y , 1 )  ; 
  } ;  returnVal . run = function (  ) { drawSpriteZ ( 2 , sprC4 , frame , x - 8 - camx , y - 8 - camy )  ; 
@@ -608,11 +628,13 @@ tileSetSolid ( x , y , 1 )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-ColorBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . color = null ; 
+ColorBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . color = null ; 
  returnVal . filled = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
  if ( _arr == null ) color = 0 ; 
  
   else color = _arr ; 
@@ -642,11 +664,13 @@ ColorBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  re
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-ColorSwitch =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . color = 0 ; 
+ColorSwitch =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . color = 0 ; 
  returnVal . shape = null ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
  if ( _arr == null ) color = 0 ; 
  
   else color = _arr . tointeger (  )  ; 
@@ -675,12 +699,14 @@ game . colorswitch [ this . color ] = true ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-EvilBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
+EvilBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
  returnVal . slideshape = 0 ; 
  returnVal . oldsolid = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y + 2 , 8 , 8 , 0 )  ; 
 oldsolid = tileGetSolid ( x , y )  ; 
 tileSetSolid ( x , y , 1 )  ; 
@@ -703,12 +729,14 @@ newActor ( Darknyan , x , y - 16 )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-EvilBlockB =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
+EvilBlockB =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
  returnVal . slideshape = 0 ; 
  returnVal . oldsolid = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y + 2 , 8 , 8 , 0 )  ; 
 oldsolid = tileGetSolid ( x , y )  ; 
 tileSetSolid ( x , y , 1 )  ; 
@@ -731,7 +759,7 @@ newActor ( MuffinBomb , x , y - 16 )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-BreakBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
+BreakBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
  returnVal . slideshape = 0 ; 
  returnVal . tile = 0 ; 
  returnVal . solidtile = 0 ; 
@@ -739,7 +767,9 @@ BreakBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  re
  returnVal . solidlayer = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y + 2 , 8 , 8 , 0 )  ; 
 tileSetSolid ( x , y , 1 )  ; 
 slideshape = Rec ( x , y - 1 , 12 , 8 , 0 )  ; 
@@ -763,11 +793,13 @@ slideshape = Rec ( x , y - 1 , 12 , 8 , 0 )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-LockBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . color = 0 ; 
+LockBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . color = 0 ; 
  returnVal . oldsolid = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
  if ( _arr == null ) color = 0 ; 
  
   else color = _arr . tointeger (  )  ; 
@@ -814,7 +846,7 @@ playSound ( sndBump , 0 )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-BossDoor =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . dy = 0 ; 
+BossDoor =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . dy = 0 ; 
  returnVal . moving = false ; 
  
  with ( returnVal ) { 

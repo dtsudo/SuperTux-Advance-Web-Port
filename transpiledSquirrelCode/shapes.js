@@ -13,7 +13,9 @@ Rec =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal
  returnVal . oy = 0.0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _w , _h , _kind , _ox = 0.0 , _oy = 0.0 ) { x = _x . tofloat (  )  ; 
+  returnVal . constructor = function ( _x , _y , _w , _h , _kind , _ox = 0.0 , _oy = 0.0 ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+  x = _x . tofloat (  )  ; 
 y = _y . tofloat (  )  ; 
 w = _w . tofloat (  )  ; 
 h = _h . tofloat (  )  ; 
@@ -41,7 +43,9 @@ Cir =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal
  returnVal . h = 0.0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _r , _ox = 0.0 , _oy = 0.0 ) { x = _x . tofloat (  )  ; 
+  returnVal . constructor = function ( _x , _y , _r , _ox = 0.0 , _oy = 0.0 ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+  x = _x . tofloat (  )  ; 
 y = _y . tofloat (  )  ; 
 r = _r . tofloat (  )  ; 
 ox = _ox . tofloat (  )  ; 

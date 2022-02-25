@@ -31,16 +31,18 @@ selectLoadGame =  function (  ) { meLoadGame =  [  ]  ;
  dir . sort (  )  ; 
  for (  var i = 0 ;
  i < dir . len (  )  ; i ++  )  { 
-  let f = "" ;
+  var f = "" ;
   if ( dir [ i ]  != "." && i != ".." && dir [ i ]  != "delete.me" && dir [ i ]  . find ( ".json" )  == dir [ i ]  . len (  )  - 5 && canint ( dir [ i ]  )  ) f = dir [ i ]  . slice ( 0 ,  - 5 )  ; 
  
   else continue ; 
  
   var o =  {  }  ;
- o . name =  function (  ) {  return "File " + f ;
-  }  ; 
-o . func =  function (  ) { loadGame ( f )  ; 
- }  ; 
+ o . name =  (  function ( f ) {  return  function (  ) {  return "File " + f ;
+  }  ;
+  }  )  ( f )  ; 
+o . func =  (  function ( f ) {  return  function (  ) { loadGame ( f )  ; 
+ }  ;
+  }  )  ( f )  ; 
 meLoadGame . push ( o )  ; 
  } 
  meLoadGame . push (  { name :  function (  ) {  return gvLangObj [ "menu-commons" ]  [ "cancel" ]  ;

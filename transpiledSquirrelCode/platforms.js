@@ -4,7 +4,7 @@ if (!window.jsFiles)
 window.jsFiles.push(function () {
 
 
-PlatformV =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
+PlatformV =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
  returnVal . r = 0 ; 
  returnVal . w = 0 ; 
  returnVal . ystart = 0 ; 
@@ -15,7 +15,9 @@ PlatformV =  function ( ) { var returnVal = { constructor: function(){} } ;  ret
  returnVal . init = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 ystart = _y ; 
  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
  if ( init == 1 )  { 
@@ -96,14 +98,16 @@ mode = 0 ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-Spring =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
+Spring =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
  returnVal . dir = 0 ; 
  returnVal . frame = 0.0 ; 
  returnVal . fspeed = 0.0 ; 
  returnVal . power = 10.0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y , 4 , 4 , 0 )  ; 
 dir = _arr ; 
  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
@@ -136,14 +140,16 @@ fspeed = 0.0 ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-SpringD =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
+SpringD =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
  returnVal . dir = 0 ; 
  returnVal . frame = 0.0 ; 
  returnVal . fspeed = 0.0 ; 
  returnVal . power = 10.0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y , 4 , 4 , 0 )  ; 
 dir = _arr ; 
  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
@@ -180,10 +186,12 @@ fspeed = 0.0 ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-LevelSinker =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . rate = 0.01 ; 
+LevelSinker =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . rate = 0.01 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
  if ( _arr != null ) rate = _arr ; 
  
   } ;  returnVal . run = function (  ) {  if ( gvMap . h > 240 ) gvMap . h -= rate ; 
@@ -193,13 +201,15 @@ LevelSinker =  function ( ) { var returnVal = { constructor: function(){} } ;  r
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
 sinkLevel =  function ( rate ) { newActor ( LevelSinker , 0 , 0 , rate )  ; 
  }  ; 
-FireChain =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . r = 0 ; 
+FireChain =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . r = 0 ; 
  returnVal . a = 0.0 ; 
  returnVal . s = 0.0 ; 
  returnVal . hb = null ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 r = _arr [ 0 ]  . tointeger (  )  ; 
 a = _arr [ 1 ]  . tofloat (  )  ; 
 s = _arr [ 2 ]  . tofloat (  )  ; 
@@ -234,10 +244,12 @@ c . hspeed = randFloat ( 0.5 )  - 0.25 ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-PathCarrier =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PathCrawler ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . obj = null ; 
+PathCarrier =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PathCrawler ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . obj = null ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y , _arr )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y , _arr )  ; 
  var newarr =  [  ]  ;
   if ( _arr . len (  )  > 3 )  for (  var i = 3 ;
  i < _arr . len (  )  ; i ++  ) newarr . push ( _arr [ i ]  )  ; 
@@ -255,14 +267,16 @@ actor [ obj ]  . y = y ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-RingCarrier =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . r = 0.0 ; 
+RingCarrier =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . r = 0.0 ; 
  returnVal . c = 0.0 ; 
  returnVal . s = 0.0 ; 
  returnVal . a = 0.0 ; 
  returnVal . l = null ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) { x = _x ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+  x = _x ; 
 y = _y ; 
  baseConstructor  ( _x , _y )  ; 
 r = _arr [ 0 ]  . tofloat (  )  ; 

@@ -4,10 +4,12 @@ if (!window.jsFiles)
 window.jsFiles.push(function () {
 
 
-Water =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
+Water =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
  } ;  returnVal . draw = function (  ) { setDrawColor ( 0x2020a040 )  ; 
 drawRect ( x - shape . w - floor ( camx )  , y - shape . h - camy ,  ( shape . w * 2 )  - 1 ,  ( shape . h * 2 )  + 2 , true )  ; 
  for (  var i = 0 ;

@@ -20,12 +20,14 @@ dbgSnowPlainF =  function (  ) {  for (  var i = 0 ;
  drawSprite ( bgSnowPlainALT , 0 ,  (  (  - camx / 8 )  % 720 )  +  ( i * 720 )  ,  ( screenH (  )  / 2 )  - 120 )  ; 
  } 
   }  ; 
-FireBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
+FireBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
  returnVal . slideshape = 0 ; 
  returnVal . fireshape = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y + 2 , 8 , 8 , 0 )  ; 
 slideshape = Rec ( x , y - 1 , 12 , 8 , 0 )  ; 
 fireshape = Rec ( x , y , 12 , 12 , 0 )  ; 
@@ -52,13 +54,15 @@ playSound ( sndFlame , 0 )  ;
  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-TNTALT =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = null ; 
+TNTALT =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = null ; 
  returnVal . gothit = false ; 
  returnVal . hittime = 0.0 ; 
  returnVal . frame = 0.0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 shape = Rec ( x , y , 10 , 10 , 0 )  ; 
 tileSetSolid ( x , y , 1 )  ; 
  } ;  returnVal . run = function (  ) { drawSprite ( sprC4 , frame , x - 8 - camx , y - 8 - camy )  ; 

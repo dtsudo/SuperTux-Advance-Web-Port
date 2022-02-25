@@ -4,7 +4,7 @@ if (!window.jsFiles)
 window.jsFiles.push(function () {
 
 
-Tux =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . canJump = 16 ; 
+Tux =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . canJump = 16 ; 
  returnVal . didJump = false ; 
  returnVal . friction = 0.1 ; 
  returnVal . gravity = 0.0 ; 
@@ -57,7 +57,9 @@ Tux =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal
  returnVal . anCrawl =  [ 72.0 , 75.0 , "crawl" ]  ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 anim = anStand ; 
 shapeStand = Rec ( x , y , 5 , 12 , 0 , 0 , 0 )  ; 
 shapeSlide = Rec ( x , y , 5 , 6 , 0 , 0 , 6 )  ; 
@@ -1115,12 +1117,14 @@ game . subitem = 0 ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-TuxDie =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . vspeed =  - 4.0 ; 
+TuxDie =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . vspeed =  - 4.0 ; 
  returnVal . timer = 150 ; 
  returnVal . mywep = 0 ; 
  
  with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) {  baseConstructor  ( _x , _y )  ; 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
 stopMusic (  )  ; 
 playSound ( sndDie , 0 )  ; 
 mywep = game . weapon ; 
