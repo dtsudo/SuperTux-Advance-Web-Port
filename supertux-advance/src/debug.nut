@@ -9,7 +9,7 @@
 		debug = !debug
 		//if(debug) foreach(i in actor) print(typeof i)
 	}
-	if(keyPress(k_f1)) devcom = !devcom
+	if(keyPress(k_tick)) devcom = !devcom
 
 	local fps = getFPS()
 	debugTickSum -= debugTickList[debugTickIndex]
@@ -93,7 +93,7 @@
 	local history = []
 	local input = ""
 
-	while(!keyPress(k_tick) && !keyPress(k_escape)) {
+	while(!keyPress(k_f1) && !keyPress(k_escape)) {
 		if(keyPress(k_backspace) && input.len() > 0) input = input.slice(0, -1)
 		if(keyPress(k_enter)) {
 			dostr(input)

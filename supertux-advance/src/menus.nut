@@ -110,10 +110,10 @@ const fontH = 14
 		name = function() { return gvLangObj["pause-menu"]["save"]},
 		func = function() { saveGame(); playSound(sndHeal, 0); gvGameMode = gmOverworld }
 	},
-	{
-		name = function() { return gvLangObj["pause-menu"]["character"]},
-		func = function() { pickChar() }
-	},
+	//{
+	//	name = function() { return gvLangObj["pause-menu"]["character"]},
+	//	func = function() { pickChar() }
+	//},
 	{
 		name = function() { return gvLangObj["pause-menu"]["quit-game"]},
 		func = function() { startMain(); cursor = 0 }

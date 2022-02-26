@@ -14,8 +14,12 @@ drawLight =  function ( sprite , frame , x , y ) {  if (  ! config . light )  re
   if ( gvLight == 0xffffffff )  return ; 
   
  setDrawTarget ( gvLightScreen )  ; 
-drawSprite ( sprite , frame , x , y )  ; 
-setDrawTarget ( gvPlayScreen )  ; 
+ if ( isWebBrowserVersion ) javascriptSetGlobalCompositeOperation ( "lighter" )  ; 
+ 
+ drawSprite ( sprite , frame , x , y )  ; 
+ if ( isWebBrowserVersion ) javascriptSetGlobalCompositeOperation ( "source-over" )  ; 
+ 
+ setDrawTarget ( gvPlayScreen )  ; 
  }  ; 
 drawLightEx =  function ( sprite , frame , x , y , a , f , w , h ) {  if (  ! config . light )  return ; 
   
@@ -24,8 +28,12 @@ drawLightEx =  function ( sprite , frame , x , y , a , f , w , h ) {  if (  ! co
   if ( gvLight == 0xffffffff )  return ; 
   
  setDrawTarget ( gvLightScreen )  ; 
-drawSpriteEx ( sprite , frame , x , y , a , f , w , h , 1 )  ; 
-setDrawTarget ( gvPlayScreen )  ; 
+ if ( isWebBrowserVersion ) javascriptSetGlobalCompositeOperation ( "lighter" )  ; 
+ 
+ drawSpriteEx ( sprite , frame , x , y , a , f , w , h , 1 )  ; 
+ if ( isWebBrowserVersion ) javascriptSetGlobalCompositeOperation ( "source-over" )  ; 
+ 
+ setDrawTarget ( gvPlayScreen )  ; 
  }  ; 
 runAmbientLight =  function (  ) {  if ( config . light )  { 
   if ( gvLight != gvLightTarget )  { 
@@ -59,8 +67,13 @@ drawRec ( 0 , 0 , screenW (  )  , screenH (  )  , true )  ;
   
  setDrawTarget ( gvScreen )  ; 
  }  ; 
-drawAmbientLight =  function (  ) {  if ( config . light ) drawImage ( gvLightScreen , 0 , 0 )  ; 
+drawAmbientLight =  function (  ) {  if ( config . light )  { 
+  if ( isWebBrowserVersion ) javascriptDrawAmbientLight (  )  ; 
  
+  else drawImage ( gvLightScreen , 0 , 0 )  ; 
+ 
+  } 
+  
   }  ; 
 setLight =  function ( color ) { gvLightTarget = color ; 
 gvLight = color ; 

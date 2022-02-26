@@ -140,10 +140,10 @@ namespace SquirrelTranspiler
 				string file = files[i];
 				string partialFileName = file.Substring(mainDirectory.Length);
 
-				string fileContents = GetFileContents(file);
-				WriteFileContents(mainDirectory + "../sample-brux-project/imageFiles/file" + i + ".png", fileContents);
+				byte[] fileContents = GetFileContentsAsBytes(file);
+				var fileContentsBase64 = Convert.ToBase64String(fileContents);
 
-				imageJsFileContents += $"window.imageFiles.imageList.push({{ originalName: '{partialFileName}', fileLocation: 'imageFiles/file{i}.png' }}); \n";
+				imageJsFileContents += $"window.imageFiles.imageList.push({{ originalName: '{partialFileName}', base64: '{fileContentsBase64}' }}); \n";
 
 				imageJsFileContents += RegisterFileInFolderStructure(partialFileName);
 			}
@@ -422,6 +422,31 @@ namespace SquirrelTranspiler
 					}
 				}
 			}
+		}
+
+		private static byte[] GetFileContentsAsBytes(string fileName)
+		{
+			List<byte> list = new List<byte>();
+
+			using (FileStream fileStream = new FileStream(path: fileName, mode: FileMode.Open, access: FileAccess.Read))
+			{
+				using (BinaryReader binaryReader = new BinaryReader(fileStream))
+				{
+					try
+					{
+						while (true)
+						{
+							byte b = binaryReader.ReadByte();
+							list.Add(b);
+						}
+					}
+					catch (EndOfStreamException)
+					{
+					}
+				}
+			}
+
+			return list.ToArray();
 		}
 
 		private static string GetFileContents(string fileName)

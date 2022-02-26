@@ -84,7 +84,7 @@ window.files['lang/en.json'] = `
 
 	"info" : {
 		"welcome" :
-		"Welcome to SuperTux Advance! This message will go away when you walk away from the block. Press F1 if you would like to see developer commentary. Press UP near NPCs to talk to them. Some have more than one thing to say.",
+		"Welcome to SuperTux Advance! This message will go away when you walk away from the block. Press ~ (tilde) if you would like to see developer commentary. Press UP near NPCs to talk to them. Some have more than one thing to say.",
 		"tutWall" :
 		"Press JUMP against the wall to do a wall jump.",
 		"tutSlide" :
@@ -98,7 +98,7 @@ window.files['lang/en.json'] = `
 		"pipes" :
 		"Pipes can be entered just by falling in. You can also hold DOWN to funnel yourself into them.",
 		"controls" :
-		"Don't forget to set your controls in the options menu on the main screen! If you really mess up setting them up, delete your config.json file.",
+		"Hello Tux!",
 		"secrets" :
 		"Secret passages are everywhere! Feel against the wall to reveal them, or watch for enemy movements.",
 		"coyotetime" :

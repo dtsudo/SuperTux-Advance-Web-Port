@@ -3,6 +3,8 @@
 	
 	window.isWebBrowserVersion = true;
 	
+	window.stopGame = false;
+	
 	var urlParams = (new URL(document.location)).searchParams;
 				
 	var unlockAllLevels = urlParams.get('unlocklevels') !== null
@@ -77,12 +79,15 @@
 			window.superTuxAdvanceCanvasContext.fillStyle = 'rgba(0, 0, 0, 1)'
 			window.superTuxAdvanceCanvasContext.fillRect(0, 0, 960, 720);
 			gvGameMode();
+		
+			
+			
 			window.update();
 			
 			debugCommands();
-			config.light = false;
 				
-			setTimeout(computeAndRenderNextFrame, 0);
+			if (!window.stopGame)
+				setTimeout(computeAndRenderNextFrame, 0);
 		};
 
 		setTimeout(computeAndRenderNextFrame, 0);
@@ -99,6 +104,8 @@
 			}
 			window.superTuxAdvanceCanvasContext = window.superTuxAdvanceCanvas.getContext('2d');
 		}
+		
+		window.superTuxAdvanceCanvasContext.imageSmoothingEnabled = false;
 		
 		if (window.imageFiles.loadingComplete && window.audioFiles.loadingComplete) {
 			for (var i = 0 ; i < window.jsFiles.length; i++)

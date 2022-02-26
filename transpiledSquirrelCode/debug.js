@@ -13,7 +13,7 @@ drawDebug =  function (  ) {  if ( keyPress ( k_f12 )  )  {
  debug =  ! debug ; 
  } 
   
-  if ( keyPress ( k_f1 )  ) devcom =  ! devcom ; 
+  if ( keyPress ( k_tick )  ) devcom =  ! devcom ; 
  
   var fps = getFPS (  )  ;
  debugTickSum -= debugTickList [ debugTickIndex ]  ; 
@@ -105,7 +105,7 @@ update (  )  ;
  var output = "" ;
   var history =  [  ]  ;
   var input = "" ;
-  while (  ! keyPress ( k_tick )  &&  ! keyPress ( k_escape )  )  { 
+  while (  ! keyPress ( k_f1 )  &&  ! keyPress ( k_escape )  )  { 
   if ( keyPress ( k_backspace )  && input . len (  )  > 0 ) input = input . slice ( 0 ,  - 1 )  ; 
  
   if ( keyPress ( k_enter )  )  { 

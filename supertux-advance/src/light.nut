@@ -8,7 +8,15 @@
 	if(gvLight == 0xffffffff) return
 
 	setDrawTarget(gvLightScreen)
+	
+	if (::isWebBrowserVersion)
+		javascriptSetGlobalCompositeOperation("lighter")
+	
 	drawSprite(sprite, frame, x, y)
+	
+	if (::isWebBrowserVersion)
+		javascriptSetGlobalCompositeOperation("source-over")
+		
 	setDrawTarget(gvPlayScreen)
 }
 
@@ -18,7 +26,15 @@
 	if(gvLight == 0xffffffff) return
 
 	setDrawTarget(gvLightScreen)
+	
+	if (::isWebBrowserVersion)
+		javascriptSetGlobalCompositeOperation("lighter")
+		
 	drawSpriteEx(sprite, frame, x, y, a, f, w, h, 1)
+	
+	if (::isWebBrowserVersion)
+		javascriptSetGlobalCompositeOperation("source-over")
+		
 	setDrawTarget(gvPlayScreen)
 }
 
@@ -56,7 +72,12 @@
 }
 
 ::drawAmbientLight <- function() {
-	if(config.light) drawImage(gvLightScreen, 0, 0)
+	if(config.light) {
+		if (::isWebBrowserVersion)
+			javascriptDrawAmbientLight()
+		else
+			drawImage(gvLightScreen, 0, 0)
+	}
 }
 
 ::setLight <- function(color) {

@@ -6,8 +6,6 @@
 	window.imageFiles.loadingComplete = false;
 	
 	for (var i = 0; i < window.imageFiles.imageList.length; i++) {
-		var fileName = window.imageFiles.imageList[i].fileLocation;
-		
 		var img = new Image();
 		img.addEventListener('load', function () {
 			window.imageFiles.numFilesLoaded++;
@@ -15,7 +13,7 @@
 				window.imageFiles.loadingComplete = true;
 		});
 		
-		img.src = fileName;
+		img.src = "data:image/png;base64," + window.imageFiles.imageList[i].base64;
 		
 		window.imageFiles.imageDictionary[window.imageFiles.imageList[i].originalName] = img;
 	}
@@ -72,6 +70,10 @@
 			key = "z";
 		if (key === "X")
 			key = "x";
+		if (key === "A")
+			key = "a";
+		if (key === "~")
+			key = "`";
 		
 		for (var i = 0; i < keysBeingPressed.length; i++) {
 			if (keysBeingPressed[i] === key)
@@ -221,11 +223,19 @@ window.drawSpriteEx = function (sprite, frameNum, x, y, angle, flip, xscale, ysc
 	window.drawSpriteExMod(sprite, frameNum, x, y, angle, flip, xscale, yscale, alpha, 0xffffffff);
 };
 
+
 window.drawSpriteExMod = function( sprite, frameNum, x, y, angle, flip, xscale, yscale, alpha, color) {
 	
 	x = Math.floor(x);
 	y = Math.floor(y);
 
+	if (xscale <= 0 || yscale <= 0)
+		return;
+	
+	if (alpha <= 0) {
+		return;
+	}
+	
 	var context = window.superTuxAdvanceCanvasContext;
 	
 	if (window.canvasTarget !== 0)
@@ -240,17 +250,21 @@ window.drawSpriteExMod = function( sprite, frameNum, x, y, angle, flip, xscale, 
 		else
 			context.translate(x, y);
 		
+		context.scale(xscale, yscale);
 		context.translate(-sprite.pivotX, -sprite.pivotY);
 		
-		context.scale(xscale, yscale);
 		
 		context.translate(sprite.pivotX, sprite.pivotY);
 		context.rotate(angle * radianConversion);
 		context.translate(-sprite.pivotX, -sprite.pivotY);
 				
-		if (flip) {
+		if (flip & 1) {
 			context.translate(sprite.width, 0);
 			context.scale(-1, 1);
+		}
+		if (flip & 2) {
+			context.translate(0, sprite.height);
+			context.scale(1, -1);
 		}
 		
 		var sx = 0;
@@ -273,6 +287,9 @@ window.drawSpriteExMod = function( sprite, frameNum, x, y, angle, flip, xscale, 
 			sx += sprite.width;
 		}
 		
+		context.save();
+		context.globalAlpha = alpha;
+		
 		var sWidth = sprite.width;
 		var sHeight = sprite.height;
 		if (window.canvasTarget === 0)
@@ -280,6 +297,7 @@ window.drawSpriteExMod = function( sprite, frameNum, x, y, angle, flip, xscale, 
 		else
 			context.drawImage(sprite.img, sx, sy, sWidth, sHeight, 0 , 0, sWidth, sHeight);
 		
+		context.restore();
 		context.setTransform(1, 0, 0, 1, 0, 0);
 	}
 	else if (sprite.type === "font") {
@@ -287,6 +305,7 @@ window.drawSpriteExMod = function( sprite, frameNum, x, y, angle, flip, xscale, 
 	}
 
 };
+
 
 window.floor = function (num) {
 	return Math.floor(num);
@@ -346,6 +365,11 @@ window.loadSound = function (file) {
 	return index;
 };
 
+window.playSoundChannel = function (soundIndex, loops, x) {
+	var soundFile = window.soundIndexMapping[soundIndex];
+	window.playSound(soundIndex, loops);
+};
+
 window.playSound = function (sound, loops) {
 	var file = window.soundIndexMapping[sound];
 	var audioArray = window.audioFiles.audioDictionary[file];
@@ -357,7 +381,55 @@ window.playSound = function (sound, loops) {
 			audioArray[i] = audioArray[i+1];
 	}
 	audio.play();
+	if (loops > 0) {
+		var repeat;
+		repeat = function () {
+			if (audio.ended)
+				window.playSound(sound, loops-1);
+			else
+				setTimeout(repeat, 50);
+		};
+		repeat();
+	}
 };
+
+window.javascriptSetGlobalCompositeOperation = function (val) {
+	window.canvasTextures[gvLightScreen].getContext('2d').globalCompositeOperation = val;
+};
+
+window.javascriptDrawAmbientLight = function() {
+        if (config.light) {
+			
+			if (!window.lightCanvas) {
+		//		window.lightCanvas = document.getElementById('lightCanvas');
+			}
+			else {
+				window.lightCanvasContext = window.lightCanvas.getContext('2d');
+				window.lightCanvasContext.drawImage(window.canvasTextures[gvLightScreen], 0, 0);
+			}
+			
+			var context = window.canvasTextures[gvLightScreen].getContext('2d');
+			var imageData = context.getImageData(0, 0, 320, 240);
+			var imageDataData = imageData.data;
+			for (var i = 0; i < imageDataData.length; i += 4) {
+				var r = imageDataData[i];
+				var g = imageDataData[i+1];
+				var b = imageDataData[i+2];
+				var a = imageDataData[i+3];
+				
+				var avg = Math.round((r+g+b)/3);
+				imageDataData[i] = 0;
+				imageDataData[i+1] = 0;
+				imageDataData[i+2] = 0;
+				imageDataData[i+3] = 255-avg;
+			}
+			context.putImageData(imageData, 0, 0);
+			drawImage(gvLightScreen, 0, 0);
+			
+				
+		}
+
+    };
 
 window.deleteSound = function (sound) {
 	consle.log("deleting sound: " + sound);
@@ -396,20 +468,24 @@ window.deleteMusic = function (music) {
 };
 
 window.currentlyPlayingMusic = null;
-window.playMusic = function (music, loops) {
-	var musicFile = window.musicIndexMapping[music];
+window.playMusic = function (m, loops) {
+	var musicFile = window.musicIndexMapping[m];
 	var music = window.audioFiles.audioDictionary[musicFile][0];
+	
+	//console.log("MUSIC: " + musicFile + " ; volume: " + music.volume);
+	if (musicFile.indexOf("retro-2") >= 0)
+		music.volume = 0.2;
 	
 	if (window.currentlyPlayingMusic !== null) {
 		window.currentlyPlayingMusic.pause();
 		window.currentlyPlayingMusic.currentTime = 0;
 	}
 	window.currentlyPlayingMusic = music;
-	try
-	{
-		music.play();
-	} catch (error) {
-	}
+	
+	music.loop = true;
+	var promise = music.play();
+	
+	promise.catch(err => { setTimeout(function() { window.playMusic(m, loops); }, 100); });
 };
 
 window.musicIndex = 1;
@@ -542,7 +618,7 @@ window.jsonRead = function (string) {
 	return JSON.parse(string);
 };
 
-window.localStorageGuid = "23d39e3e40ae43e7884b2b058cf086c5";
+window.localStorageGuid = "23c39e3e40ae43e7884b2b058cf086c5";
 
 window.fileWrite = function (name, string) {
 	try {
@@ -784,6 +860,8 @@ window.k_left = "ArrowLeft";
 window.k_right = "ArrowRight";
 window.k_z = "z";
 window.k_x = "x";
+window.k_a = "a";
+window.k_tick = "`";
 window.k_lshift = "Shift";
 window.k_lctrl = "Control";
 window.k_escape = "Escape";
@@ -928,9 +1006,6 @@ window.getFrames = function () {
 	return window.frameCounter;
 };
 
-window.playSoundChannel = function () {
-	
-};
 
 
 
