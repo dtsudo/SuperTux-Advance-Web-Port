@@ -1,5 +1,3 @@
-This is a work in progress.
+This is a port of https://github.com/KelvinShadewing/supertux-advance so that it can run in a web browser.
 
-Lots of things don't work :P
-
-https://dtsudo.github.io/WorkInProgress-SuperTux-Advance-Web-Version-Port/program.html?unlocklevels=true&invulnerable=false - Note that you may need to clear the cache to see updated files. (GitHub pages caches content rather aggressively.)
+Play on GitHub Pages at: https://dtsudo.github.io/WorkInProgress-SuperTux-Advance-Web-Version-Port/program.html?unlocklevels=true&invulnerable=false - Note that you may need to clear the cache to see updated files. (GitHub Pages caches content rather aggressively.)
