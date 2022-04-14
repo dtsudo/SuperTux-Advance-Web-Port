@@ -12,16 +12,22 @@
 	if(!fileExists(level)) return
 
 	//Clear actors and start creating new ones
+	setFPS(60)
 	gvPlayer = false
+	gvBoss = false
 	actor.clear()
 	actlast = 0
 	game.health = game.maxHealth
 	game.levelCoins = 0
 	game.maxCoins = 0
+	game.redcoins = 0
+	game.levelredcoins = 0
+	game.maxredcoins = 0
 	game.secrets = 0
 	game.enemies = 0
 	gvInfoBox = ""
 	gvLastSong = ""
+	gfxReset()
 
 	//Reset auto/locked controls
 	autocon.up = false
@@ -132,7 +138,6 @@
 					break
 
 				case 8:
-					game.maxCoins += 50
 					c = newActor(ItemBlock, i.x + 8, i.y - 8, 6)
 					break
 
@@ -198,12 +203,12 @@
 					break
 
 				case 22:
-					if(gvLangObj["info"].rawin(i.name)) c = newActor(InfoBlock, i.x + 8, i.y - 8, textLineLen(gvLangObj["info"][i.name], 52))
+					if(gvLangObj["info"].rawin(i.name)) c = newActor(InfoBlock, i.x + 8, i.y - 8, textLineLen(gvLangObj["info"][i.name], gvTextW))
 					else c = newActor(InfoBlock, i.x + 8, i.y - 8, "")
 					break
 
 				case 23:
-					if(gvLangObj["devcom"].rawin(i.name)) c = newActor(KelvinScarf, i.x + 8, i.y - 8, textLineLen(gvLangObj["devcom"][i.name], 52))
+					if(gvLangObj["devcom"].rawin(i.name)) c = newActor(KelvinScarf, i.x + 8, i.y - 8, textLineLen(gvLangObj["devcom"][i.name], gvTextW))
 					else c = newActor(KelvinScarf, i.x + 8, i.y - 8, "")
 					break
 
@@ -403,12 +408,18 @@
 
 				case 68:
 					c = newActor(Coin5, i.x + 8, i.y - 8)
-					game.maxCoins += 5
 					break
 
 				case 69:
 					c = newActor(Coin10, i.x + 8, i.y - 8)
-					game.maxCoins += 10
+					break
+
+				case 70:
+					c = newActor(RedCoin, i.x + 8, i.y - 8)
+					break
+
+				case 71:
+					c = newActor(Fishy, i.x + 8, i.y - 8)
 					break
 
 				case 73:
@@ -429,7 +440,7 @@
 					break
 
 				case 79:
-					c = newActor(BossDoor, i.x, i.y - 16)
+					c = newActor(BossDoor, i.x, i.y - 16, i.name)
 					break
 			}
 
@@ -443,8 +454,6 @@
 			local n = arg[0]
 			if(getroottable().rawin(n))
 			{
-				print(i.id)
-
 				//Create polygon to pass to object
 				local poly = []
 				for(local j = 0; j <= i.polygon.len(); j++) {
@@ -463,8 +472,6 @@
 			local n = arg[0]
 			if(getroottable().rawin(n))
 			{
-				print(i.id)
-
 				//Create polygon to pass to object
 				local poly = []
 				for(local j = 0; j < i.polyline.len(); j++) poly.push([i.x + i.polyline[j].x, i.y + i.polyline[j].y])
@@ -513,8 +520,10 @@
 	local lx = 0
 	local ly = 0
 	if(gvPlayer) {
-		lx = ((joyZ(0) / js_max.tofloat()) * screenW() / 2.5)
-		ly = ((joyH(0) / js_max.tofloat()) * screenH() / 2.5)
+		/* Temporarily disabled
+		lx = ((joyH(0) / js_max.tofloat()) * screenW() / 2.5)
+		ly = ((joyV(0) / js_max.tofloat()) * screenH() / 2.5)
+		*/
 
 		if(getcon("leftPeek", "hold")) lx = -(screenW() / 2.5)
 		if(getcon("rightPeek", "hold")) lx = (screenW() / 2.5)
@@ -585,7 +594,7 @@
 
 	gvMap.drawTiles(floor(-camx), floor(-camy), floor(camx / 16) - 3, floor(camy / 16), (screenW() / 16) + 5, (screenH() / 16) + 2, "bg")
 	gvMap.drawTiles(floor(-camx), floor(-camy), floor(camx / 16) - 3, floor(camy / 16), (screenW() / 16) + 5, (screenH() / 16) + 2, "mg")
-	if(gvMap.name != "shop") for(local i = 0; i < screenW() / 16; i++) {
+	if(gvMap.name != "shop") for(local i = 0; i < (screenW() / 16) + 1; i++) {
 		drawSprite(sprVoid, 0, 0 + (i * 16), gvMap.h - 32 - camy)
 	}
 	runActors()
@@ -608,10 +617,15 @@
 		}
 		//Draw health
 		if(game.health > game.maxHealth) game.health = game.maxHealth
-		for(local i = 0; i < game.maxHealth; i++) {
-			if(i < game.health) drawSprite(sprHealth, 1, 8 + (16 * i), 8)
+
+		local fullhearts = floor(game.health / 4)
+
+		for(local i = 0; i < game.maxHealth / 4; i++) {
+			if(i < fullhearts) drawSprite(sprHealth, 4, 8 + (16 * i), 8)
+			else if(i == fullhearts) drawSprite(sprHealth, game.health % 4, 8 + (16 * i), 8)
 			else drawSprite(sprHealth, 0, 8 + (16 * i), 8)
 		}
+
 		//Draw energy
 		for(local i = 0; i < game.maxEnergy; i++) {
 			if(gvPlayer) {
@@ -622,11 +636,28 @@
 			}
 		}
 
-		//Draw coins
+		//Draw boss health
+		if(gvBoss) {
+			local fullhearts = floor(game.bossHealth / 4)
+			if(game.bossHealth == 0) fullhearts = 0
+
+			drawSprite(sprBossHealth, 6, screenW() - 23, screenH() - 48)
+			drawSprite(sprSkull, 0, screenW() - 26, screenH() - 46)
+			for(local i = 0; i < 10; i++) {
+				if(i < fullhearts) drawSprite(sprBossHealth, 4, screenW() - 23, screenH() - 64 - (16 * i))
+				else if(i == fullhearts && game.bossHealth > 0) drawSprite(sprBossHealth, game.bossHealth % 4, screenW() - 23, screenH() - 64 - (16 * i))
+				else drawSprite(sprBossHealth, 0, screenW() - 23, screenH() - 64 - (16 * i))
+			}
+			drawSprite(sprBossHealth, 5, screenW() - 23, screenH() - 64 - (16 * 10))
+		}
+
+		//Draw coins & herrings
 		drawSprite(sprCoin, 0, 16, screenH() - 16)
 		if(game.maxCoins > 0) drawText(font2, 24, screenH() - 23, game.levelCoins.tostring() + "/" + game.maxCoins.tostring())
 		else drawText(font2, 24, screenH() - 23, game.coins.tostring())
-
+		//Herrings (redcoins)
+		if(game.maxredcoins > 0) drawSprite(sprHerring, 0, 16, screenH() - 40)
+		if(game.maxredcoins > 0) drawText(font2, 24, screenH() - 46, game.levelredcoins.tostring() + "/" + game.maxredcoins.tostring())
 		//Draw subitem
 		drawSprite(sprSubItem, 0, screenW() - 18, 18)
 		switch(game.subitem) {
@@ -651,6 +682,9 @@
 			case 7:
 				drawSprite(sprStar, 0, screenW() - 18, 18)
 				break
+			case 8:
+				drawSprite(getroottable()[game.characters[game.playerChar][1]], 0, screenW() - 18, 24)
+				break
 		}
 
 		//Draw level IGT
@@ -673,6 +707,10 @@
 
 		//Keys
 		local kx = 10
+		if(game.canres) {
+			drawSprite(getroottable()[game.characters[game.playerChar][1]], game.weapon, screenW() - kx, screenH() - 10)
+			kx += 16
+		}
 		if(gvKeyCopper) {
 			drawSprite(sprKeyCopper, 0, screenW() - kx, screenH() - 16)
 			kx += 16
@@ -697,7 +735,7 @@
 			if(chint(gvInfoBox[i])  == "\n") ln++
 		}
 		setDrawColor(0x000000d0)
-		drawRec(0, 0, 320, 8 * ln, true)
+		drawRec(0, 0, screenW(), 8 * ln, true)
 		drawText(font, 8, 8, gvInfoBox)
 
 	}
@@ -717,14 +755,16 @@
 	drawImage(gvScreen, 0, 0)
 
 	//Handle berries
+	if(game.berries > 0 && game.berries % 16 == 0 && game.health < game.maxHealth) {
+		game.health++
+		game.berries = 0
+	}
 	if(gvPlayer) if(game.berries == 64) {
 		game.berries = 0
-		if(game.health < game.maxHealth) {
-			game.health++
-			playSound(sndHeal, 0)
-		}
-		else newActor(Starnyan, gvPlayer.x, gvPlayer.y)
+		newActor(Starnyan, gvPlayer.x, gvPlayer.y)
 	}
+
+	if(game.health < 0) game.health = 0
 }
 
 ::playerTeleport <- function(_x, _y) { //Used to move the player and camera at the same time
@@ -736,6 +776,8 @@
 
 	gvPlayer.x = _x.tofloat()
 	gvPlayer.y = _y.tofloat()
+	gvPlayer.xprev = gvPlayer.x
+	gvPlayer.yprev = gvPlayer.y
 	camx = _x.tofloat() - (screenW() / 2)
 	camy = _y.tofloat() - (screenH() / 2)
 

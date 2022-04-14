@@ -54,7 +54,7 @@ contribDidRun [ contribFolder ] = true ;
   
   if ( meContribLevels . len (  )  == 0 )  { 
  meContribLevels . push (  { name :  function (  ) {  return gvLangObj [ "contrib-menu" ]  [ "empty" ]  ;
-  }  , func :  function (  ) {  }  }  )  ; 
+  }  , disabled : true }  )  ; 
  } 
   
   else meContribLevels . sort (  function ( a , b ) {  if ( a . name (  )  > b . name (  )  )  return 1 ;

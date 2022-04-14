@@ -11,7 +11,7 @@
 	constructor(_x, _y, _arr = null) {
 		base.constructor(_x, _y)
 
-		shape = Rec(x, y - 16, 20, 16, 0)
+		shape = Rec(x, y - 16, 24, 24, 0)
 		flip = randInt(2)
 
 		if(_arr != null) {
@@ -24,14 +24,35 @@
 			arr = []
 
 			for(local i = 3; i < argv.len(); i++) {
-				arr.push(textLineLen(gvLangObj["npc"][argv[i]], 52))
+				if(i >= argv.len()) arr.push("")
+				else if(argv[i] == 0) arr.push("")
+				else if(gvLangObj["npc"].rawin(argv[i])) arr.push(textLineLen(gvLangObj["npc"][argv[i]], gvTextW))
+				else arr.push("")
 			}
 		}
 	}
 
 	function run() {
 		if(gvPlayer && sayfunc != null) {
-			if(hitTest(shape, gvPlayer.shape) && getcon("up", "press") && this.rawin(sayfunc)) this[sayfunc]()
+			if(hitTest(shape, gvPlayer.shape)) {
+				if(getcon("up", "press") && this.rawin(sayfunc)) this[sayfunc]()
+				if(sprite == 0) {
+					if(sayfunc == "sayChar") switch(typeof gvPlayer) {
+						case "Tux":
+							if(arr[0] != "") drawSprite(sprTalk, 1, gvPlayer.x - camx, gvPlayer.y - camy - 24 + round(sin(getFrames().tofloat() / 5)))
+							break
+						case "Konqi":
+							if(arr[1] != "") drawSprite(sprTalk, 1, gvPlayer.x - camx, gvPlayer.y - camy - 24 + round(sin(getFrames().tofloat() / 5)))
+							break
+						case "Midi":
+							if(arr[2] != "") drawSprite(sprTalk, 1, gvPlayer.x - camx, gvPlayer.y - camy - 24 + round(sin(getFrames().tofloat() / 5)))
+							break
+					}
+
+				}
+				else if(sayfunc == "say" && talki > 0 || sayfunc == "sayRand") drawSprite(sprTalk, 0, x - camx, y - spriteH(sprite) - camy - 4 + round(sin(getFrames().tofloat() / 5)))
+				else drawSprite(sprTalk, 2, x - camx, y - spriteH(sprite) - camy - 4 + round(sin(getFrames().tofloat() / 5)))
+			}
 
 			if(gvInfoBox == text) if(!inDistance2(x, y, gvPlayer.x, gvPlayer.y, 32)) gvInfoBox = ""
 
@@ -41,8 +62,11 @@
 			}
 		}
 
-		if(useflip) drawSpriteEx(sprite, getFrames() * useflip, x - camx, y - camy, 0, flip, 1, 1, 1)
-		else drawSpriteEx(sprite, flip, x - camx, y - camy, 0, 0, 1, 1, 1)
+		// webBrowserVersionChange: avoid invoking drawSpriteEx when (sprite == 0)
+		if (sprite != 0) {
+			if(useflip) drawSpriteEx(sprite, getFrames() * useflip, x - camx, y - camy, 0, flip, 1, 1, 1)
+			else drawSpriteEx(sprite, flip, x - camx, y - camy, 0, 0, 1, 1, 1)
+		}
 	}
 
 	function say() {
@@ -76,24 +100,48 @@
 	}
 
 	function rescueKonqi() {
-		sayChar()
+		text = textLineLen(gvLangObj["npc"]["konqi-c"], gvTextW)
+		gvInfoBox = text
 		freeKonqi()
+		if(actor.rawin("BossDoor")) foreach(i in actor["BossDoor"]) i.opening = true
 	}
 
 	function rescueMidi() {
-		sayChar()
+		text = textLineLen(gvLangObj["npc"]["midi-c"], gvTextW)
+		gvInfoBox = text
 		freeMidi()
+		if(actor.rawin("BossDoor")) foreach(i in actor["BossDoor"]) i.opening = true
 	}
 
 	function rescueFriend() {
-		sayChar()
 		//Find who to free based on sprite
-		if(sprite == sprXue) if(!game.friends.rawin("Xue")) game.friends.Xue <- true
-		if(sprite == sprGnu) if(!game.friends.rawin("Gnu")) game.friends.Gnu <- true
-		if(sprite == sprPlasmaBreeze) if(!game.friends.rawin("PlasmaBreeze")) game.friends.PlasmaBreeze <- true
-		if(sprite == sprRockyRaccoon) if(!game.friends.rawin("RockyRaccoon")) game.friends.RockyRaccoon <- true
-		if(sprite == sprPygame) if(!game.friends.rawin("Pygame")) game.friends.Pygame <- true
-		if(sprite == sprGaruda) if(!game.friends.rawin("Garuda")) game.friends.Garuda <- true
+		if(sprite == sprXue) {
+			if(!game.friends.rawin("Xue")) game.friends.Xue <- true
+			text = textLineLen(gvLangObj["npc"]["xue-c"], gvTextW)
+		}
+		if(sprite == sprGnu) if(!game.friends.rawin("Gnu")) {
+			game.friends.Gnu <- true
+			text = textLineLen(gvLangObj["npc"]["gnu-c"], gvTextW)
+		}
+		if(sprite == sprPlasmaBreeze) if(!game.friends.rawin("PlasmaBreeze")) {
+			game.friends.PlasmaBreeze <- true
+			text = textLineLen(gvLangObj["npc"]["breeze-c"], gvTextW)
+		}
+		if(sprite == sprRockyRaccoon) if(!game.friends.rawin("RockyRaccoon")) {
+			game.friends.RockyRaccoon <- true
+			text = textLineLen(gvLangObj["npc"]["rocky-c"], gvTextW)
+		}
+		if(sprite == sprPygame) if(!game.friends.rawin("Pygame")) {
+			game.friends.Pygame <- true
+			text = textLineLen(gvLangObj["npc"]["python-c"], gvTextW)
+		}
+		if(sprite == sprGaruda) if(!game.friends.rawin("Garuda")) {
+			game.friends.Garuda <- true
+			text = textLineLen(gvLangObj["npc"]["garuda-c"], gvTextW)
+		}
+
+		gvInfoBox = text
+		if(actor.rawin("BossDoor")) foreach(i in actor["BossDoor"]) i.opening = true
 	}
 
 	function _typeof() { return "NPC" }

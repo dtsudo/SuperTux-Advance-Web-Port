@@ -230,7 +230,19 @@ gvMap . shape . h = 4.0 ;
  if ( nps . y >= shape . y + shape . oy || vspeed > 0 )  if ( hitTest ( nps , gvMap . shape )  &&  ! hitTest ( shape , gvMap . shape )  && hitTest ( ns , gvMap . shape )  )  return false ;
   
   
-  break ;  }  
+  break ;  case 44 :  var nps ;
+  if (  squirrelTypeOf ( shape )  == "Rec" ) nps = Rec ( shape . x + shape . ox , ns . y , ns . w , ns . h , shape . kind )  ; 
+ 
+  if (  squirrelTypeOf ( shape )  == "Cir" ) nps = Cir ( shape . x + shape . ox , ns . y , ns . r )  ; 
+ 
+ gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 8 )  ; 
+gvMap . shape . kind = 2 ; 
+gvMap . shape . w = 8.0 ; 
+gvMap . shape . h = 8.0 ; 
+ if ( nps . y > shape . y + shape . oy || vspeed >= 0 )  if ( hitTest ( nps , gvMap . shape )  &&  ! hitTest ( shape , gvMap . shape )  && hitTest ( ns , gvMap . shape )  )  return false ;
+  
+  
+  }  
   if ( debug )  { 
  gvMap . shape . draw (  )  ; 
  } 
@@ -390,7 +402,13 @@ gvMap . shape . w = 8.0 ;
 gvMap . shape . h = 4.0 ; 
  if ( hitTest ( ns , gvMap . shape )  )  return true ;
   
-  break ;  case 44 :  break ;  case 45 :  break ;  case 46 :  break ;  case 47 :  break ;  case 48 :  break ;  case 49 :  break ;  }  
+  break ;  case 44 : gvMap . shape . setPos ( x , y + 4 )  ; 
+gvMap . shape . kind = 2 ; 
+gvMap . shape . w = 8.0 ; 
+gvMap . shape . h = 4.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return true ;
+  
+  break ;  case 45 :  break ;  case 46 :  break ;  case 47 :  break ;  case 48 :  break ;  case 49 :  break ;  }  
   } 
   
   return false ;
@@ -438,6 +456,7 @@ PathCrawler =  function ( ) { var returnVal = { constructor: function(){} } ;  r
  returnVal . reverse = false ; 
  returnVal . dir = 0.0 ; 
  returnVal . moving = true ; 
+ returnVal . started = false ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
@@ -450,8 +469,12 @@ shape = Rec ( x , y , 6 , 6 , 0 )  ;
  
  tx = path [ 0 ]  [ 0 ]  ; 
 ty = path [ 0 ]  [ 1 ]  ; 
-print ( jsonWrite ( path )  )  ; 
  } ;  returnVal . run = function (  ) {  if ( moving )  { 
+  if (  ! started )  { 
+ started = true ; 
+pathStart (  )  ; 
+ } 
+  
   if (  ! inDistance2 ( x , y , tx , ty , speed )  )  { 
  dir = pointAngle ( x , y , tx , ty )  ; 
 x += lendirX ( speed , dir )  ; 
@@ -465,6 +488,7 @@ y = ty ;
   if ( step - 1 < 0 )  { 
  reverse = false ; 
 step ++  ; 
+pathZero (  )  ; 
  } 
   
   else step --  ; 
@@ -483,6 +507,7 @@ ty = path [ step ]  [ 1 ]  ;
   else  { 
  step --  ; 
 reverse = true ; 
+pathEnd (  )  ; 
  } 
   
   
@@ -496,7 +521,7 @@ ty = path [ step ]  [ 1 ]  ;
   
   } 
   
-  } ; 
+  } ;  returnVal . pathStart = function (  ) {  } ;  returnVal . pathEnd = function (  ) {  } ;  returnVal . pathZero = function (  ) {  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
 

@@ -84,75 +84,98 @@
 	};
 
 	window.drawSpriteExMod = function (sprite, frameNum, x, y, angle, flip, xscale, yscale, alpha, color) {
-		x = Math.floor(x);
-		y = Math.floor(y);
-
 		if (xscale <= 0 || yscale <= 0)
 			return;
 		
 		if (alpha <= 0)
 			return;
 		
-		if ((typeof sprite) === "number") {
-			window.drawSpriteExMod(loadedSprites[sprite], frameNum, x, y, angle, flip, xscale, yscale, alpha, color);
-		} else if (sprite.type === "sprite") {
-			let context = window.superTuxAdvanceWebVersion.superTuxAdvanceCanvases[window.superTuxAdvanceWebVersion.currentCanvas].context;
+		while (true) {
+			let modifiedSprite = false;
 			
-			let radianConversion = 2.0 * Math.PI / 360.0;
-			
-			context.translate(x, y);
-			
-			context.scale(xscale, yscale);
-			context.translate(-sprite.pivotX, -sprite.pivotY);
-			
-			context.translate(sprite.pivotX, sprite.pivotY);
-			context.rotate(angle * radianConversion);
-			context.translate(-sprite.pivotX, -sprite.pivotY);
-					
-			if (flip & 1) {
-				context.translate(sprite.width, 0);
-				context.scale(-1, 1);
+			if ((typeof sprite) === "number") {
+				sprite = loadedSprites[sprite];
+				modifiedSprite = true;
 			}
-			if (flip & 2) {
-				context.translate(0, sprite.height);
-				context.scale(1, -1);
+		
+			if (sprite.type === "font") {
+				sprite = sprite.sprite;
+				modifiedSprite = true;
 			}
 			
-			let sx = 0;
-			let sy = 0;
-			
-			let numTotalFrames = (sprite.img.naturalWidth / sprite.width) * (sprite.img.naturalHeight / sprite.height);
-			
-			frameNum = Math.floor(frameNum);
-			
-			frameNum = frameNum % numTotalFrames;
-			
-			let numFramesPerRow = sprite.img.naturalWidth / sprite.width;
-			
-			while (frameNum >= numFramesPerRow) {
-				frameNum -= numFramesPerRow;
-				sy += sprite.height;
-			}
-			
-			while (frameNum > 0) {
-				frameNum -= 1;
-				sx += sprite.width;
-			}
-			
-			context.save();
-			context.globalAlpha = alpha;
-			
-			let sWidth = sprite.width;
-			let sHeight = sprite.height;
-			context.drawImage(sprite.img, sx, sy, sWidth, sHeight, 0, 0, sWidth, sHeight);
-			
-			context.restore();
-			context.setTransform(1, 0, 0, 1, 0, 0);
-		} else if (sprite.type === "font") {
-			window.drawSpriteExMod(sprite.sprite, frameNum, x, y, angle, flip, xscale, yscale, alpha, color);
-		} else {
-			throw "drawSpriteExMod was invoked with an unrecognized sprite";
+			if (!modifiedSprite)
+				break;
 		}
+		
+		if (sprite.type !== "sprite")
+			throw "drawSpriteExMod was invoked with an unrecognized sprite";		
+		
+		x = Math.floor(x);
+		y = Math.floor(y);
+		
+		let context = window.superTuxAdvanceWebVersion.superTuxAdvanceCanvases[window.superTuxAdvanceWebVersion.currentCanvas].context;
+			
+		let radianConversion = 2.0 * Math.PI / 360.0;
+			
+		let pivotX = sprite.pivotX;
+		let pivotY = sprite.pivotY;
+			
+		if (flip & 1) {
+			pivotX = sprite.width - pivotX;
+		}
+			
+		if (flip & 2) {
+			pivotY = sprite.height - pivotY;
+		}
+			
+		context.translate(x, y);
+			
+		context.scale(xscale, yscale);
+		//context.translate(-pivotX, -pivotY);
+			
+		//context.translate(pivotX, pivotY);
+		context.rotate(angle * radianConversion);
+		context.translate(-pivotX, -pivotY);
+					
+		if (flip & 1) {
+			context.translate(sprite.width, 0);
+			context.scale(-1, 1);
+		}
+		if (flip & 2) {
+			context.translate(0, sprite.height);
+			context.scale(1, -1);
+		}
+			
+		let sx = 0;
+		let sy = 0;
+			
+		let numTotalFrames = (sprite.img.naturalWidth / sprite.width) * (sprite.img.naturalHeight / sprite.height);
+			
+		frameNum = Math.floor(frameNum);
+			
+		frameNum = frameNum % numTotalFrames;
+			
+		let numFramesPerRow = sprite.img.naturalWidth / sprite.width;
+			
+		while (frameNum >= numFramesPerRow) {
+			frameNum -= numFramesPerRow;
+			sy += sprite.height;
+		}
+			
+		while (frameNum > 0) {
+			frameNum -= 1;
+			sx += sprite.width;
+		}
+			
+		context.save();
+		context.globalAlpha = alpha;
+			
+		let sWidth = sprite.width;
+		let sHeight = sprite.height;
+		context.drawImage(sprite.img, sx, sy, sWidth, sHeight, 0, 0, sWidth, sHeight);
+			
+		context.restore();
+		context.setTransform(1, 0, 0, 1, 0, 0);
 	};
 
 	window.deleteSprite = function (sprite) {

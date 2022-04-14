@@ -43,8 +43,20 @@ game . maxEnergy = 4 - game . difficulty ;
 game . maxEnergy = 4 - game . difficulty ; 
  } 
   
-  if ( keyPress ( k_equals )  ) game . lives ++  ; 
+  if ( keyPress ( k_8 )  ) game . maxHealth = game . maxHealth + 4 ; 
  
+  if ( keyPress ( k_0 )  ) game . maxHealth = game . maxHealth - 4 ; 
+ 
+  if ( keyDown ( k_lctrl )  || keyDown ( k_rctrl )  )  { 
+  if ( keyPress ( k_k )  )  { 
+ gvKeyCopper = true ; 
+gvKeySilver = true ; 
+gvKeyGold = true ; 
+gvKeyMythril = true ; 
+ } 
+  
+  } 
+  
   if ( gvPlayer && mouseDown ( 0 )  )  { 
  gvPlayer . x = mouseX (  )  + camx ; 
 gvPlayer . y = mouseY (  )  + camy ; 
@@ -115,7 +127,8 @@ history . push ( input )  ;
   var newchar = keyString (  )  ;
   if ( newchar != "`" ) input += newchar ; 
  
- drawImage ( bgPause , 0 , 0 )  ; 
+ setDrawTarget ( gvScreen )  ; 
+drawImage ( bgPause , 0 , 0 )  ; 
 setDrawColor ( 0x00000080 )  ; 
 drawRec ( 0 , 0 , screenW (  )  , 8 * 16 , true )  ; 
 output = "" ; 
@@ -131,6 +144,8 @@ output += "\n" ;
   if ( floor ( getFrames (  )  / 32 )  % 2 == 0 ) output += "|" ; 
  
  drawText ( font , 0 , 0 , output )  ; 
+resetDrawTarget (  )  ; 
+drawImage ( gvScreen , 0 , 0 )  ; 
 update (  )  ; 
  } 
   

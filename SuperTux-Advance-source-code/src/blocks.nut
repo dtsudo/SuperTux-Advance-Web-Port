@@ -523,7 +523,7 @@
 			game.chy = y
 			playSoundChannel(sndBell, 0, 4)
 			if(game.difficulty < 3) {
-				if(game.health < game.maxHealth) game.health++
+				if(game.health < game.maxHealth) game.health += 4
 				else if(game.subitem == 0) game.subitem = 5
 			}
 		}
@@ -717,7 +717,7 @@
 		drawSpriteZ(2, sprBoxItem, getFrames() / 16, x - 8 - camx, y - 8 - camy)
 	}
 
-	function _typeof() { return "WoodBlock" }
+	function _typeof() { return "EvilBlock" }
 }
 
 ::EvilBlockB <- class extends Actor {
@@ -750,7 +750,7 @@
 		drawSpriteZ(2, sprBoxItem, getFrames() / 16, x - 8 - camx, y - 8 - camy)
 	}
 
-	function _typeof() { return "WoodBlock" }
+	function _typeof() { return "EvilBlockB" }
 }
 
 ::BreakBlock <- class extends Actor {
@@ -854,6 +854,14 @@
 ::BossDoor <- class extends Actor {
 	dy = 0
 	moving = false
+	delay = 0
+	opening = false
+
+	constructor(_x, _y, _arr = null) {
+		base.constructor(_x, _y)
+
+		if(_arr != "") delay = _arr.tointeger()
+	}
 
 	function run() {
 		if(gvWarning == 0 && dy == 0) {
@@ -863,11 +871,91 @@
 			tileSetSolid(x, y - 32, 1)
 			tileSetSolid(x, y - 48, 1)
 		}
-		if(moving && dy < 32) dy++
+		if(moving && dy < 32 && !opening) {
+			if(delay > 0) delay--
+			else dy++
+		}
+		else if(opening && dy > 0) {
+			dy--
+			tileSetSolid(x, y, 0)
+			tileSetSolid(x, y - 16, 0)
+			tileSetSolid(x, y - 32, 0)
+			tileSetSolid(x, y - 48, 0)
+		}
 
 		drawSpriteZ(4, sprBossDoor, 0, x - camx, y - camy - dy + 16)
 		drawSpriteZ(4, sprBossDoor, 0, x - camx, y - camy - 80 + dy)
 	}
 
 	function _typeof() { return "BossDoor" }
+}
+
+::Fishy <- class extends Actor {
+	shape = 0
+	slideshape = 0
+
+	constructor(_x, _y, _arr = null) {
+		base.constructor(_x, _y)
+		tileSetSolid(x, y, 1)
+
+		shape = Rec(x, y + 2, 8, 8, 0)
+		slideshape = Rec(x, y - 1, 12, 8, 0)
+	}
+
+	function run() {
+		if(gvPlayer) {
+			if(inDistance2(x, y, gvPlayer.x, gvPlayer.y, 64)) if(game.maxredcoins == game.levelredcoins ){
+				deleteActor(id)
+				newActor(Poof, x, y)
+				tileSetSolid(x, y, 0)
+			}
+
+		}
+
+		drawSprite(sprFishBlock, 0, x - 8 - camx, y - 8 - camy)
+	}
+
+	function _typeof() { return "Fishy" }
+}
+
+::FireBlock <- class extends Actor {
+	shape = 0
+	slideshape = 0
+	fireshape = 0
+
+	constructor(_x, _y, _arr = null) {
+		base.constructor(_x, _y)
+
+		shape = Rec(x, y + 2, 8, 8, 0)
+		slideshape = Rec(x, y - 1, 12, 8, 0)
+		fireshape = Rec(x, y, 16, 16, 0)
+		tileSetSolid(x, y, 1)
+	}
+
+	function run() {
+
+		if(actor.rawin("Fireball")) foreach(i in actor["Fireball"])  if(hitTest(fireshape, i.shape)) {
+			tileSetSolid(x, y, 0)
+			deleteActor(id)
+			deleteActor(i.id)
+			newActor(Flame, x, y)
+			playSound(sndFlame, 0)
+		}
+
+		if(actor.rawin("ExplodeF")) foreach(i in actor["ExplodeF"])  if(hitTest(fireshape, i.shape)) {
+			tileSetSolid(x, y, 0)
+			deleteActor(id)
+			newActor(Flame, x, y)
+			playSound(sndFlame, 0)
+		}
+
+		if(actor.rawin("Flame")) foreach(i in actor["Flame"]) if(inDistance2(x, y, i.x, i.y, 20) && i.frame >= 2) {
+			tileSetSolid(x, y, 0)
+			deleteActor(id)
+			newActor(Flame, x, y)
+			playSound(sndFlame, 0)
+		}
+
+		drawSprite(sprFireBlock, 0, x - 8 - camx, y - 8 - camy)
+	}
 }

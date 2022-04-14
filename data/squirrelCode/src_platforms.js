@@ -225,7 +225,7 @@ drawSprite ( sprFireball , getFrames (  )  / 4 , hb . x - camx , hb . y - camy )
 drawLightEx ( sprLightFire , 0 , hb . x - camx , hb . y - camy , 0 , 0 , 1.0 / 8.0 , 1.0 / 8.0 )  ; 
  if (  ( i - 1 )  % 2 == 0 )  { 
   if ( gvPlayer )  if ( hitTest ( hb , gvPlayer . shape )  )  { 
- gvPlayer . hurt = 1 ; 
+ gvPlayer . hurt = 2 ; 
  } 
   
   
@@ -256,8 +256,13 @@ PathCarrier =  function ( ) { var returnVal = { constructor: function(){} } ;  r
  
   if ( getroottable (  )  . rawin ( _arr [ 2 ]  )  ) obj = newActor ( getroottable (  )  [ _arr [ 2 ]  ]  , x , y , newarr )  ; 
  
-  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
- if ( checkActor ( obj )  )  { 
+  } ;  returnVal . run = function (  ) {  var dorun = true ;
+  if ( actor [ obj ]  . rawin ( "frozen" )  )  if ( actor [ obj ]  . frozen > 0 ) dorun = false ; 
+ 
+  
+  if ( dorun )  baseMethods . run  (  )  ; 
+ 
+  if ( checkActor ( obj )  )  { 
  actor [ obj ]  . x = x ; 
 actor [ obj ]  . y = y ; 
  } 
@@ -270,7 +275,7 @@ actor [ obj ]  . y = y ;
 RingCarrier =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . r = 0.0 ; 
  returnVal . c = 0.0 ; 
  returnVal . s = 0.0 ; 
- returnVal . a = 0.0 ; 
+ returnVal . a = null ; 
  returnVal . l = null ; 
  
  with ( returnVal ) { 
@@ -283,24 +288,34 @@ r = _arr [ 0 ]  . tofloat (  )  ;
 c = _arr [ 1 ]  . tointeger (  )  ; 
 s = _arr [ 2 ]  . tofloat (  )  ; 
  var newarr =  [  ]  ;
-  if ( _arr . len (  )  > 4 )  for (  var i = 4 ;
+ a =  [  ]  ; 
+ if ( _arr . len (  )  > 4 )  for (  var i = 4 ;
  i < _arr . len (  )  ; i ++  ) newarr . push ( _arr [ i ]  )  ; 
  
   if ( newarr . len (  )  == 1 ) newarr = newarr [ 0 ]  ; 
  
  l =  [  ]  ; 
- for (  var i = 0 ;
+ if ( c == 0 ) deleteActor ( id )  ; 
+ 
+  else  for (  var i = 0 ;
  i < c ; i ++  )  { 
  l . push ( newActor ( getroottable (  )  [ _arr [ 3 ]  ]  , x , y , newarr )  )  ; 
+a . push (  ( 360.0 / c )  * i / 180.0 * pi )  ; 
  } 
+  
   } ;  returnVal . run = function (  ) {  var cl = c ;
- a += s / 60.0 ; 
- for (  var i = 0 ;
+  for (  var i = 0 ;
  i < c ; i ++  )  { 
   if ( checkActor ( l [ i ]  )  )  { 
- actor [ l [ i ]  ]  . x = x + r * cos (  ( i * 2 * pi / c )  + a )  ; 
-actor [ l [ i ]  ]  . y = y + r * sin (  ( i * 2 * pi / c )  + a )  ; 
- } 
+ actor [ l [ i ]  ]  . x = x + r * cos (  ( 2 * pi / c )  + a [ i ]  )  ; 
+actor [ l [ i ]  ]  . y = y + r * sin (  ( 2 * pi / c )  + a [ i ]  )  ; 
+ var canrotate = true ;
+  if ( actor [ l [ i ]  ]  . rawin ( "frozen" )  )  if ( actor [ l [ i ]  ]  . frozen > 0 ) canrotate = false ; 
+ 
+  
+  if ( canrotate ) a [ i ]  += s / 60.0 ; 
+ 
+  } 
   
   else cl --  ; 
  

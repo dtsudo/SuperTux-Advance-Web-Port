@@ -19,7 +19,7 @@ Enemy =  function ( ) { var returnVal = { constructor: function(){} } ;  returnV
   if ( hitTest ( shape , gvPlayer . shape )  &&  ! frozen )  { 
   if ( gvPlayer . invincible > 0 ) hurtinvinc (  )  ; 
  
-  else  if ( y > gvPlayer . y && vspeed < gvPlayer . vspeed && gvPlayer . canstomp && gvPlayer . placeFree ( gvPlayer . x , gvPlayer . y + 2 )  ) gethurt (  )  ; 
+  else  if ( y > gvPlayer . y && vspeed < gvPlayer . vspeed && gvPlayer . canStomp && gvPlayer . placeFree ( gvPlayer . x , gvPlayer . y + 2 )  ) gethurt (  )  ; 
  
   else  if ( gvPlayer . rawin ( "anSlide" )  )  { 
   if ( gvPlayer . anim == gvPlayer . anSlide ) gethurt (  )  ; 
@@ -145,6 +145,11 @@ playSound ( sndFlame , 0 )  ;
  mapDeleteSolid ( icebox )  ; 
 newActor ( IceChunks , x , y )  ; 
  } 
+  
+  if ( gvPlayer )  { 
+  if ( gvPlayer . held == id ) gvPlayer . held = null ; 
+ 
+  } 
   
   } ;  returnVal . _typeof = function (  ) {  return "Enemy" ;
   } ; 
@@ -369,7 +374,7 @@ shape = Rec ( x , y , 8 , 12 , 0 )  ;
 timer =  ( x * y )  % 60 ; 
 flip = _arr ; 
  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
- if ( up && y > ystart - 24 &&  ! frozen ) y -= 2 ; 
+ if ( up && y > ystart - 32 &&  ! frozen ) y -= 2 ; 
  
   if (  ! up && y < ystart &&  ! frozen ) y += 2 ; 
  
@@ -410,7 +415,7 @@ icebox =  - 1 ;
   
   if ( flip == 1 ) drawSpriteEx ( sprSnake , getFrames (  )  / 8 , floor ( x - camx )  , floor ( y - camy )  , 0 , 0 , 1 , 1 , 1 )  ; 
  
-  if ( flip ==  - 1 ) drawSpriteEx ( sprSnake , getFrames (  )  / 8 , floor ( x - camx )  , floor ( y - camy )  - 8 , 0 , 2 , 1 , 1 , 1 )  ; 
+  if ( flip ==  - 1 ) drawSpriteEx ( sprSnake , getFrames (  )  / 8 , floor ( x - camx )  , floor ( y - camy )  + 32 , 0 , 2 , 1 , 1 , 1 )  ; 
  
   } 
   
@@ -447,7 +452,6 @@ playSound ( sndFlame , 0 )  ;
  if ( icebox !=  - 1 )  { 
  mapDeleteSolid ( icebox )  ; 
 newActor ( IceChunks , x , ystart - 6 )  ; 
-icebox =  - 1 ; 
  } 
   
   } ;  returnVal . hurtice = function (  ) { frozen = 600 ; 
@@ -519,6 +523,9 @@ icebox =  - 1 ;
   
   } 
   
+  } ;  returnVal . hurtplayer = function (  ) {  baseMethods . hurtplayer  (  )  ; 
+ if ( gvPlayer ) gvPlayer . hurt = 2 ; 
+ 
   } ;  returnVal . gethurt = function (  ) {  if ( gvPlayer &&  ! frozen )  { 
  hurtplayer (  )  ; 
  } 
@@ -556,6 +563,7 @@ CarlBoom =  function ( ) { var returnVal = { constructor: function(){} } ;  retu
  returnVal . flip = false ; 
  returnVal . squish = false ; 
  returnVal . squishTime = 0.0 ; 
+ returnVal . hspeed = 0.0 ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
@@ -567,13 +575,13 @@ shape = Rec ( x , y , 6 , 6 , 0 , 0 , 1 )  ;
   
   } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
  if ( active )  { 
-  if (  ! squish )  { 
   if ( placeFree ( x , y + 1 )  ) vspeed += 0.1 ; 
  
   if ( placeFree ( x , y + vspeed )  ) y += vspeed ; 
  
   else vspeed /= 2 ; 
  
+  if (  ! squish )  { 
   if ( y > gvMap . h + 8 ) deleteActor ( id )  ; 
  
   if (  ! frozen )  { 
@@ -663,12 +671,7 @@ icebox =  - 1 ;
   else  { 
  squishTime += 1.5 ; 
 frame += 0.002 * squishTime ; 
- if ( squishTime >= 150 )  { 
- deleteActor ( id )  ; 
-newActor ( BadExplode , x , y )  ; 
- } 
-  
- drawSpriteEx ( sprCarlBoom , wrap ( frame , 4 , 7 )  , x - camx , y - camy , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+drawSpriteEx ( sprCarlBoom , wrap ( frame , 4 , 7 )  , x - camx , y - camy , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  if ( getFrames (  )  % 20 == 0 )  { 
   var c ;
   if (  ! flip ) c = actor [ newActor ( FlameTiny , x - 6 , y - 8 )  ]  ; 
@@ -683,6 +686,46 @@ c . hspeed = randFloat ( 0.2 )  - 0.1 ;
  squish = false ; 
 squishTime = 0 ; 
  } 
+  
+  if ( getcon ( "shoot" , "hold" )  && gvPlayer )  { 
+  if ( hitTest ( shape , gvPlayer . shape )  &&  ( gvPlayer . held == null || gvPlayer . held == id )  )  { 
+  if ( gvPlayer . flip == 0 ) x = gvPlayer . x + 8 ; 
+ 
+  else x = gvPlayer . x - 8 ; 
+ 
+ y = gvPlayer . y ; 
+vspeed = 0 ; 
+squishTime -= 1.0 ; 
+hspeed = gvPlayer . hspeed ; 
+gvPlayer . held = id ; 
+ if ( squishTime >= 150 ) gvPlayer . held = null ; 
+ 
+  } 
+  
+  else  if ( gvPlayer . held == id ) gvPlayer . held = null ; 
+ 
+  
+  } 
+  
+  if ( placeFree ( x + hspeed , y )  ) x += hspeed ; 
+ 
+  else  if ( placeFree ( x + hspeed , y - 2 )  )  { 
+ x += hspeed ; 
+y -= 1.0 ; 
+ } 
+  
+  
+  if (  ! placeFree ( x , y + 1 )  ) hspeed *= 0.9 ; 
+ 
+  if ( abs ( hspeed )  < 0.1 ) hspeed = 0.0 ; 
+ 
+  if ( squishTime >= 150 )  { 
+ deleteActor ( id )  ; 
+newActor ( BadExplode , x , y )  ; 
+ if ( gvPlayer )  if ( gvPlayer . held == id ) gvPlayer . held = null ; 
+ 
+  
+  } 
   
   } 
   
@@ -752,8 +795,13 @@ shape = Cir ( x , y , 16 )  ;
 drawLightEx ( sprLightFire , 0 , x - camx , y - camy , 0 , 0 , 0.75 -  ( frame / 10.0 )  , 0.75 -  ( frame / 10.0 )  )  ; 
 frame += 0.2 ; 
  if ( gvPlayer )  { 
-  if ( hitTest ( shape , gvPlayer . shape )  ) gvPlayer . hurt = 1 ; 
+  if ( hitTest ( shape , gvPlayer . shape )  )  { 
+  if ( gvPlayer . blastResist ) gvPlayer . hurt = 2 ; 
  
+  else gvPlayer . hurt = 4 ; 
+ 
+  } 
+  
   if ( floor ( frame )  <= 1 && distance2 ( x , y , gvPlayer . x , gvPlayer . y )  < 64 )  { 
   if ( x < gvPlayer . x ) gvPlayer . hspeed += 0.5 ; 
  
@@ -814,9 +862,9 @@ vspeed =  - 3.0 ;
   
   if (  ! placeFree ( x , y + 1 )  ) vspeed =  - 3.0 ; 
  
-  if (  ! placeFree ( x + 2 , y - 2 )  &&  ! placeFree ( x + 2 , y )  ) hspeed =  - 1 ; 
+  if (  ! placeFree ( x + 2 , y - 2 )  &&  ! placeFree ( x + 2 , y )  ) hspeed =  - abs ( hspeed )  ; 
  
-  if (  ! placeFree ( x - 2 , y - 2 )  &&  ! placeFree ( x - 2 , y )  ) hspeed = 1 ; 
+  if (  ! placeFree ( x - 2 , y - 2 )  &&  ! placeFree ( x - 2 , y )  ) hspeed = abs ( hspeed )  ; 
  
  vspeed += 0.1 ; 
  if ( hspeed > 0 ) flip = 0 ; 
@@ -868,9 +916,9 @@ icebox =  - 1 ;
   
   } 
   
-  if ( x < 0 ) hspeed = 0.5 ; 
+  if ( x < 0 ) hspeed = abs ( hspeed )  ; 
  
-  if ( x > gvMap . w ) hspeed =  - 0.5 ; 
+  if ( x > gvMap . w ) hspeed =  - abs ( hspeed )  ; 
  
   } ;  returnVal . gethurt = function (  ) { newActor ( Poof , x , y )  ; 
 deleteActor ( id )  ; 
@@ -893,7 +941,8 @@ playSound ( sndFlame , 0 )  ;
  } 
   
   } ;  returnVal . hurtice = function (  ) { frozen = 600 ; 
- } ; 
+ } ;  returnVal . _typeof = function (  ) {  return "SnowBounce" ;
+  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
 BadCannon =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 3.5 ; 
@@ -1428,7 +1477,7 @@ shape . setPos ( x , y )  ;
 timer --  ; 
  if ( timer == 0 ||  ! placeFree ( x , y )  ) deleteActor ( id )  ; 
  
-  if ( gvPlayer )  if ( hitTest ( shape , gvPlayer . shape )  ) gvPlayer . hurt = 1 ; 
+  if ( gvPlayer )  if ( hitTest ( shape , gvPlayer . shape )  ) gvPlayer . hurt = 2 ; 
  
   
  drawSprite ( sprIceball , 0 , x - camx , y - camy )  ; 
@@ -1821,7 +1870,7 @@ icebox =  - 1 ;
  
   if ( x > gvMap . w ) hspeed =  - 0.0 ; 
  
-  } ;  returnVal . gethurt = function (  ) { gvPlayer . hurt = 1 ; 
+  } ;  returnVal . gethurt = function (  ) { gvPlayer . hurt = 3 ; 
  } ;  returnVal . hurtblast = function (  ) {  if ( icebox !=  - 1 )  { 
  mapDeleteSolid ( icebox )  ; 
 newActor ( IceChunks , x , y )  ; 
@@ -1834,42 +1883,6 @@ playSound ( sndFlame , 0 )  ;
 deleteActor ( id )  ; 
 playSound ( sndFlame , 0 )  ; 
  } ;  returnVal . hurtice = function (  ) { frozen = 600 ; 
- } ; 
- } 
- returnVal.constructor(...arguments); return returnVal ;  }  ; 
-Darknyan =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . hspeed = 0 ; 
- returnVal . vspeed =  - 3 ; 
- 
- with ( returnVal ) { 
-  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
-
-   baseConstructor  ( _x , _y )  ; 
- if ( gvPlayer )  if ( gvPlayer . x > x ) hspeed =  - 1 ; 
- 
-  else hspeed = 1 ; 
- 
-  
- shape = Rec ( x , y , 6 , 6 , 0 )  ; 
- } ;  returnVal . run = function (  ) {  if (  ! placeFree ( x , y + 1 )  ) vspeed =  - 3 ; 
- 
-  if (  ! placeFree ( x + 1 , y )  ) hspeed =  - 1 ; 
- 
-  if (  ! placeFree ( x - 1 , y )  ) hspeed = 1 ; 
- 
- vspeed += 0.1 ; 
- if ( placeFree ( x + hspeed , y )  ) x += hspeed ; 
- 
-  if ( placeFree ( x , y + vspeed )  ) y += vspeed ; 
- 
-  else vspeed /= 2 ; 
- 
- shape . setPos ( x , y )  ; 
- if ( gvPlayer )  if ( inDistance2 ( x , y , gvPlayer . x , gvPlayer . y , 16 )  )  { 
- gvPlayer . hurt = 1 ; 
- } 
-  
-  
- drawSprite ( sprDarkStar , getFrames (  )  / 10 , x - camx , y - camy )  ; 
  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
@@ -1979,14 +1992,14 @@ y -= 1.0 ;
   } 
   
   if ( gvPlayer && chasing )  { 
-  if ( x < gvPlayer . x - 8 )  if ( hspeed < 2.5 )  { 
+  if ( x < gvPlayer . x - 8 )  if ( hspeed <  ( 2.5 +  (  ( 2.0 / 200.0 )  * squishTime )  )  )  { 
  hspeed += 0.1 ; 
  if ( hspeed < 0 ) hspeed += 0.1 ; 
  
   } 
   
   
-  if ( x > gvPlayer . x + 8 )  if ( hspeed >  - 2.5 )  { 
+  if ( x > gvPlayer . x + 8 )  if ( hspeed >  -  ( 2.5 +  (  ( 2.0 / 200.0 )  * squishTime )  )  )  { 
  hspeed -= 0.1 ; 
  if ( hspeed > 0 ) hspeed -= 0.1 ; 
  
@@ -2147,7 +2160,7 @@ shape = Rec ( x , y , 6 , 6 , 0 )  ;
 drawSprite ( sprSawblade , getFrames (  )  / 2 , x - camx , y - camy )  ; 
 drawLightEx ( sprLightIce , 0 , x - camx , y - camy , 0 , 0 , 0.125 , 0.125 )  ; 
 shape . setPos ( x , y )  ; 
- if ( gvPlayer )  if ( hitTest ( shape , gvPlayer . shape )  ) gvPlayer . hurt = 1 ; 
+ if ( gvPlayer )  if ( hitTest ( shape , gvPlayer . shape )  ) gvPlayer . hurt = 2 ; 
  
   
   } ; 
@@ -2166,7 +2179,7 @@ shape = Rec ( x , y , 16 , 16 , 0 )  ;
  } ;  returnVal . run = function (  ) { drawSpriteEx ( sprExplodeT , frame , x - camx , y - camy , randInt ( 360 )  , 0 , 1 , 1 , 1 )  ; 
 frame += 0.1 ; 
  if ( gvPlayer )  { 
-  if ( hitTest ( shape , gvPlayer . shape )  ) gvPlayer . hurt = 1 ; 
+  if ( hitTest ( shape , gvPlayer . shape )  ) gvPlayer . hurt = 8 ; 
  
   if ( floor ( frame )  <= 1 && distance2 ( x , y , gvPlayer . x , gvPlayer . y )  < 64 )  { 
   if ( x < gvPlayer . x ) gvPlayer . hspeed += 0.1 ; 
@@ -2469,9 +2482,9 @@ playSound ( sndFlame , 0 )  ;
  } 
   
   
-  if ( smart ) drawSpriteEx ( sprBLZBRN , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+  if ( smart ) drawSpriteEx ( sprBlazeborn , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  
-  else drawSpriteEx ( sprBLZBRN , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+  else drawSpriteEx ( sprBlazeborn , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  
   if ( frozen <= 120 )  { 
   if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
@@ -2496,9 +2509,9 @@ icebox =  - 1 ;
   
   } 
   
-  if ( smart ) drawSpriteEx ( sprBLZBRN , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+  if ( smart ) drawSpriteEx ( sprBlazeborn , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  
-  else drawSpriteEx ( sprBLZBRN , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+  else drawSpriteEx ( sprBlazeborn , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  
   } 
   
@@ -2513,7 +2526,8 @@ icebox =  - 1 ;
   
   } 
   
- shape . setPos ( x , y )  ; 
+ drawLightEx ( sprLightFire , 0 , x - camx , y - camy , randInt ( 360 )  , 0 , 0.5 + sin ( getFrames (  )  . tofloat (  )  / 2.5 )  * 0.05 , 0.5 + sin ( getFrames (  )  . tofloat (  )  / 2.5 )  * 0.05 )  ; 
+shape . setPos ( x , y )  ; 
 setDrawColor ( 0xff0000ff )  ; 
  if ( debug ) shape . draw (  )  ; 
  
@@ -2521,7 +2535,7 @@ setDrawColor ( 0xff0000ff )  ;
   
   } ;  returnVal . hurtplayer = function (  ) {  if ( squish )  return ; 
   
-  baseMethods . hurtplayer  (  )  ; 
+ gvPlayer . hurt = 3 ; 
  } ;  returnVal . gethurt = function (  ) {  if ( squish )  return ; 
   
   if ( gvPlayer . rawin ( "anSlide" )  )  { 
@@ -2553,7 +2567,7 @@ gvPlayer . frame = gvPlayer . anJumpU [ 0 ]  ;
 gvPlayer . frame = gvPlayer . anJumpU [ 0 ]  ; 
  } 
   
-  baseMethods . hurtplayer  (  )  ; 
+ gvPlayer . hurt = 3 ; 
 squish = false ; 
  } ;  returnVal . hurtblast = function (  ) { newActor ( Poof , x , y )  ; 
 deleteActor ( id )  ; 
@@ -2565,6 +2579,212 @@ newActor ( BadExplode , x , y )  ;
 newActor ( Flame , x , y - 1 )  ; 
  } ;  returnVal . hurtice = function (  ) { frozen = 600 ; 
  } ;  returnVal . _typeof = function (  ) {  return "Blazeborn" ;
+  } ; 
+ } 
+ returnVal.constructor(...arguments); return returnVal ;  }  ; 
+Wildcap =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
+ returnVal . flip = false ; 
+ returnVal . squish = false ; 
+ returnVal . squishTime = 0.0 ; 
+ returnVal . smart = false ; 
+ returnVal . moving = false ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x . tofloat (  )  , _y . tofloat (  )  )  ; 
+shape = Rec ( x , y , 6 , 6 , 0 )  ; 
+smart = _arr ; 
+ } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
+ if ( active )  { 
+  if (  ! moving )  if ( gvPlayer )  if ( x > gvPlayer . x )  { 
+ flip = true ; 
+moving = true ; 
+ } 
+  
+  
+  
+  if (  ! squish )  { 
+  if ( placeFree ( x , y + 1 )  ) vspeed += 0.1 ; 
+ 
+  if ( placeFree ( x , y + vspeed )  ) y += vspeed ; 
+ 
+  else vspeed /= 2 ; 
+ 
+  if ( y > gvMap . h + 8 ) deleteActor ( id )  ; 
+ 
+  if (  ! frozen )  { 
+  if ( flip )  { 
+  if ( placeFree ( x - 1 , y )  ) x -= 1.0 ; 
+ 
+  else  if ( placeFree ( x - 2 , y - 2 )  )  { 
+ x -= 1.0 ; 
+y -= 1.0 ; 
+ } 
+  
+  else  if ( placeFree ( x - 1 , y - 2 )  )  { 
+ x -= 1.0 ; 
+y -= 1.0 ; 
+ } 
+  
+  else flip = false ; 
+ 
+  
+  
+  if ( smart )  if ( placeFree ( x - 6 , y + 14 )  ) flip = false ; 
+ 
+  
+  if ( x <= 0 ) flip = false ; 
+ 
+  } 
+  
+  else  { 
+  if ( placeFree ( x + 1 , y )  ) x += 1.0 ; 
+ 
+  else  if ( placeFree ( x + 1 , y - 1 )  )  { 
+ x += 1.0 ; 
+y -= 1.0 ; 
+ } 
+  
+  else  if ( placeFree ( x + 2 , y - 2 )  )  { 
+ x += 1.0 ; 
+y -= 1.0 ; 
+ } 
+  
+  else flip = true ; 
+ 
+  
+  
+  if ( smart )  if ( placeFree ( x + 6 , y + 14 )  ) flip = true ; 
+ 
+  
+  if ( x >= gvMap . w ) flip = true ; 
+ 
+  } 
+  
+  } 
+  
+  if ( frozen )  { 
+  if ( gvPlayer )  if ( icebox ==  - 1 &&  ! hitTest ( shape , gvPlayer . shape )  )  { 
+ icebox = mapNewSolid ( shape )  ; 
+ } 
+  
+  
+  if ( smart ) drawSpriteEx ( sprWildcap , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else drawSpriteEx ( sprWildcap , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  if ( frozen <= 70 )  { 
+  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
+ 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else  { 
+  if ( icebox !=  - 1 )  { 
+ mapDeleteSolid ( icebox )  ; 
+newActor ( IceChunks , x , y )  ; 
+icebox =  - 1 ; 
+ if ( gvPlayer )  if ( x > gvPlayer . x ) flip = true ; 
+ 
+  else flip = false ; 
+ 
+  
+  } 
+  
+  if ( smart ) drawSpriteEx ( sprWildcap , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else drawSpriteEx ( sprWildcap , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  } 
+  
+  } 
+  
+  else  { 
+ squishTime += 0.025 ; 
+ if ( squishTime >= 1 ) deleteActor ( id )  ; 
+ 
+  if ( smart ) drawSpriteEx ( sprWildcap , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else drawSpriteEx ( sprWildcap , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  } 
+  
+ shape . setPos ( x , y )  ; 
+setDrawColor ( 0xff0000ff )  ; 
+ if ( debug ) shape . draw (  )  ; 
+ 
+  } 
+  
+  } ;  returnVal . hurtplayer = function (  ) {  if ( squish )  return ; 
+  
+ gvPlayer . hurt = 4 ; 
+ } ;  returnVal . gethurt = function (  ) {  if ( squish )  return ; 
+  
+  if ( gvPlayer . rawin ( "anSlide" )  )  { 
+  if ( gvPlayer . anim == gvPlayer . anSlide )  { 
+  var c = newActor ( DeadNME , x , y )  ;
+ gvPlayer . hurt = 1 ; 
+actor [ c ]  . sprite = sprWildcap ; 
+actor [ c ]  . vspeed =  - abs ( gvPlayer . hspeed )  ; 
+actor [ c ]  . hspeed =  ( gvPlayer . hspeed / 16 )  ; 
+actor [ c ]  . spin =  ( gvPlayer . hspeed * 7 )  ; 
+actor [ c ]  . angle = 180 ; 
+deleteActor ( id )  ; 
+playSound ( sndKick , 0 )  ; 
+ } 
+  
+  else  if ( getcon ( "jump" , "hold" )  ) gvPlayer . vspeed =  - 8.0 ; 
+ 
+  else  { 
+ gvPlayer . vspeed =  - 4.0 ; 
+playSound ( sndSquish , 0 )  ; 
+ } 
+  
+  
+  if ( gvPlayer . anim == gvPlayer . anJumpT || gvPlayer . anim == gvPlayer . anFall )  { 
+ gvPlayer . anim = gvPlayer . anJumpU ; 
+gvPlayer . frame = gvPlayer . anJumpU [ 0 ]  ; 
+ } 
+  
+  } 
+  
+  else  if ( getcon ( "jump" , "hold" )  ) gvPlayer . vspeed =  - 8.0 ; 
+ 
+  else gvPlayer . vspeed =  - 4.0 ; 
+ 
+  
+  if ( gvPlayer . anim == gvPlayer . anJumpT || gvPlayer . anim == gvPlayer . anFall )  { 
+ gvPlayer . anim = gvPlayer . anJumpU ; 
+gvPlayer . frame = gvPlayer . anJumpU [ 0 ]  ; 
+ } 
+  
+ squish = true ; 
+ } ;  returnVal . hurtblast = function (  ) {  var c = newActor ( DeadNME , x , y )  ;
+ actor [ c ]  . sprite = sprDeathcap ; 
+actor [ c ]  . vspeed =  - 4 ; 
+actor [ c ]  . hspeed =  ( 4 / 16 )  ; 
+actor [ c ]  . spin =  ( 4 * 7 )  ; 
+actor [ c ]  . angle = 180 ; 
+deleteActor ( id )  ; 
+playSound ( sndKick , 0 )  ; 
+ if ( icebox !=  - 1 ) mapDeleteSolid ( icebox )  ; 
+ 
+  } ;  returnVal . hurtfire = function (  ) { newActor ( Flame , x , y - 1 )  ; 
+deleteActor ( id )  ; 
+playSound ( sndFlame , 0 )  ; 
+ if ( randInt ( 50 )  == 0 )  { 
+  var a = actor [ newActor ( MuffinRed , x , y )  ]  ;
+ a . vspeed =  - 2 ; 
+ } 
+  
+  } ;  returnVal . hurtice = function (  ) { frozen = 600 ; 
+ } ;  returnVal . _typeof = function (  ) {  return "Deathcap" ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 

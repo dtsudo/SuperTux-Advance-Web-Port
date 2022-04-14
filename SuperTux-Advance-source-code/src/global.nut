@@ -2,8 +2,7 @@
 | GLOBAL VARIABLES |
 \*================*/
 
-// webBrowserVersionChange: remove "Nightly" from the version string
-::gvVersion <- "0.0.10"
+::gvVersion <- "0.1.0"
 ::gvMap <- 0
 ::gvGameMode <- 0
 ::gvQuit <- false
@@ -13,14 +12,19 @@
 	coins = 0
 	levelCoins = 0
 	maxCoins = 0 //Total coins in the level
+	redcoins = 0
+	levelredcoins = 0
+	maxredcoins = 0
 	secrets = 0
 	enemies = 0
-	health = 4
-	maxHealth = 4
+	health = 12
+	maxHealth = 12
 	weapon = 0
 	maxEnergy = 0
 	fireBonus = 0
 	iceBonus = 0
+	airBonus = 0
+	earthBonus = 0
 	subitem = 0
 	completed = {} //List of completed level names
 	allCoins = {} //Levels that the player has gotten all enemies in
@@ -63,9 +67,12 @@
 	chy = 0
 	berries = 0
 	path = "res/map/"
+	canres = false //If the player can respawn
+	bossHealth = 0
 }
 ::gameDefault <- clone(game)
 ::gvPlayer <- false; //Pointer to player actor
+::gvBoss <- false; //Pointer to boss actor
 /*\
  # When characters are unlocked, they will
  # be added to game.characters. Mods can
@@ -114,6 +121,11 @@
 	showglobaligt = false
 	// webBrowserVersionChange: set light to false
 	light = false
+	// webBrowserVersionChange: set showcursor to false
+	showcursor = false
+	usefilter = false
+	soundVolume = 128
+	musicVolume = 128
 }
 
 ::contribDidRun <- {}
@@ -124,6 +136,7 @@
 ::camy <- 0
 ::camxprev <- 0
 ::camyprev <- 0
+::gvTextW <- 0
 
 //Debug variabls
 ::gvFPS <- 0

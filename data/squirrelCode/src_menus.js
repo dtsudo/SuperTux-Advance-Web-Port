@@ -6,10 +6,14 @@ window.superTuxAdvanceWebVersion.squirrelFiles['src/menus.nut'] = function () {
 
 menu =  [  ]  ; 
 menuLast =  [  ]  ; 
+menuItemsPos =  [  ]  ; 
 cursor = 0 ; 
 cursorOffset = 0 ; 
-menuMax = 7 ;
+cursorTimer = 30 ; 
+menuMax = 8 ;
+ fontW = 8 ;
  fontH = 14 ;
+ menuY = 40 ;
  textMenu =  function (  ) {  if ( menu ==  [  ]  )  return ; 
   
   if ( menu != menuLast )  { 
@@ -18,27 +22,65 @@ cursorOffset = 0 ;
  } 
   
  menuLast = menu ; 
+menuItemsPos =  [  ]  ; 
  if ( menu . len (  )  > menuMax )  for (  var i = cursorOffset ;
  i < cursorOffset + menuMax ; i ++  )  { 
-  if ( cursor == i )  { 
- drawSprite ( font2 , 97 ,  ( screenW (  )  / 2 )  -  ( menu [ i ]  . name (  )  . len (  )  * 4 )  - 16 , screenH (  )  - 8 -  ( menuMax * fontH )  +  (  ( i - cursorOffset )  * fontH )  )  ; 
-drawSprite ( font2 , 102 ,  ( screenW (  )  / 2 )  +  ( menu [ i ]  . name (  )  . len (  )  * 4 )  + 7 , screenH (  )  - 8 -  ( menuMax * fontH )  +  (  ( i - cursorOffset )  * fontH )  )  ; 
+  var currFont = font2 ;
+  if ( menu [ i ]  . rawin ( "disabled" )  )  { 
+ currFont = font2G ; 
  } 
   
- drawText ( font2 ,  ( screenW (  )  / 2 )  -  ( menu [ i ]  . name (  )  . len (  )  * 4 )  , screenH (  )  - 8 -  ( menuMax * fontH )  +  (  ( i - cursorOffset )  * fontH )  , menu [ i ]  . name (  )  )  ; 
+  if ( cursor == i )  { 
+ drawSprite ( currFont , 97 ,  ( screenW (  )  / 2 )  -  ( menu [ i ]  . name (  )  . len (  )  * 4 )  - 16 , screenH (  )  - menuY -  ( menuMax * fontH )  +  (  ( i - cursorOffset )  * fontH )  )  ; 
+drawSprite ( currFont , 102 ,  ( screenW (  )  / 2 )  +  ( menu [ i ]  . name (  )  . len (  )  * 4 )  + 7 , screenH (  )  - menuY -  ( menuMax * fontH )  +  (  ( i - cursorOffset )  * fontH )  )  ; 
+ if ( menu [ i ]  . rawin ( "desc" )  )  { 
+ setDrawColor ( 0x00000080 )  ; 
+drawRec ( 0 , screenH (  )  - fontH - 10 , screenW (  )  , 12 , true )  ; 
+drawText ( font ,  ( screenW (  )  / 2 )  -  ( menu [ i ]  . desc (  )  . len (  )  * 3 )  , screenH (  )  - fontH - 8 , menu [ i ]  . desc (  )  )  ; 
  } 
+  
+  } 
+  
+  var textX =  ( screenW (  )  / 2 )  -  ( menu [ i ]  . name (  )  . len (  )  * 4 )  ;
+  var textY = screenH (  )  - menuY -  ( menuMax * fontH )  +  (  ( i - cursorOffset )  * fontH )  ;
+ drawText ( currFont , textX , textY , menu [ i ]  . name (  )  )  ; 
+menuItemsPos . append (  { index : i , x : textX , y : textY , len : menu [ i ]  . name (  )  . len (  )  * fontW }  )  ; 
+ if ( cursorOffset > 0 )  for (  var i = 0 ;
+ i < 4 ; i ++  ) drawSprite ( font2 , 103 ,  ( screenW (  )  / 2 - 24 )  +  ( i * 12 )  , screenH (  )  - menuY -  ( fontH *  ( menuMax + 1 )  )  )  ; 
+ 
+  if ( cursorOffset < menu . len (  )  - menuMax )  for (  var i = 0 ;
+ i < 4 ; i ++  ) drawSprite ( font2 , 98 ,  ( screenW (  )  / 2 - 24 )  +  ( i * 12 )  , screenH (  )  - menuY )  ; 
+ 
+  } 
   
   else  for (  var i = 0 ;
  i < menu . len (  )  ; i ++  )  { 
+  var currFont = font2 ;
+  if ( menu [ i ]  . rawin ( "disabled" )  )  { 
+ currFont = font2G ; 
+ } 
+  
   if ( cursor == i )  { 
- drawSprite ( font2 , 97 ,  ( screenW (  )  / 2 )  -  ( menu [ i ]  . name (  )  . len (  )  * 4 )  - 16 , screenH (  )  - 8 -  ( menu . len (  )  * fontH )  +  ( i * fontH )  )  ; 
-drawSprite ( font2 , 102 ,  ( screenW (  )  / 2 )  +  ( menu [ i ]  . name (  )  . len (  )  * 4 )  + 7 , screenH (  )  - 8 -  ( menu . len (  )  * fontH )  +  ( i * fontH )  )  ; 
+ drawSprite ( currFont , 97 ,  ( screenW (  )  / 2 )  -  ( menu [ i ]  . name (  )  . len (  )  * 4 )  - 16 , screenH (  )  - menuY -  ( menu . len (  )  * fontH )  +  ( i * fontH )  )  ; 
+drawSprite ( currFont , 102 ,  ( screenW (  )  / 2 )  +  ( menu [ i ]  . name (  )  . len (  )  * 4 )  + 7 , screenH (  )  - menuY -  ( menu . len (  )  * fontH )  +  ( i * fontH )  )  ; 
+ if ( menu [ i ]  . rawin ( "desc" )  )  { 
+ setDrawColor ( 0x00000080 )  ; 
+drawRec ( 0 , screenH (  )  - fontH - 10 , screenW (  )  , 12 , true )  ; 
+drawText ( font ,  ( screenW (  )  / 2 )  -  ( menu [ i ]  . desc (  )  . len (  )  * 3 )  , screenH (  )  - fontH - 8 , menu [ i ]  . desc (  )  )  ; 
  } 
   
- drawText ( font2 ,  ( screenW (  )  / 2 )  -  ( menu [ i ]  . name (  )  . len (  )  * 4 )  , screenH (  )  - 8 -  ( menu . len (  )  * fontH )  +  ( i * fontH )  , menu [ i ]  . name (  )  )  ; 
+  } 
+  
+  var textX =  ( screenW (  )  / 2 )  -  ( menu [ i ]  . name (  )  . len (  )  * 4 )  ;
+  var textY = screenH (  )  - menuY -  ( menu . len (  )  * fontH )  +  ( i * fontH )  ;
+ drawText ( currFont , textX , textY , menu [ i ]  . name (  )  )  ; 
+menuItemsPos . append (  { index : i , x : textX , y : textY , len : menu [ i ]  . name (  )  . len (  )  * fontW }  )  ; 
  } 
   
-  if ( getcon ( "down" , "press" )  )  { 
+ updateCursor (  )  ; 
+ if ( mouseRelease ( 0 )  ) processCursorInput (  )  ; 
+ 
+  if ( getcon ( "down" , "press" )  ||  ( getcon ( "down" , "hold" )  && cursorTimer <= 0 )  )  { 
  cursor ++  ; 
  if ( cursor >= cursorOffset + menuMax ) cursorOffset ++  ; 
  
@@ -47,9 +89,14 @@ drawSprite ( font2 , 102 ,  ( screenW (  )  / 2 )  +  ( menu [ i ]  . name (  ) 
 cursorOffset = 0 ; 
  } 
   
-  } 
+  if ( getcon ( "down" , "press" )  ) cursorTimer = 40 ; 
+ 
+  else cursorTimer = 10 ; 
+ 
+ playSound ( sndMenuMove , 0 )  ; 
+ } 
   
-  if ( getcon ( "up" , "press" )  )  { 
+  if ( getcon ( "up" , "press" )  ||  ( getcon ( "up" , "hold" )  && cursorTimer <= 0 )  )  { 
  cursor --  ; 
  if ( cursor < cursorOffset ) cursorOffset --  ; 
  
@@ -59,10 +106,20 @@ cursorOffset = 0 ;
  
   } 
   
-  } 
+  if ( getcon ( "up" , "press" )  ) cursorTimer = 40 ; 
+ 
+  else cursorTimer = 10 ; 
+ 
+ playSound ( sndMenuMove , 0 )  ; 
+ } 
   
+  if ( getcon ( "down" , "hold" )  || getcon ( "up" , "hold" )  ) cursorTimer --  ; 
+ 
   if ( getcon ( "jump" , "press" )  || getcon ( "accept" , "press" )  )  { 
+  if ( menu [ cursor ]  . rawin ( "disabled" )  )  return ; 
+  
  menu [ cursor ]  . func (  )  ; 
+playSound ( sndMenuSelect , 0 )  ; 
  } 
   
   if ( getcon ( "pause" , "press" )  )  { 
@@ -75,6 +132,16 @@ cursorOffset = 0 ;
   } 
   } 
   
+  if ( mouseWheelY (  )  < 0 && cursorOffset < menu . len (  )  - menuMax )  { 
+ cursorOffset ++  ; 
+cursor ++  ; 
+ } 
+  
+  if ( mouseWheelY (  )  > 0 && cursorOffset > 0 )  { 
+ cursorOffset --  ; 
+cursor --  ; 
+ } 
+  
   }  ; 
 meMain =  [  { name :  function (  ) {  return gvLangObj [ "main-menu" ]  [ "new" ]  ;
   }  , func :  function (  ) { menu = meDifficulty ; 
@@ -85,7 +152,7 @@ meMain =  [  { name :  function (  ) {  return gvLangObj [ "main-menu" ]  [ "new
  }  }  ,  { name :  function (  ) {  return gvLangObj [ "main-menu" ]  [ "options" ]  ;
   }  , func :  function (  ) { menu = meOptions ; 
  }  }  ,  { name :  function (  ) {  return gvLangObj [ "main-menu" ]  [ "credits" ]  ;
-  }  , func :  function (  ) { startCredits (  )  ; 
+  }  , func :  function (  ) { startCredits ( "res" )  ; 
  }  }  ]  ; 
 mePausePlay =  [  { name :  function (  ) {  return gvLangObj [ "pause-menu" ]  [ "continue" ]  ;
   }  , func :  function (  ) { gvGameMode = gmPlay ; 
@@ -93,6 +160,8 @@ mePausePlay =  [  { name :  function (  ) {  return gvLangObj [ "pause-menu" ]  
   }  , func :  function (  ) { gvIGT = 0 ; 
 game . check = false ; 
 startPlay ( gvMap . file )  ; 
+ }  }  ,  { name :  function (  ) {  return gvLangObj [ "main-menu" ]  [ "options" ]  ;
+  }  , func :  function (  ) { menu = meOptions ; 
  }  }  ,  { name :  function (  ) {  return gvLangObj [ "pause-menu" ]  [ "quit-level" ]  ;
   }  , func :  function (  ) { startOverworld ( game . world )  ; 
 cursor = 0 ; 
@@ -103,11 +172,15 @@ mePauseOver =  [  { name :  function (  ) {  return gvLangObj [ "pause-menu" ]  
   }  , func :  function (  ) { saveGame (  )  ; 
 playSound ( sndHeal , 0 )  ; 
 gvGameMode = gmOverworld ; 
+ }  }  ,  { name :  function (  ) {  return gvLangObj [ "main-menu" ]  [ "options" ]  ;
+  }  , func :  function (  ) { menu = meOptions ; 
  }  }  ,  { name :  function (  ) {  return gvLangObj [ "pause-menu" ]  [ "quit-game" ]  ;
-  }  , func :  function (  ) { startMain (  )  ; 
+  }  , func :  function (  ) { saveGame (  )  ; 
+startMain (  )  ; 
 cursor = 0 ; 
  }  }  ]  ; 
 meOptions =  [  { name :  function (  ) {  return gvLangObj [ "options-menu" ]  [ "timers" ]  ;
+  }  , desc :  function (  ) {  return gvLangObj [ "options-menu-desc" ]  [ "timers" ]  ;
   }  , func :  function (  ) { menu = meTimers ; 
  }  }  ,  { name :  function (  ) {  var msg = gvLangObj [ "options-menu" ]  [ "autorun" ]  ;
   if ( config . autorun ) msg += gvLangObj [ "menu-commons" ]  [ "on" ]  ; 
@@ -115,15 +188,76 @@ meOptions =  [  { name :  function (  ) {  return gvLangObj [ "options-menu" ]  
   else msg += gvLangObj [ "menu-commons" ]  [ "off" ]  ; 
  
   return msg ;
+  }  , desc :  function (  ) {  return gvLangObj [ "options-menu-desc" ]  [ "autorun" ]  ;
   }  , func :  function (  ) { config . autorun =  ! config . autorun ; 
 fileWrite ( "config.json" , jsonWrite ( config )  )  ; 
- }  }  ,  { name :  function (  ) {  return gvLangObj [ "menu-commons" ]  [ "back" ]  ;
-  }  , func :  function (  ) { cursor = 3 ; 
-menu = meMain ; 
-fileWrite ( "config.json" , jsonWrite ( config )  )  ; 
- }  , back :  function (  ) { cursor = 3 ; 
-menu = meMain ; 
-fileWrite ( "config.json" , jsonWrite ( config )  )  ; 
+ }  }  ,  { name :  function (  ) {  return gvLangObj [ "options-menu" ]  [ "sound-volume" ]  ;
+  }  , desc :  function (  ) {  if ( getcon ( "left" , "press" )  && getSoundVolume (  )  > 0 )  { 
+ config . soundVolume -= 4 ; 
+setSoundVolume ( config . soundVolume )  ; 
+playSound ( sndMenuMove , 0 )  ; 
+ } 
+  
+  if ( getcon ( "right" , "press" )  && getSoundVolume (  )  < 128 )  { 
+ config . soundVolume += 4 ; 
+setSoundVolume ( config . soundVolume )  ; 
+playSound ( sndMenuMove , 0 )  ; 
+ } 
+  
+  var vol = "VOL: [" ;
+  for (  var i = 0 ;
+ i < 16 ; i ++  )  { 
+  if ( i < getSoundVolume (  )  / 8 ) vol += chint ( 8 )  ; 
+ 
+  else vol += chint ( 7 )  ; 
+ 
+  } 
+ vol += "] (<-/->)" ; 
+ return vol ;
+  }  , func :  function (  ) {  }  }  ,  { name :  function (  ) {  return gvLangObj [ "options-menu" ]  [ "music-volume" ]  ;
+  }  , desc :  function (  ) {  if ( getcon ( "left" , "press" )  && getMusicVolume (  )  > 0 )  { 
+ config . musicVolume -= 4 ; 
+setMusicVolume ( config . musicVolume )  ; 
+playSound ( sndMenuMove , 0 )  ; 
+ } 
+  
+  if ( getcon ( "right" , "press" )  && getMusicVolume (  )  < 128 )  { 
+ config . musicVolume += 4 ; 
+setMusicVolume ( config . musicVolume )  ; 
+playSound ( sndMenuMove , 0 )  ; 
+ } 
+  
+  var vol = "VOL: [" ;
+  for (  var i = 0 ;
+ i < 16 ; i ++  )  { 
+  if ( i < getMusicVolume (  )  / 8 ) vol += chint ( 8 )  ; 
+ 
+  else vol += chint ( 7 )  ; 
+ 
+  } 
+ vol += "] (<-/->)" ; 
+ return vol ;
+  }  , func :  function (  ) {  }  }  ,  { name :  function (  ) {  return gvLangObj [ "menu-commons" ]  [ "back" ]  ;
+  }  , func :  function (  ) {  if ( gvGameMode == gmPause )  { 
+  if ( gvPauseMode ) menu = mePauseOver ; 
+ 
+  else menu = mePausePlay ; 
+ 
+  } 
+  
+  else menu = meMain ; 
+ 
+ fileWrite ( "config.json" , jsonWrite ( config )  )  ; 
+ }  , back :  function (  ) {  if ( gvGameMode == gmPause )  { 
+  if ( gvPauseMode ) menu = mePauseOver ; 
+ 
+  else menu = mePausePlay ; 
+ 
+  } 
+  
+  else menu = meMain ; 
+ 
+ fileWrite ( "config.json" , jsonWrite ( config )  )  ; 
  }  }  ]  ; 
 meKeybinds =  [  { name :  function (  ) {  return gvLangObj [ "controls-menu" ]  [ "up" ]  + ": " + gvLangObj [ "key" ]  [ config . key . up . tostring (  )  ]  ;
   }  , func :  function (  ) { rebindKeys ( 0 )  ; 

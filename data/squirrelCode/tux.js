@@ -42,13 +42,19 @@ donut ( "src/pickchar.nut" )  ;
 donut ( "src/weather.nut" )  ; 
 donut ( "src/light.nut" )  ; 
 donut ( "src/credits.nut" )  ; 
+donut ( "src/cursor.nut" )  ; 
+donut ( "src/shop.nut" )  ; 
  var modlist = lsdir ( "mods" )  ;
   for (  var i = 0 ;
  i < modlist . len (  )  ; i ++  )  if ( modlist [ i ]  != "." && modlist [ i ]  != ".." ) donut ( "mods/" + modlist [ i ]  )  ; 
  
-  var disres = displayW (  )  . tofloat (  )  / displayH (  )  . tofloat (  )  ;
+  if ( fileExists ( "config.json" )  ) config = mergeTable ( config , jsonRead ( fileRead ( "config.json" )  )  )  ; 
+ 
+ setSoundVolume ( config . soundVolume )  ; 
+setMusicVolume ( config . musicVolume )  ; 
+ var disres = displayW (  )  . tofloat (  )  / displayH (  )  . tofloat (  )  ;
   var reschoice = 0 ;
-  var aspects =  [  ( 16.0 / 9.0 )  ,  ( 8.0 / 5.0 )  ,  ( 4.0 / 3.0 )  ]  ;
+  var aspects =  [  ( 16.0 / 9.0 )  ,  ( 5.0 / 3.0 )  ,  ( 4.0 / 3.0 )  ]  ;
   var resdiff = 100 ;
   for (  var i = 0 ;
  i < aspects . len (  )  ; i ++  )  { 
@@ -58,13 +64,17 @@ reschoice = i ;
  } 
   
   } 
-  switch ( reschoice )  {  case 0 : setResolution ( 320 , 180 )  ; 
- break ;  case 1 : setResolution ( 320 , 200 )  ; 
+  switch ( reschoice )  {  case 0 : setResolution ( 424 , 240 )  ; 
+ break ;  case 1 : setResolution ( 400 , 240 )  ; 
  break ;  case 2 : setResolution ( 320 , 240 )  ; 
  break ;  default : setResolution ( 320 , 240 )  ; 
- break ;  } gvScreen = newTexture ( screenW (  )  , screenH (  )  )  ; 
-gvPlayScreen = newTexture ( screenW (  )  , screenH (  )  )  ; 
+ break ;  } gvTextW = floor ( screenW (  )  / 6 )  - 1 ; 
+ if ( config . usefilter ) setScalingFilter ( 1 )  ; 
+ 
+ gvScreen = newTexture ( screenW (  )  , screenH (  )  )  ; 
 bgPause = newTexture ( screenW (  )  , screenH (  )  )  ; 
+setScalingFilter ( 0 )  ; 
+gvPlayScreen = newTexture ( screenW (  )  , screenH (  )  )  ; 
 gvLightScreen = newTexture ( screenW (  )  , screenH (  )  )  ; 
 textureSetBlendMode ( gvLightScreen , bm_sub )  ; 
 setWindowTitle ( "SuperTux Advance" )  ; 
@@ -74,16 +84,13 @@ tileSearchDir . push ( "res/gfx" )  ;
 tileSearchDir . push ( "res/map" )  ; 
 tileSearchDir . push ( "res/snd" )  ; 
 setFPS ( 60 )  ; 
- if ( fileExists ( "config.json" )  ) config = jsonRead ( fileRead ( "config.json" )  )  ; 
- 
- gvLangObj = jsonRead ( fileRead ( "lang/en.json" )  )  ; 
+gvLangObj = jsonRead ( fileRead ( "lang/en.json" )  )  ; 
 gvLangObj = mergeTable ( gvLangObj , jsonRead ( fileRead ( "lang/" + config . lang + ".json" )  )  )  ; 
 strDifficulty =  [ gvLangObj [ "difficulty-levels" ]  [ "easy" ]  , gvLangObj [ "difficulty-levels" ]  [ "normal" ]  , gvLangObj [ "difficulty-levels" ]  [ "hard" ]  , gvLangObj [ "difficulty-levels" ]  [ "super" ]  ]  ; 
 print ( "Launching SuperTux Advance v." + gvVersion + "..." )  ; 
 startMain (  )  ; 
 menu = meMain ; 
 config . playerChar = "Tux" ; 
-update (  )  ; 
  if (  ! isWebBrowserVersion )  { 
   while (  ! getQuit (  )  &&  ! gvQuit )  { 
   if ( keyPress ( k_f11 )  ) toggleFullscreen (  )  ; 

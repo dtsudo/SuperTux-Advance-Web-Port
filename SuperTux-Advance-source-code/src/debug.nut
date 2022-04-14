@@ -32,7 +32,16 @@
 	if(keyPress(k_3)) { game.weapon = 2; game.maxEnergy = 4 - game.difficulty }
 	if(keyPress(k_4)) { game.weapon = 3; game.maxEnergy = 4 - game.difficulty }
 	if(keyPress(k_5)) { game.weapon = 4; game.maxEnergy = 4 - game.difficulty }
-	if(keyPress(k_equals)) game.lives++
+	if(keyPress(k_8)) game.maxHealth = game.maxHealth + 4
+	if(keyPress(k_0)) game.maxHealth = game.maxHealth - 4
+	if(keyDown(k_lctrl) || keyDown(k_rctrl)) {
+		if(keyPress(k_k)) {
+			gvKeyCopper = true
+			gvKeySilver = true
+			gvKeyGold = true
+			gvKeyMythril = true
+		}
+	}
 
 	//Teleport
 	if(gvPlayer && mouseDown(0)) {
@@ -108,6 +117,7 @@
 		local newchar = keyString()
 		if(newchar != "`") input += newchar
 
+		setDrawTarget(gvScreen)
 		drawImage(bgPause, 0, 0)
 		setDrawColor(0x00000080)
 		drawRec(0, 0, screenW(), 8 * 16, true)
@@ -122,6 +132,8 @@
 		if(floor(getFrames() / 32) % 2 == 0) output += "|"
 		drawText(font, 0, 0, output)
 
+		resetDrawTarget()
+		drawImage(gvScreen, 0, 0)
 		update()
 	}
 }

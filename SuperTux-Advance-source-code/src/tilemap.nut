@@ -51,24 +51,24 @@
 		sprite = _sprite
 	}
 
-	function draw(x, y, alpha) {
+	function draw(x, y, alpha, color = 0xffffffff) {
 		local currentTime = wrap(getTicks(), 0, frameTime.top())
 		for(local i = 0; i < frameList.len(); i++) {
 			if(currentTime >= frameTime[i]) {
 				if(i < frameTime.len() - 1) {
 					if(currentTime < frameTime[i + 1]) {
-						drawSpriteEx(sprite, frameList[i], floor(x), floor(y), 0, 0, 1, 1, alpha)
+						drawSpriteExMod(sprite, frameList[i], floor(x), floor(y), 0, 0, 1, 1, alpha, color)
 						return
 					}
 				}
 				else if(currentTime <= frameTime[i] && i == 0) {
-					drawSpriteEx(sprite, frameList[i], floor(x), floor(y), 0, 0, 1, 1, alpha)
+					drawSpriteExMod(sprite, frameList[i], floor(x), floor(y), 0, 0, 1, 1, alpha, color)
 					return
 				}
 			}
 		}
 
-		drawSpriteEx(sprite, frameList.top(), floor(x), floor(y), 0, 0, 1, 1, alpha)
+		drawSpriteExMod(sprite, frameList.top(), floor(x), floor(y), 0, 0, 1, 1, alpha, color)
 	}
 }
 
@@ -93,6 +93,7 @@
 	shape = null
 	anim = null //List of animated tiles
 	solidLayer = null
+	plat = null //List of platforms
 
 	constructor(filename) {
 		tileset = []
@@ -222,11 +223,14 @@
 		else print("Map file " + filename + " does not exist!")
 	}
 
+	// webBrowserVersionChange: made slight changes to this function to make it run faster
 	function drawTiles(x, y, mx, my, mw, mh, l, a = 1) { //@mx through @mh are the rectangle of tiles that will be drawn
 		//Find layer
 		local t = -1; //Target layer
-		for(local i = 0; i < data.layers.len(); i++) {
-			if(data.layers[i].type == "tilelayer" && data.layers[i].name == l) {
+		local dataLayers = data.layers;
+		local dataLayersLen = dataLayers.len();
+		for(local i = 0; i < dataLayersLen; i++) {
+			if(dataLayers[i].type == "tilelayer" && dataLayers[i].name == l) {
 				t = i
 				break
 			}
@@ -235,26 +239,43 @@
 			return; //Quit if no tile layer by that name was found
 		}
 
+		local dataLayersT = dataLayers[t];
+		local dataLayersTWidth = dataLayersT.width;
+		local dataLayersTHeight = dataLayersT.height;
+		
 		//Make sure values are in range
-		if(data.layers[t].width < mx + mw) mw = data.layers[t].width - mx
-		if(data.layers[t].height < my + mh) mh = data.layers[t].height - my
+		if(dataLayersTWidth < mx + mw) mw = dataLayersTWidth - mx
+		if(dataLayersTHeight < my + mh) mh = dataLayersTHeight - my
 		if(mx < 0) mx = 0
 		if(my < 0) my = 0
-		if(mx > data.layers[t].width) mx = data.layers[t].width
-		if(my > data.layers[t].height) my = data.layers[t].height
+		if(mx > dataLayersTWidth) mx = dataLayersTWidth
+		if(my > dataLayersTHeight) my = dataLayersTHeight
 
-		for(local i = my; i < my + mh; i++) {
-			for(local j = mx; j < mx + mw; j++) {
-				if(i * data.layers[t].width + j >= data.layers[t].data.len()) return
-				local n = data.layers[t].data[(i * data.layers[t].width) + j]; //Number value of the tile
+		local myPlusMh = my + mh;
+		local mxPlusMw = mx + mw;
+		
+		local dataLayersTData = dataLayersT.data;
+		local dataLayersTDataLen = dataLayersTData.len();
+		
+		local dataTilesetsLen = data.tilesets.len();
+		
+		local dataLayersTOpacityTimesA = dataLayersT.opacity * a;
+		
+		for(local i = my; i < myPlusMh; i++) {
+			local iTimesDataLayersTWidth = i * dataLayersTWidth;
+			local yPlusITimesDataTileheight = y + i * data.tileheight;
+			for(local j = mx; j < mxPlusMw; j++) {
+				if(iTimesDataLayersTWidth + j >= dataLayersTDataLen) return
+				local n = dataLayersTData[iTimesDataLayersTWidth + j]; //Number value of the tile
 				if(n != 0) {
-					for(local k = data.tilesets.len() - 1; k >= 0; k--) {
+					local xPlusJTimesDataTilewidth = x + j * data.tilewidth;
+					for(local k = dataTilesetsLen - 1; k >= 0; k--) {
 						if(n >= data.tilesets[k].firstgid) {
 							if(anim.rawin(n)) {
-								if(tileset[k] == anim[n].sprite) anim[n].draw(x + (j * data.tilewidth), y + (i * data.tileheight), data.layers[t].opacity * a)
-								else drawSpriteEx(tileset[k], n - data.tilesets[k].firstgid, x + (j * data.tilewidth), y + (i * data.tileheight), 0, 0, 1, 1, data.layers[t].opacity * a)
+								if(tileset[k] == anim[n].sprite) anim[n].draw(xPlusJTimesDataTilewidth, yPlusITimesDataTileheight, dataLayersTOpacityTimesA)
+								else drawSpriteEx(tileset[k], n - data.tilesets[k].firstgid, xPlusJTimesDataTilewidth, yPlusITimesDataTileheight, 0, 0, 1, 1, dataLayersTOpacityTimesA)
 							}
-							else drawSpriteEx(tileset[k], n - data.tilesets[k].firstgid, x + (j * data.tilewidth), y + (i * data.tileheight), 0, 0, 1, 1, data.layers[t].opacity * a)
+							else drawSpriteEx(tileset[k], n - data.tilesets[k].firstgid, xPlusJTimesDataTilewidth, yPlusITimesDataTileheight, 0, 0, 1, 1, dataLayersTOpacityTimesA)
 							k = -1
 							break
 						}
@@ -293,7 +314,7 @@
 					for(local k = data.tilesets.len() - 1; k >= 0; k--) {
 						if(n >= data.tilesets[k].firstgid) {
 							if(anim.rawin(n)) {
-								if(tileset[k] == anim[n].sprite) anim[n].draw(x + (j * data.tilewidth), y + (i * data.tileheight), data.layers[t].opacity * a)
+								if(tileset[k] == anim[n].sprite) anim[n].draw(x + (j * data.tilewidth), y + (i * data.tileheight), data.layers[t].opacity * a, c)
 								else drawSpriteExMod(tileset[k], n - data.tilesets[k].firstgid, x + (j * data.tilewidth), y + (i * data.tileheight), 0, 0, 1, 1, data.layers[t].opacity * a, c)
 							}
 							else drawSpriteExMod(tileset[k], n - data.tilesets[k].firstgid, x + (j * data.tilewidth), y + (i * data.tileheight), 0, 0, 1, 1, data.layers[t].opacity * a, c)

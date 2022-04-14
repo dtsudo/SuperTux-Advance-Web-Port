@@ -4,10 +4,14 @@
 
 ::menu <- []
 ::menuLast <- []
+::menuItemsPos <- [] //Positions of all menu items
 ::cursor <- 0
 ::cursorOffset <- 0
-const menuMax = 7 //Maximum number of slots that can be shown on screen
+::cursorTimer <- 30
+const menuMax = 8 //Maximum number of slots that can be shown on screen
+const fontW = 8
 const fontH = 14
+const menuY = 40
 ::textMenu <- function(){
 	//If no menu is loaded
 	if(menu == []) return
@@ -17,45 +21,92 @@ const fontH = 14
 		cursorOffset = 0
 	}
 	menuLast = menu
+	menuItemsPos = []
 
 	//Draw options
 	//The number
 	if(menu.len() > menuMax) for(local i = cursorOffset; i < cursorOffset + menuMax; i++) {
+		//Detect if menu item is disabled (has no function). Display it with gray font if so.
+		local currFont = font2
+		if(menu[i].rawin("disabled")) { currFont = font2G }
+
 		if(cursor == i) {
-			drawSprite(font2, 97, (screenW() / 2) - (menu[i].name().len() * 4) - 16, screenH() - 8 - (menuMax * fontH) + ((i - cursorOffset) * fontH))
-			drawSprite(font2, 102, (screenW() / 2) + (menu[i].name().len() * 4) + 7, screenH() - 8 - (menuMax * fontH) + ((i - cursorOffset) * fontH))
+			drawSprite(currFont, 97, (screenW() / 2) - (menu[i].name().len() * 4) - 16, screenH() - menuY - (menuMax * fontH) + ((i - cursorOffset) * fontH))
+			drawSprite(currFont, 102, (screenW() / 2) + (menu[i].name().len() * 4) + 7, screenH() - menuY - (menuMax * fontH) + ((i - cursorOffset) * fontH))
+			if(menu[i].rawin("desc")){
+				setDrawColor(0x00000080)
+				drawRec(0, screenH() - fontH - 10, screenW(), 12, true)
+				drawText(font, (screenW() / 2) - (menu[i].desc().len() * 3), screenH() - fontH - 8, menu[i].desc())
+			}
 		}
-		drawText(font2, (screenW() / 2) - (menu[i].name().len() * 4), screenH() - 8 - (menuMax * fontH) + ((i - cursorOffset) * fontH), menu[i].name())
+
+		local textX = (screenW() / 2) - (menu[i].name().len() * 4)
+		local textY = screenH() - menuY - (menuMax * fontH) + ((i - cursorOffset) * fontH)
+
+		drawText(currFont, textX, textY, menu[i].name())
+		menuItemsPos.append({index = i, x = textX, y = textY, len = menu[i].name().len() * fontW})
+
+		//Draw scroll indicators
+		if(cursorOffset > 0) for(local i = 0; i < 4; i++) drawSprite(font2, 103, (screenW() / 2 - 24) + (i * 12), screenH() - menuY - (fontH * (menuMax + 1)))
+		if(cursorOffset < menu.len() - menuMax) for(local i = 0; i < 4; i++) drawSprite(font2, 98, (screenW() / 2 - 24) + (i * 12), screenH() - menuY)
 	}
 	else for(local i = 0; i < menu.len(); i++) {
+		//Detect if menu item is disabled (has no function). Display it with gray font if so.
+		local currFont = font2
+		if(menu[i].rawin("disabled")) { currFont = font2G }
+
 		if(cursor == i) {
-			drawSprite(font2, 97, (screenW() / 2) - (menu[i].name().len() * 4) - 16, screenH() - 8 - (menu.len() * fontH) + (i * fontH))
-			drawSprite(font2, 102, (screenW() / 2) + (menu[i].name().len() * 4) + 7, screenH() - 8 - (menu.len() * fontH) + (i * fontH))
+			drawSprite(currFont, 97, (screenW() / 2) - (menu[i].name().len() * 4) - 16, screenH() - menuY - (menu.len() * fontH) + (i * fontH))
+			drawSprite(currFont, 102, (screenW() / 2) + (menu[i].name().len() * 4) + 7, screenH() - menuY - (menu.len() * fontH) + (i * fontH))
+			if(menu[i].rawin("desc")) {
+				setDrawColor(0x00000080)
+				drawRec(0, screenH() - fontH - 10, screenW(), 12, true)
+				drawText(font, (screenW() / 2) - (menu[i].desc().len() * 3), screenH() - fontH - 8, menu[i].desc())
+			}
 		}
-		drawText(font2, (screenW() / 2) - (menu[i].name().len() * 4), screenH() - 8 - (menu.len() * fontH) + (i * fontH), menu[i].name())
+
+		local textX = (screenW() / 2) - (menu[i].name().len() * 4)
+		local textY = screenH() - menuY - (menu.len() * fontH) + (i * fontH)
+
+		drawText(currFont, textX, textY, menu[i].name())
+		menuItemsPos.append({index = i, x = textX, y = textY, len = menu[i].name().len() * fontW})
 	}
 
+	//Mouse cursor update + left click input check
+	updateCursor()
+	if(mouseRelease(0)) processCursorInput()
+
 	//Keyboard input
-	if(getcon("down", "press")) {
+	if(getcon("down", "press") || (getcon("down", "hold") && cursorTimer <= 0)) {
 		cursor++
 		if(cursor >= cursorOffset + menuMax) cursorOffset++
 		if(cursor >= menu.len()) {
 			cursor = 0
 			cursorOffset = 0
 		}
+		if(getcon("down", "press")) cursorTimer = 40
+		else cursorTimer = 10
+		playSound(sndMenuMove, 0)
 	}
 
-	if(getcon("up", "press")) {
+	if(getcon("up", "press") || (getcon("up", "hold") && cursorTimer <= 0)) {
 		cursor--
 		if(cursor < cursorOffset) cursorOffset--
 		if(cursor < 0) {
 			cursor = menu.len() - 1
 			if(menu.len() > menuMax) cursorOffset = menu.len() - menuMax
 		}
+		if(getcon("up", "press")) cursorTimer = 40
+		else cursorTimer = 10
+		playSound(sndMenuMove, 0)
 	}
 
+	if(getcon("down", "hold") || getcon("up", "hold")) cursorTimer--
+
 	if(getcon("jump", "press") || getcon("accept", "press")) {
+		if(menu[cursor].rawin("disabled")) return;
 		menu[cursor].func()
+		playSound(sndMenuSelect, 0)
 	}
 
 	if(getcon("pause", "press")) {
@@ -65,6 +116,15 @@ const fontH = 14
 					break
 				}
 		}
+	}
+
+	if(mouseWheelY() < 0 && cursorOffset < menu.len() - menuMax) {
+		cursorOffset++
+		cursor++
+	}
+	if(mouseWheelY() > 0 && cursorOffset > 0) {
+		cursorOffset--
+		cursor--
 	}
 }
 
@@ -82,15 +142,15 @@ const fontH = 14
 	{
 		name = function() { return gvLangObj["main-menu"]["contrib-levels"] },
 		func = function() { selectContrib(); }
-	}
+	},
 	{
 		name = function() { return gvLangObj["main-menu"]["options"] },
 		func = function() { menu = meOptions }
 	},
-    	{
+		{
 		name = function() { return gvLangObj["main-menu"]["credits"] },
-		func = function() { startCredits(); }
-    	}
+		func = function() { startCredits("res"); }
+		}
 	// webBrowserVersionChange: remove "quit" option
 	//{
 	//	name = function() { return gvLangObj["main-menu"]["quit"] },
@@ -106,7 +166,11 @@ const fontH = 14
 	{
 		name = function() { return gvLangObj["pause-menu"]["restart"]},
 		func = function() { gvIGT = 0; game.check = false; startPlay(gvMap.file) }
-	}
+	},
+	{
+		name = function() { return gvLangObj["main-menu"]["options"] },
+		func = function() { menu = meOptions }
+	},
 	{
 		name = function() { return gvLangObj["pause-menu"]["quit-level"]},
 		func = function() { startOverworld(game.world); cursor = 0 }
@@ -128,8 +192,12 @@ const fontH = 14
 	//	func = function() { pickChar() }
 	//},
 	{
+		name = function() { return gvLangObj["main-menu"]["options"] },
+		func = function() { menu = meOptions }
+	},
+	{
 		name = function() { return gvLangObj["pause-menu"]["quit-game"]},
-		func = function() { startMain(); cursor = 0 }
+		func = function() { saveGame(); startMain(); cursor = 0 }
 	}
 ]
 
@@ -137,19 +205,34 @@ const fontH = 14
 	// webBrowserVersionChange: remove keyboard/gamepad controls options
 	//{
 	//	name = function() { return gvLangObj["options-menu"]["keyboard"] },
+	//	desc = function() { return gvLangObj["options-menu-desc"]["keyboard"] },
 	//	func = function() { menu = meKeybinds }
 	//},
 	//{
 	//	name = function() { return gvLangObj["options-menu"]["joystick"] },
+	//	desc = function() { return gvLangObj["options-menu-desc"]["joystick"] },
 	//	func = function() { menu = meJoybinds }
+	//},
+	// webBrowserVersionChange: remove "show mouse cursor" option
+	//{
+	//	name = function() {
+	//		local msg = gvLangObj["options-menu"]["cursor"]
+	//		if(config.showcursor) msg += gvLangObj["menu-commons"]["on"]
+	//		else msg += gvLangObj["menu-commons"]["off"]
+	//		return msg
+	//	},
+	//	desc = function() { return gvLangObj["options-menu-desc"]["cursor"] },
+	//	func = function() { config.showcursor = !config.showcursor; fileWrite("config.json", jsonWrite(config)) }
 	//},
 	// webBrowserVersionChange: remove language option
 	//{
 	//	name = function() { return gvLangObj["options-menu"]["language"] },
+	//	desc = function() { return gvLangObj["options-menu-desc"]["language"] },
 	//	func = function() { selectLanguage() }
 	//},
 	{
 		name = function() { return gvLangObj["options-menu"]["timers"] },
+		desc = function() { return gvLangObj["options-menu-desc"]["timers"] },
 		func = function() { menu = meTimers }
 	},
 	// webBrowserVersionChange: remove lighting option
@@ -159,12 +242,14 @@ const fontH = 14
 	//		if(config.light) msg += gvLangObj["menu-commons"]["on"]
 	//		else msg += gvLangObj["menu-commons"]["off"]
 	//		return msg
-	//	}
+	//	},
+	//	desc = function() { return gvLangObj["options-menu-desc"]["light"] },
 	//	func = function() { config.light = !config.light; fileWrite("config.json", jsonWrite(config)) }
 	//},
 	// webBrowserVersionChange: remove full-screen option
 	//{
 	//	name = function() { return gvLangObj["options-menu"]["fullscreen"] },
+	//	desc = function() { return gvLangObj["options-menu-desc"]["fullscreen"] },
 	//	func = function() { toggleFullscreen() }
 	//},
 	// webBrowserVersionChange: remove "stick controls speed" option
@@ -174,7 +259,8 @@ const fontH = 14
 	//		if(config.stickspeed) msg += gvLangObj["menu-commons"]["on"]
 	//		else msg += gvLangObj["menu-commons"]["off"]
 	//		return msg
-	//	}
+	//	},
+	//	desc = function() { return gvLangObj["options-menu-desc"]["stickspeed"] },
 	//	func = function() { config.stickspeed = !config.stickspeed; fileWrite("config.json", jsonWrite(config)) }
 	//},
 	{
@@ -183,13 +269,87 @@ const fontH = 14
 			if(config.autorun) msg += gvLangObj["menu-commons"]["on"]
 			else msg += gvLangObj["menu-commons"]["off"]
 			return msg
-		}
+		},
+		desc = function() { return gvLangObj["options-menu-desc"]["autorun"] },
 		func = function() { config.autorun = !config.autorun; fileWrite("config.json", jsonWrite(config)) }
+	},
+	// webBrowserVersionChange: remove "use graphics filter" option
+	//{
+	//	name = function() {
+	//		local msg = gvLangObj["options-menu"]["usefilter"]
+	//		if(config.usefilter) msg += gvLangObj["menu-commons"]["on"]
+	//		else msg += gvLangObj["menu-commons"]["off"]
+	//		return msg
+	//	},
+	//	desc = function() { return gvLangObj["options-menu-desc"]["usefilter"] },
+	//	func = function() { config.usefilter = !config.usefilter; fileWrite("config.json", jsonWrite(config)) }
+	//},
+	{
+		name = function() { return gvLangObj["options-menu"]["sound-volume"] },
+		desc = function() {
+			if(getcon("left", "press") && getSoundVolume() > 0) {
+				config.soundVolume -= 4
+				setSoundVolume(config.soundVolume)
+				playSound(sndMenuMove, 0)
+			}
+			if(getcon("right", "press") && getSoundVolume() < 128) {
+				config.soundVolume += 4
+				setSoundVolume(config.soundVolume)
+				playSound(sndMenuMove, 0)
+			}
+
+			local vol = "VOL: ["
+			for(local i = 0; i < 16; i++) {
+				if(i < getSoundVolume() / 8) vol += chint(8)
+				else vol += chint(7)
+			}
+			vol += "] (<-/->)"
+			return vol
+		},
+		func = function() { }
+	},
+	{
+		name = function() { return gvLangObj["options-menu"]["music-volume"] },
+		desc = function() {
+			if(getcon("left", "press") && getMusicVolume() > 0) {
+				config.musicVolume -= 4
+				setMusicVolume(config.musicVolume)
+				playSound(sndMenuMove, 0)
+			}
+			if(getcon("right", "press") && getMusicVolume() < 128) {
+				config.musicVolume += 4
+				setMusicVolume(config.musicVolume)
+				playSound(sndMenuMove, 0)
+			}
+
+			local vol = "VOL: ["
+			for(local i = 0; i < 16; i++) {
+				if(i < getMusicVolume() / 8) vol += chint(8)
+				else vol += chint(7)
+			}
+			vol += "] (<-/->)"
+			return vol
+		},
+		func = function() { }
 	},
 	{
 		name = function() { return gvLangObj["menu-commons"]["back"] },
-		func = function() { cursor = 3; menu = meMain; fileWrite("config.json", jsonWrite(config)) }
-		back = function() { cursor = 3; menu = meMain; fileWrite("config.json", jsonWrite(config)) }
+		func = function() {
+			if(gvGameMode == gmPause) {
+				if(gvPauseMode) menu = mePauseOver
+				else menu = mePausePlay
+			}
+			else menu = meMain;
+			fileWrite("config.json", jsonWrite(config))
+		}
+		back = function() {
+			if(gvGameMode == gmPause) {
+				if(gvPauseMode) menu = mePauseOver
+				else menu = mePausePlay
+			}
+			else menu = meMain;
+			fileWrite("config.json", jsonWrite(config))
+		}
 	}
 
 ]

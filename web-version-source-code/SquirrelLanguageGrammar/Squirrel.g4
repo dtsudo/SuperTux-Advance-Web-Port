@@ -56,6 +56,7 @@ Str
 derefexp
 	: id
 	| id '.' id
+	| id '[' exp ']'
 	;
 
 stats
@@ -226,6 +227,7 @@ expNotIncludingObjectLiteral
 	| expNotIncludingObjectLiteral '-' exp
 	| expNotIncludingObjectLiteral '>>' exp
 	| expNotIncludingObjectLiteral '<<' exp
+	| expNotIncludingObjectLiteral '<=>' exp
 	| expNotIncludingObjectLiteral '<=' exp
 	| expNotIncludingObjectLiteral '>=' exp
 	| expNotIncludingObjectLiteral '<' exp

@@ -28,10 +28,11 @@
 	anHurt = null
 
 	//Ability flags
-	canJump = false //Mario-like jump attack
-	canStomp = true //Ground stomp attack
+	canStomp = false //Mario-like jump attack
+	canGroundPound = true //Ground stomp attack
 	canSlide = false //Slide attack
 	canMove = true //Movement unlocked, set to false during cutscenes or when player restrained
+	blastResist = false
 
 	//Physics stats
 	weight = 1.0
@@ -41,4 +42,24 @@
 	runSpeed = 3.0
 	accel = 0.2
 	friction = 0.1
+
+	//Misc
+	held = null
+
+	routine = null
+
+	constructor(x, y, _arr = null) {
+		base.constructor(x, y, _arr)
+	}
+
+	function run() {
+		animics()
+		if(routine != null) routine()
+	}
+
+	function animics() {
+		//Animation
+
+		//Physics
+	}
 }

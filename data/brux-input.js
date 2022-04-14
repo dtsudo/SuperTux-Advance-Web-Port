@@ -107,6 +107,11 @@ window.js_left = 4;
 	let keyDownHandler = function (e) {
 		let key = e.key;
 		
+		if (window.superTuxAdvanceWebVersion.disableArrowKeyScrolling) {
+			if (key === "ArrowRight" || key === "ArrowLeft" || key === "ArrowUp" || key === "ArrowDown" || key === " ")
+				e.preventDefault();
+		}
+		
 		key = mapJavascriptKeyToCanonicalKey(key);
 			
 		for (let i = 0; i < keysBeingPressed.length; i++) {
@@ -205,7 +210,8 @@ window.js_left = 4;
 	};
 
 	window.mouseRelease = function (b) {
-		console.log("Warning: mouseRelease is not implemented");
+		// Commented out this log statement to avoid spamming the console
+		//console.log("Warning: mouseRelease is not implemented");
 	};
 
 	window.getQuit = function () {
@@ -290,5 +296,16 @@ window.js_left = 4;
 
 	window.keyString = function () {
 		console.log("Warning: keyString is not implemented");
+	};
+	
+	window.mouseWheelX = function () {
+		console.log("Warning: mouseWheelX is not implemented");
+		return 0;
+	};
+	
+	window.mouseWheelY = function () {
+		// Commented out this log statement to avoid spamming the console
+		//console.log("Warning: mouseWheelY is not implemented");
+		return 0;
 	};
 })());

@@ -31,7 +31,7 @@ Coin5 =  function ( ) { var returnVal = { constructor: function(){} } ;  returnV
 
    baseConstructor  ( _x , _y )  ; 
 frame = randFloat ( 4 )  ; 
-game . maxCoins ++  ; 
+game . maxCoins = game . maxCoins + 5 ; 
  } ;  returnVal . run = function (  ) { frame += 0.2 ; 
 drawSprite ( sprCoin5 , frame , x - camx , y - camy )  ; 
  if ( gvPlayer )  if ( inDistance2 ( x , y , gvPlayer . x , gvPlayer . y + 2 , 16 )  )  { 
@@ -51,7 +51,7 @@ Coin10 =  function ( ) { var returnVal = { constructor: function(){} } ;  return
 
    baseConstructor  ( _x , _y )  ; 
 frame = randFloat ( 4 )  ; 
-game . maxCoins ++  ; 
+game . maxCoins = game . maxCoins + 10 ; 
  } ;  returnVal . run = function (  ) { frame += 0.2 ; 
 drawSprite ( sprCoin10 , frame , x - camx , y - camy )  ; 
  if ( gvPlayer )  if ( inDistance2 ( x , y , gvPlayer . x , gvPlayer . y + 2 , 16 )  )  { 
@@ -82,6 +82,27 @@ playSound ( sndGulp , 0 )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
+RedCoin =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
+frame = randFloat ( 4 )  ; 
+game . maxredcoins ++  ; 
+ } ;  returnVal . run = function (  ) { frame += 0.1 ; 
+drawSprite ( sprHerring , 0 , x - camx , y - camy +  (  ( getFrames (  )  / 16 )  % 2 == 0 )  . tointeger (  )  )  ; 
+ if ( gvPlayer )  if ( inDistance2 ( x , y , gvPlayer . x , gvPlayer . y + 2 , 16 )  )  { 
+ deleteActor ( id )  ; 
+playSoundChannel ( sndFish , 0 , 1 )  ; 
+game . levelredcoins ++  ; 
+ } 
+  
+  
+  } ;  returnVal . _typeof = function (  ) {  return "Coin" ;
+  } ; 
+ } 
+ returnVal.constructor(...arguments); return returnVal ;  }  ; 
 FlowerFire =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
@@ -92,12 +113,12 @@ FlowerFire =  function ( ) { var returnVal = { constructor: function(){} } ;  re
  deleteActor ( id )  ; 
  if ( game . weapon == 0 )  { 
  game . weapon = 1 ; 
-game . maxEnergy = 4 - game . difficulty ; 
+game . maxEnergy = 4 - game . difficulty + game . fireBonus ; 
  } 
   
   else  { 
  game . subitem = game . weapon ; 
-game . maxEnergy = 4 - game . difficulty ; 
+game . maxEnergy = 4 - game . difficulty + game . fireBonus ; 
 game . weapon = 1 ; 
  } 
   
@@ -121,12 +142,12 @@ FlowerIce =  function ( ) { var returnVal = { constructor: function(){} } ;  ret
  deleteActor ( id )  ; 
  if ( game . weapon == 0 )  { 
  game . weapon = 2 ; 
-game . maxEnergy = 4 - game . difficulty ; 
+game . maxEnergy = 4 - game . difficulty + game . iceBonus ; 
  } 
   
   else  { 
  game . subitem = game . weapon ; 
-game . maxEnergy = 4 - game . difficulty ; 
+game . maxEnergy = 4 - game . difficulty + game . iceBonus ; 
 game . weapon = 2 ; 
  } 
   
@@ -213,7 +234,7 @@ y -= 1.0 ;
  shape . setPos ( x , y )  ; 
  if ( gvPlayer )  if ( inDistance2 ( x , y , gvPlayer . x , gvPlayer . y , 14 )  )  { 
   if ( game . health < game . maxHealth )  { 
- game . health ++  ; 
+ game . health += 4 ; 
  for (  var i = 0 ;
  i < 4 ; i ++  )  { 
  newActor ( Heal , gvPlayer . x - 16 + randInt ( 32 )  , gvPlayer . y - 16 + randInt ( 32 )  )  ; 
@@ -302,7 +323,7 @@ y -= 1.0 ;
  shape . setPos ( x , y )  ; 
  if ( gvPlayer )  if ( inDistance2 ( x , y , gvPlayer . x , gvPlayer . y , 14 )  )  { 
   if ( game . health < game . maxHealth - 3 )  { 
- game . health += 4 ; 
+ game . health += 12 ; 
  for (  var i = 0 ;
  i < 4 ; i ++  )  { 
  newActor ( Heal , gvPlayer . x - 16 + randInt ( 32 )  , gvPlayer . y - 16 + randInt ( 32 )  )  ; 
@@ -408,6 +429,65 @@ deleteActor ( id )  ;
  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
+Onedown =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
+frame = randFloat ( 4 )  ; 
+ } ;  returnVal . run = function (  ) {  if ( getFrames (  )  % 20 == 0 )  { 
+ newActor ( FlameTiny , x - 8 + randInt ( 16 )  , y - 8 + randInt ( 16 )  )  ; 
+ } 
+  
+ frame += 0.2 ; 
+drawSprite ( spr1down , frame , x - camx , y - camy )  ; 
+ if ( gvPlayer )  if ( inDistance2 ( x , y , gvPlayer . x , gvPlayer . y + 2 , 16 )  )  { 
+ deleteActor ( id )  ; 
+gvPlayer . hurt = 16 ; 
+ } 
+  
+  
+  } ;  returnVal . _typeof = function (  ) {  return "Coin" ;
+  } ; 
+ } 
+ returnVal.constructor(...arguments); return returnVal ;  }  ; 
+Darknyan =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . hspeed = 0 ; 
+ returnVal . vspeed =  - 3 ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
+ if ( gvPlayer )  if ( gvPlayer . x > x ) hspeed =  - 2 ; 
+ 
+  else hspeed = 2 ; 
+ 
+  
+ shape = Rec ( x , y , 6 , 6 , 0 )  ; 
+ } ;  returnVal . run = function (  ) {  if (  ! placeFree ( x , y + 2 )  ) vspeed =  - 5 ; 
+ 
+  if (  ! placeFree ( x + 2 , y )  ) hspeed =  - 2 ; 
+ 
+  if (  ! placeFree ( x - 2 , y )  ) hspeed = 2 ; 
+ 
+ vspeed += 0.2 ; 
+ if ( placeFree ( x + hspeed , y )  ) x += hspeed ; 
+ 
+  if ( placeFree ( x , y + vspeed )  ) y += vspeed ; 
+ 
+  else vspeed /= 2 ; 
+ 
+ shape . setPos ( x , y )  ; 
+ if ( gvPlayer )  if ( inDistance2 ( x , y , gvPlayer . x , gvPlayer . y , 16 )  )  { 
+ gvPlayer . hurt = 6 ; 
+ } 
+  
+  
+ drawSprite ( sprDarkStar , getFrames (  )  / 10 , x - camx , y - camy )  ; 
+ } ; 
+ } 
+ returnVal.constructor(...arguments); return returnVal ;  }  ; 
 Starnyan =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . hspeed = 0 ; 
  returnVal . vspeed =  - 4 ; 
  
@@ -415,17 +495,17 @@ Starnyan =  function ( ) { var returnVal = { constructor: function(){} } ;  retu
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
 
    baseConstructor  ( _x , _y )  ; 
- if ( gvPlayer )  if ( gvPlayer . x > x ) hspeed =  - 1 ; 
+ if ( gvPlayer )  if ( gvPlayer . x > x ) hspeed =  - 2 ; 
  
-  else hspeed = 1 ; 
+  else hspeed = 2 ; 
  
   
  shape = Rec ( x , y , 6 , 6 , 0 )  ; 
- } ;  returnVal . run = function (  ) {  if (  ! placeFree ( x , y + 1 )  ) vspeed =  - 5 ; 
+ } ;  returnVal . run = function (  ) {  if (  ! placeFree ( x , y + 2 )  ) vspeed =  - 5 ; 
  
-  if (  ! placeFree ( x + 1 , y )  ) hspeed =  - 2 ; 
+  if (  ! placeFree ( x + 2 , y )  ) hspeed =  - 2 ; 
  
-  if (  ! placeFree ( x - 1 , y )  ) hspeed = 2 ; 
+  if (  ! placeFree ( x - 2 , y )  ) hspeed = 2 ; 
  
  vspeed += 0.25 ; 
  if ( placeFree ( x + hspeed , y )  ) x += hspeed ; 
@@ -477,11 +557,14 @@ shape . setPos ( x , y )  ;
 drawSprite ( sprAirFeather , frame , x - camx , y - camy )  ; 
  if ( gvPlayer )  if ( hitTest ( shape , gvPlayer . shape )  )  { 
  playSoundChannel ( sndHeal , 0 , 1 )  ; 
- if ( game . weapon == 0 ) game . weapon = 3 ; 
- 
+ if ( game . weapon == 0 )  { 
+ game . weapon = 3 ; 
+game . maxEnergy = 4 - game . difficulty + game . airBonus ; 
+ } 
+  
   else  { 
  game . subitem = game . weapon ; 
-game . maxEnergy = 1 ; 
+game . maxEnergy = 4 - game . difficulty + game . airBonus ; 
 game . weapon = 3 ; 
  } 
   
@@ -534,7 +617,7 @@ OneUp =  function ( ) { var returnVal = { constructor: function(){} } ;  returnV
  
  shape . setPos ( x , y )  ; 
  if ( gvPlayer )  if ( inDistance2 ( x , y , gvPlayer . x , gvPlayer . y , 16 )  )  { 
- game . levelCoins += 50 ; 
+ game . canres = true ; 
 playSound ( snd1up , 0 )  ; 
 deleteActor ( id )  ; 
  } 
@@ -638,12 +721,12 @@ EarthShell =  function ( ) { var returnVal = { constructor: function(){} } ;  re
  deleteActor ( id )  ; 
  if ( game . weapon == 0 )  { 
  game . weapon = 4 ; 
-game . maxEnergy = 4 - game . difficulty ; 
+game . maxEnergy = 4 - game . difficulty + game . earthBonus ; 
  } 
   
   else  { 
  game . subitem = game . weapon ; 
-game . maxEnergy = 4 - game . difficulty ; 
+game . maxEnergy = 4 - game . difficulty + game . earthBonus ; 
 game . weapon = 4 ; 
  } 
   
@@ -725,7 +808,6 @@ MagicKey =  function ( ) { var returnVal = { constructor: function(){} } ;  retu
  
   } ;  returnVal . run = function (  ) {  if ( gvPlayer )  if ( inDistance2 ( x , y , gvPlayer . x , gvPlayer . y , 16 )  )  { 
  deleteActor ( id )  ; 
-game . health += 4 ; 
  switch ( color )  {  case 0 : gvKeyCopper = true ; 
  break ;  case 1 : gvKeySilver = true ; 
  break ;  case 2 : gvKeyGold = true ; 

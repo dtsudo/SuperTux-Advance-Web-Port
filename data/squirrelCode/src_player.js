@@ -20,10 +20,11 @@ Player =  function ( ) { var returnVal = { constructor: function(){} } ;  return
  returnVal . anSlide = null ; 
  returnVal . anCrawl = null ; 
  returnVal . anHurt = null ; 
- returnVal . canJump = false ; 
- returnVal . canStomp = true ; 
+ returnVal . canStomp = false ; 
+ returnVal . canGroundPound = true ; 
  returnVal . canSlide = false ; 
  returnVal . canMove = true ; 
+ returnVal . blastResist = false ; 
  returnVal . weight = 1.0 ; 
  returnVal . jumpForce = 2.0 ; 
  returnVal . walkSpeed = 1.0 ; 
@@ -31,9 +32,17 @@ Player =  function ( ) { var returnVal = { constructor: function(){} } ;  return
  returnVal . runSpeed = 3.0 ; 
  returnVal . accel = 0.2 ; 
  returnVal . friction = 0.1 ; 
+ returnVal . held = null ; 
+ returnVal . routine = null ; 
  
  with ( returnVal ) { 
+  returnVal . constructor = function ( x , y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( x , y , _arr )  ; 
+ } ;  returnVal . run = function (  ) { animics (  )  ; 
+ if ( routine != null ) routine (  )  ; 
  
+  } ;  returnVal . animics = function (  ) {  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
 

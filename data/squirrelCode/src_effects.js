@@ -20,6 +20,23 @@ angle = 45 * randInt ( 8 )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
+BigSpark =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
+ returnVal . flip = 0 ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
+ if ( _arr != null && _arr != "" ) flip = _arr . tointeger (  )  ; 
+ 
+  } ;  returnVal . run = function (  ) { frame += 0.25 ; 
+ if ( frame >= 6 ) deleteActor ( id )  ; 
+ 
+  else drawSpriteExZ ( 4 , sprBigSpark , floor ( frame )  , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
+ 
+  } ; 
+ } 
+ returnVal.constructor(...arguments); return returnVal ;  }  ; 
 Glimmer =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
  returnVal . angle = 0 ; 
  
@@ -82,7 +99,8 @@ angle =  ( 360 / 8 )  * randInt ( 8 )  ;
   else drawSpriteEx ( sprFlame , floor ( frame )  , x - camx , y - camy , 0 , 0 , 1 , 1 , 1 )  ; 
  
  drawLightEx ( sprLightFire , 0 , x - camx , y - camy , 0 , 0 , 0.75 -  ( frame / 10.0 )  , 0.75 -  ( frame / 10.0 )  )  ; 
- } ; 
+ } ;  returnVal . _typeof = function (  ) {  return "Flame" ;
+  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
 Splash =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . frame = 0.0 ; 
@@ -121,7 +139,7 @@ frame += 0.25 ;
  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-CoinEffect =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . vspeed =  - 5.0 ; 
+CoinEffect =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . vspeed =  - 6.0 ; 
  returnVal . value = 1 ; 
  
  with ( returnVal ) { 

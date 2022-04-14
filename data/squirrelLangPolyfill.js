@@ -1,4 +1,9 @@
 
+Array.prototype.append = function (val) {
+	this.push(val);
+	return this;
+};
+
 Array.prototype.len = function () {
 	return this.length;
 };
@@ -45,6 +50,18 @@ Object.prototype.clear = function () {
 	}
 	
 	return this;
+};
+
+Object.prototype.len = function () {
+	let count = 0;
+	for (let prop in this) {
+		if (this.hasOwnProperty(prop)) {
+			if (prop !== "isActorSubTable")
+				count++;
+		}
+	}
+	
+	return count;
 };
 
 Object.prototype.rawin = function (x) {

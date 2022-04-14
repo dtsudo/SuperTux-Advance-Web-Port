@@ -124,6 +124,7 @@ newActor ( Poof , x , y )  ;
  } 
   
  drawSprite ( sprIceball , getFrames (  )  / 2 , x - camx , y - camy )  ; 
+drawLightEx ( sprLightIce , 0 , x - camx , y - camy , 0 , 0 , 1.0 / 8.0 , 1.0 / 8.0 )  ; 
  if ( getFrames (  )  % 5 == 0 ) newActor ( Glimmer , x - 4 + randInt ( 8 )  , y - 4 + randInt ( 8 )  )  ; 
  
  shape . setPos ( x , y )  ; 
@@ -181,7 +182,8 @@ y += vspeed ;
  
   else drawSpriteEx ( sprGlimmer , floor ( frame )  , x - camx , y - camy , angle , 0 , 1 , 1 , 1 )  ; 
  
-  } ;  returnVal . _typeof = function (  ) {  return "Iceball" ;
+ drawLightEx ( sprLightIce , 0 , x - camx , y - camy , 0 , 0 , 1.0 / 8.0 , 1.0 / 8.0 )  ; 
+ } ;  returnVal . _typeof = function (  ) {  return "Iceball" ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
@@ -196,6 +198,7 @@ stopSound ( sndExplodeF )  ;
 playSound ( sndExplodeF , 0 )  ; 
 shape = Cir ( x , y , 16 )  ; 
  } ;  returnVal . run = function (  ) { drawSpriteEx ( sprExplodeF , frame , x - camx , y - camy , randInt ( 360 )  , 0 , 1 , 1 , 1 )  ; 
+drawLightEx ( sprLightFire , 0 , x - camx , y - camy , 0 , 0 , 0.75 -  ( frame / 10.0 )  , 0.75 -  ( frame / 10.0 )  )  ; 
 frame += 0.2 ; 
  if ( frame >= 1 )  { 
   if ( actor . rawin ( "TNT" )  )  {     var foreachOutput = squirrelForEach ( actor [ "TNT" ]  ) ;     while ( true )     {        foreachOutput . next ( ) ;        if ( foreachOutput . isDone ( ) ) break ; i = foreachOutput . getValue ( ) ;  { 
@@ -226,6 +229,7 @@ stopSound ( sndBump )  ;
 playSound ( sndBump , 0 )  ; 
 shape = Rec ( x , y , 16 , 16 , 0 )  ; 
  } ;  returnVal . run = function (  ) { drawSpriteEx ( sprExplodeN , frame , x - camx , y - camy , randInt ( 360 )  , 0 , 1 , 1 , 1 )  ; 
+drawLightEx ( sprLightFire , 0 , x - camx , y - camy , 0 , 0 , 0.75 -  ( frame / 10.0 )  , 0.75 -  ( frame / 10.0 )  )  ; 
 frame += 0.2 ; 
  if ( frame >= 5 ) deleteActor ( id )  ; 
  

@@ -9,20 +9,7 @@ namespace WebVersionGenerator
 	{
 		public static void TestSquirrelTranspiler()
 		{
-			try
-			{
-				RunTest();
-				Console.WriteLine("All tests passed");
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine("Test failure: ");
-				Console.WriteLine(e.Message);
-			}
-
-			Console.WriteLine();
-			Console.WriteLine("Press enter to continue");
-			Console.ReadLine();
+			RunTest();
 		}
 
 		private static void RunTest()
@@ -78,6 +65,10 @@ namespace WebVersionGenerator
 			TestTranspilation(
 				"x = a.b() ? 3 : 5",
 				"x = a.b() ? 3 : 5;");
+
+			TestTranspilation(
+				"x[i] += 5",
+				"x[i] += 5;");
 
 			TestTranspilation(
 				"x = typeof g()[n]",

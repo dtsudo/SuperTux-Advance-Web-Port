@@ -9,16 +9,22 @@ gvLangObj = "" ;
 mapActor =  {  }  ; 
 startPlay =  function ( level ) {  if (  ! fileExists ( level )  )  return ; 
   
- gvPlayer = false ; 
+ setFPS ( 60 )  ; 
+gvPlayer = false ; 
+gvBoss = false ; 
 actor . clear (  )  ; 
 actlast = 0 ; 
 game . health = game . maxHealth ; 
 game . levelCoins = 0 ; 
 game . maxCoins = 0 ; 
+game . redcoins = 0 ; 
+game . levelredcoins = 0 ; 
+game . maxredcoins = 0 ; 
 game . secrets = 0 ; 
 game . enemies = 0 ; 
 gvInfoBox = "" ; 
 gvLastSong = "" ; 
+gfxReset (  )  ; 
 autocon . up = false ; 
 autocon . down = false ; 
 autocon . left = false ; 
@@ -87,8 +93,7 @@ game . maxCoins ++  ;
  break ;  case 5 : c = newActor ( ItemBlock , i . x + 8 , i . y - 8 , 3 )  ; 
  break ;  case 6 : c = newActor ( ItemBlock , i . x + 8 , i . y - 8 , 5 )  ; 
  break ;  case 7 : c = newActor ( ItemBlock , i . x + 8 , i . y - 8 , 4 )  ; 
- break ;  case 8 : game . maxCoins += 50 ; 
-c = newActor ( ItemBlock , i . x + 8 , i . y - 8 , 6 )  ; 
+ break ;  case 8 : c = newActor ( ItemBlock , i . x + 8 , i . y - 8 , 6 )  ; 
  break ;  case 9 : c = newActor ( BadCannon , i . x + 8 , i . y - 8 )  ; 
  break ;  case 10 : c = newActor ( PipeSnake , i . x , i . y , 1 )  ; 
 game . enemies ++  ; 
@@ -114,11 +119,11 @@ game . enemies ++  ;
  
   break ;  case 20 : c = newActor ( Ouchin , i . x + 8 , i . y - 8 )  ; 
  break ;  case 21 : c = newActor ( TriggerBlock , i . x + 8 , i . y - 8 , i . name )  ; 
- break ;  case 22 :  if ( gvLangObj [ "info" ]  . rawin ( i . name )  ) c = newActor ( InfoBlock , i . x + 8 , i . y - 8 , textLineLen ( gvLangObj [ "info" ]  [ i . name ]  , 52 )  )  ; 
+ break ;  case 22 :  if ( gvLangObj [ "info" ]  . rawin ( i . name )  ) c = newActor ( InfoBlock , i . x + 8 , i . y - 8 , textLineLen ( gvLangObj [ "info" ]  [ i . name ]  , gvTextW )  )  ; 
  
   else c = newActor ( InfoBlock , i . x + 8 , i . y - 8 , "" )  ; 
  
-  break ;  case 23 :  if ( gvLangObj [ "devcom" ]  . rawin ( i . name )  ) c = newActor ( KelvinScarf , i . x + 8 , i . y - 8 , textLineLen ( gvLangObj [ "devcom" ]  [ i . name ]  , 52 )  )  ; 
+  break ;  case 23 :  if ( gvLangObj [ "devcom" ]  . rawin ( i . name )  ) c = newActor ( KelvinScarf , i . x + 8 , i . y - 8 , textLineLen ( gvLangObj [ "devcom" ]  [ i . name ]  , gvTextW )  )  ; 
  
   else c = newActor ( KelvinScarf , i . x + 8 , i . y - 8 , "" )  ; 
  
@@ -197,15 +202,15 @@ game . enemies ++  ;
  break ;  case 67 : c = newActor ( Blazeborn , i . x + 8 , i . y - 8 )  ; 
 game . enemies ++  ; 
  break ;  case 68 : c = newActor ( Coin5 , i . x + 8 , i . y - 8 )  ; 
-game . maxCoins += 5 ; 
  break ;  case 69 : c = newActor ( Coin10 , i . x + 8 , i . y - 8 )  ; 
-game . maxCoins += 10 ; 
+ break ;  case 70 : c = newActor ( RedCoin , i . x + 8 , i . y - 8 )  ; 
+ break ;  case 71 : c = newActor ( Fishy , i . x + 8 , i . y - 8 )  ; 
  break ;  case 73 : c = newActor ( Jumpy , i . x + 8 , i . y - 8 , i . name )  ; 
 game . enemies ++  ; 
  break ;  case 75 : c = newActor ( EvilBlock , i . x + 8 , i . y - 8 )  ; 
  break ;  case 77 : c = newActor ( SpecialBall , i . x + 8 , i . y - 8 , i . name . tointeger (  )  )  ; 
  break ;  case 78 : c = newActor ( Berry , i . x + 8 , i . y - 8 )  ; 
- break ;  case 79 : c = newActor ( BossDoor , i . x , i . y - 16 )  ; 
+ break ;  case 79 : c = newActor ( BossDoor , i . x , i . y - 16 , i . name )  ; 
  break ;  }  if (  squirrelTypeOf ( c )  == "integer" ) mapActor [ i . id ] = c ; 
  
   else mapActor [ i . id ] = c . id ; 
@@ -216,8 +221,7 @@ game . enemies ++  ;
   var arg = split ( i . name , "," )  ;
   var n = arg [ 0 ]  ;
   if ( getroottable (  )  . rawin ( n )  )  { 
- print ( i . id )  ; 
- var poly =  [  ]  ;
+  var poly =  [  ]  ;
   for (  var j = 0 ;
  j <= i . polygon . len (  )  ; j ++  )  { 
   if ( j == i . polygon . len (  )  ) poly . push (  [ i . x + i . polygon [ 0 ]  . x , i . y + i . polygon [ 0 ]  . y ]  )  ; 
@@ -238,8 +242,7 @@ game . enemies ++  ;
   var arg = split ( i . name , "," )  ;
   var n = arg [ 0 ]  ;
   if ( getroottable (  )  . rawin ( n )  )  { 
- print ( i . id )  ; 
- var poly =  [  ]  ;
+  var poly =  [  ]  ;
   for (  var j = 0 ;
  j < i . polyline . len (  )  ; j ++  ) poly . push (  [ i . x + i . polyline [ j ]  . x , i . y + i . polyline [ j ]  . y ]  )  ; 
 arg [ 0 ] = poly ; 
@@ -281,9 +284,7 @@ gmPlay =  function (  ) {  if ( gvCamTarget == null && gvPlayer ) gvCamTarget = 
   var lx = 0 ;
   var ly = 0 ;
   if ( gvPlayer )  { 
- lx =  (  ( joyZ ( 0 )  / js_max . tofloat (  )  )  * screenW (  )  / 2.5 )  ; 
-ly =  (  ( joyH ( 0 )  / js_max . tofloat (  )  )  * screenH (  )  / 2.5 )  ; 
- if ( getcon ( "leftPeek" , "hold" )  ) lx =  -  ( screenW (  )  / 2.5 )  ; 
+  if ( getcon ( "leftPeek" , "hold" )  ) lx =  -  ( screenW (  )  / 2.5 )  ; 
  
   if ( getcon ( "rightPeek" , "hold" )  ) lx =  ( screenW (  )  / 2.5 )  ; 
  
@@ -370,7 +371,7 @@ camyprev = camy ;
 gvMap . drawTiles ( floor (  - camx )  , floor (  - camy )  , floor ( camx / 16 )  - 3 , floor ( camy / 16 )  ,  ( screenW (  )  / 16 )  + 5 ,  ( screenH (  )  / 16 )  + 2 , "bg" )  ; 
 gvMap . drawTiles ( floor (  - camx )  , floor (  - camy )  , floor ( camx / 16 )  - 3 , floor ( camy / 16 )  ,  ( screenW (  )  / 16 )  + 5 ,  ( screenH (  )  / 16 )  + 2 , "mg" )  ; 
  if ( gvMap . name != "shop" )  for (  var i = 0 ;
- i < screenW (  )  / 16 ; i ++  )  { 
+ i <  ( screenW (  )  / 16 )  + 1 ; i ++  )  { 
  drawSprite ( sprVoid , 0 , 0 +  ( i * 16 )  , gvMap . h - 32 - camy )  ; 
  } 
   
@@ -400,12 +401,16 @@ drawImage ( gvPlayScreen , 0 , 0 )  ;
  } 
   if ( game . health > game . maxHealth ) game . health = game . maxHealth ; 
  
+  var fullhearts = floor ( game . health / 4 )  ;
   for (  var i = 0 ;
- i < game . maxHealth ; i ++  )  { 
-  if ( i < game . health ) drawSprite ( sprHealth , 1 , 8 +  ( 16 * i )  , 8 )  ; 
+ i < game . maxHealth / 4 ; i ++  )  { 
+  if ( i < fullhearts ) drawSprite ( sprHealth , 4 , 8 +  ( 16 * i )  , 8 )  ; 
+ 
+  else  if ( i == fullhearts ) drawSprite ( sprHealth , game . health % 4 , 8 +  ( 16 * i )  , 8 )  ; 
  
   else drawSprite ( sprHealth , 0 , 8 +  ( 16 * i )  , 8 )  ; 
  
+  
   } 
   for (  var i = 0 ;
  i < game . maxEnergy ; i ++  )  { 
@@ -420,10 +425,33 @@ drawImage ( gvPlayScreen , 0 , 0 )  ;
   } 
   
   } 
+  if ( gvBoss )  { 
+  var fullhearts = floor ( game . bossHealth / 4 )  ;
+  if ( game . bossHealth == 0 ) fullhearts = 0 ; 
+ 
+ drawSprite ( sprBossHealth , 6 , screenW (  )  - 23 , screenH (  )  - 48 )  ; 
+drawSprite ( sprSkull , 0 , screenW (  )  - 26 , screenH (  )  - 46 )  ; 
+ for (  var i = 0 ;
+ i < 10 ; i ++  )  { 
+  if ( i < fullhearts ) drawSprite ( sprBossHealth , 4 , screenW (  )  - 23 , screenH (  )  - 64 -  ( 16 * i )  )  ; 
+ 
+  else  if ( i == fullhearts && game . bossHealth > 0 ) drawSprite ( sprBossHealth , game . bossHealth % 4 , screenW (  )  - 23 , screenH (  )  - 64 -  ( 16 * i )  )  ; 
+ 
+  else drawSprite ( sprBossHealth , 0 , screenW (  )  - 23 , screenH (  )  - 64 -  ( 16 * i )  )  ; 
+ 
+  
+  } 
+ drawSprite ( sprBossHealth , 5 , screenW (  )  - 23 , screenH (  )  - 64 -  ( 16 * 10 )  )  ; 
+ } 
+  
  drawSprite ( sprCoin , 0 , 16 , screenH (  )  - 16 )  ; 
  if ( game . maxCoins > 0 ) drawText ( font2 , 24 , screenH (  )  - 23 , game . levelCoins . tostring (  )  + "/" + game . maxCoins . tostring (  )  )  ; 
  
   else drawText ( font2 , 24 , screenH (  )  - 23 , game . coins . tostring (  )  )  ; 
+ 
+  if ( game . maxredcoins > 0 ) drawSprite ( sprHerring , 0 , 16 , screenH (  )  - 40 )  ; 
+ 
+  if ( game . maxredcoins > 0 ) drawText ( font2 , 24 , screenH (  )  - 46 , game . levelredcoins . tostring (  )  + "/" + game . maxredcoins . tostring (  )  )  ; 
  
  drawSprite ( sprSubItem , 0 , screenW (  )  - 18 , 18 )  ; 
  switch ( game . subitem )  {  case 1 : drawSprite ( sprFlowerFire , 0 , screenW (  )  - 18 , 18 )  ; 
@@ -433,6 +461,7 @@ drawImage ( gvPlayScreen , 0 , 0 )  ;
  break ;  case 5 : drawSprite ( sprMuffin , 0 , screenW (  )  - 18 , 18 )  ; 
  break ;  case 6 : drawSprite ( sprMuffin , 1 , screenW (  )  - 18 , 18 )  ; 
  break ;  case 7 : drawSprite ( sprStar , 0 , screenW (  )  - 18 , 18 )  ; 
+ break ;  case 8 : drawSprite ( getroottable (  )  [ game . characters [ game . playerChar ]  [ 1 ]  ]  , 0 , screenW (  )  - 18 , 24 )  ; 
  break ;  }  if ( gvDoIGT && config . showleveligt ) drawText ( font2 , 8 , 32 , formatTime ( gvIGT )  )  ; 
  
   if ( gvPlayer )  if ( gvPlayer . y <  - 8 )  { 
@@ -451,6 +480,11 @@ gvWarning += 1.5 ;
  } 
   
   var kx = 10 ;
+  if ( game . canres )  { 
+ drawSprite ( getroottable (  )  [ game . characters [ game . playerChar ]  [ 1 ]  ]  , game . weapon , screenW (  )  - kx , screenH (  )  - 10 )  ; 
+kx += 16 ; 
+ } 
+  
   if ( gvKeyCopper )  { 
  drawSprite ( sprKeyCopper , 0 , screenW (  )  - kx , screenH (  )  - 16 )  ; 
 kx += 16 ; 
@@ -481,7 +515,7 @@ kx += 16 ;
  
   } 
  setDrawColor ( 0x000000d0 )  ; 
-drawRec ( 0 , 0 , 320 , 8 * ln , true )  ; 
+drawRec ( 0 , 0 , screenW (  )  , 8 * ln , true )  ; 
 drawText ( font , 8 , 8 , gvInfoBox )  ; 
  } 
   
@@ -496,18 +530,19 @@ drawText ( font , 8 , 8 , gvInfoBox )  ;
   
  resetDrawTarget (  )  ; 
 drawImage ( gvScreen , 0 , 0 )  ; 
- if ( gvPlayer )  if ( game . berries == 64 )  { 
- game . berries = 0 ; 
- if ( game . health < game . maxHealth )  { 
+ if ( game . berries > 0 && game . berries % 16 == 0 && game . health < game . maxHealth )  { 
  game . health ++  ; 
-playSound ( sndHeal , 0 )  ; 
+game . berries = 0 ; 
  } 
   
-  else newActor ( Starnyan , gvPlayer . x , gvPlayer . y )  ; 
+  if ( gvPlayer )  if ( game . berries == 64 )  { 
+ game . berries = 0 ; 
+newActor ( Starnyan , gvPlayer . x , gvPlayer . y )  ; 
+ } 
+  
+  
+  if ( game . health < 0 ) game . health = 0 ; 
  
-  } 
-  
-  
   }  ; 
 playerTeleport =  function ( _x , _y ) {  if (  ! gvPlayer )  return ; 
   
@@ -517,6 +552,8 @@ playerTeleport =  function ( _x , _y ) {  if (  ! gvPlayer )  return ;
   var uy = gvMap . h - screenH (  )  ;
  gvPlayer . x = _x . tofloat (  )  ; 
 gvPlayer . y = _y . tofloat (  )  ; 
+gvPlayer . xprev = gvPlayer . x ; 
+gvPlayer . yprev = gvPlayer . y ; 
 camx = _x . tofloat (  )  -  ( screenW (  )  / 2 )  ; 
 camy = _y . tofloat (  )  -  ( screenH (  )  / 2 )  ; 
  if ( camx > ux ) camx = ux ; 

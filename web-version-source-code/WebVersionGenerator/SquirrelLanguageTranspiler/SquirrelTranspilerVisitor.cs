@@ -141,8 +141,12 @@ namespace SquirrelLanguageTranspiler
 
 		public override string VisitDerefexp(SquirrelParser.DerefexpContext context)
 		{
+			if (context.exp() != null)
+				return this.VisitId(context.id(0)) + " [ " + this.VisitExp(context.exp()) + " ] ";
+
 			if (context.id().Length == 1)
 				return this.VisitId(context.id(0));
+
 			return this.VisitId(context.id(0)) + " . " + this.VisitId(context.id(1));
 		}
 
@@ -448,6 +452,10 @@ namespace SquirrelLanguageTranspiler
 					op = " + ";
 				else if (expression[0] == '-')
 					op = " - ";
+				else if (expression.StartsWith("<=>", StringComparison.Ordinal))
+				{
+					return " squirrelThreeWaysCompare ( " + this.VisitExpNotIncludingObjectLiteral(context.expNotIncludingObjectLiteral()) + " , " + this.VisitExp(context.exp(0)) + " ) ";
+				}
 				else if (expression.StartsWith(">=", StringComparison.Ordinal))
 					op = " >= ";
 				else if (expression.StartsWith("<=", StringComparison.Ordinal))

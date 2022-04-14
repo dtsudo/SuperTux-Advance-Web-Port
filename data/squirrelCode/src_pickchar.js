@@ -28,7 +28,9 @@ resetDrawTarget (  )  ;
   
   } 
   while (  ! getcon ( "pause" , "press" )  && picktimer > 0 )  { 
-  if (  ! didpick )  { 
+ setDrawTarget ( gvScreen )  ; 
+drawSprite ( bgCharSel , 0 , screenW (  )  / 2 , 0 )  ; 
+ if (  ! didpick )  { 
   if ( getcon ( "right" , "press" )  ) charslot ++  ; 
  
   if ( getcon ( "left" , "press" )  ) charslot --  ; 
@@ -48,12 +50,15 @@ didpick = true ;
  picktimer --  ; 
  } 
   
- drawText ( font2 , 8 , 8 , charlist [ charslot ]  [ 0 ]  )  ; 
- if ( didpick ) drawSprite ( getroottable (  )  [ charlist [ charslot ]  [ 1 ]  ]  , charlist [ charslot ]  [ 2 ]  [ 1 ]  , screenW (  )  / 2 , screenH (  )  / 2 )  ; 
+ drawText ( font2 ,  ( screenW (  )  / 2 )  -  ( gvLangObj [ "options-menu" ]  [ "charsel" ]  . len (  )  * 4 )  , 64 , gvLangObj [ "options-menu" ]  [ "charsel" ]  )  ; 
+drawText ( font2 ,  ( screenW (  )  / 2 )  -  ( charlist [ charslot ]  [ 0 ]  . len (  )  * 4 )  , 80 , charlist [ charslot ]  [ 0 ]  )  ; 
+ if ( didpick ) drawSprite ( getroottable (  )  [ charlist [ charslot ]  [ 1 ]  ]  , charlist [ charslot ]  [ 2 ]  [ 1 ]  , screenW (  )  / 2 , screenH (  )  - 64 )  ; 
  
-  else drawSprite ( getroottable (  )  [ charlist [ charslot ]  [ 1 ]  ]  , charlist [ charslot ]  [ 2 ]  [ 0 ]  , screenW (  )  / 2 , screenH (  )  / 2 )  ; 
+  else drawSprite ( getroottable (  )  [ charlist [ charslot ]  [ 1 ]  ]  , charlist [ charslot ]  [ 2 ]  [ 0 ]  , screenW (  )  / 2 , screenH (  )  - 64 )  ; 
  
- update (  )  ; 
+ resetDrawTarget (  )  ; 
+drawImage ( gvScreen , 0 , 0 )  ; 
+update (  )  ; 
  } 
   
   }  ; 

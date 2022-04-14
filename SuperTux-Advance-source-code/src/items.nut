@@ -32,7 +32,7 @@
 	{
 		base.constructor(_x, _y)
 		frame = randFloat(4)
-		game.maxCoins++
+		game.maxCoins = game.maxCoins + 5
 	}
 
 	function run()
@@ -55,7 +55,7 @@
 	{
 		base.constructor(_x, _y)
 		frame = randFloat(4)
-		game.maxCoins++
+		game.maxCoins = game.maxCoins + 10
 	}
 
 	function run()
@@ -91,6 +91,30 @@
 	function _typeof() { return "Coin" }
 }
 
+::RedCoin <- class extends Actor{
+	frame = 0.0
+
+	constructor(_x, _y, _arr = null)
+	{
+	base.constructor(_x, _y)
+		frame = randFloat(4)
+		game.maxredcoins++
+	}
+
+	function run()
+	{
+		frame += 0.1
+		drawSprite(sprHerring, 0, x - camx, y - camy + ((getFrames() / 16) % 2 == 0).tointeger())
+		if(gvPlayer) if(inDistance2(x, y, gvPlayer.x, gvPlayer.y + 2, 16)) {
+			deleteActor(id)
+			playSoundChannel(sndFish, 0, 1)
+			game.levelredcoins++
+		}
+	}
+
+	function _typeof() { return "Coin" }
+}
+
 ::FlowerFire <- class extends Actor{
 
 	constructor(_x, _y, _arr = null)
@@ -105,11 +129,11 @@
 			deleteActor(id)
 			if(game.weapon == 0) {
 				game.weapon = 1
-				game.maxEnergy = 4 - game.difficulty
+				game.maxEnergy = 4 - game.difficulty + game.fireBonus
 			}
 			else {
 				game.subitem = game.weapon
-				game.maxEnergy = 4 - game.difficulty
+				game.maxEnergy = 4 - game.difficulty + game.fireBonus
 				game.weapon = 1
 			}
 			playSoundChannel(sndHeal, 0, 1)
@@ -134,11 +158,11 @@
 			deleteActor(id)
 			if(game.weapon == 0) {
 				game.weapon = 2
-				game.maxEnergy = 4 - game.difficulty
+				game.maxEnergy = 4 - game.difficulty + game.iceBonus
 			}
 			else {
 				game.subitem = game.weapon
-				game.maxEnergy = 4 - game.difficulty
+				game.maxEnergy = 4 - game.difficulty + game.iceBonus
 				game.weapon = 2
 			}
 			playSoundChannel(sndHeal, 0, 1)
@@ -203,7 +227,7 @@
 
 		if(gvPlayer) if(inDistance2(x, y, gvPlayer.x, gvPlayer.y, 14)) {
 			if(game.health < game.maxHealth) {
-				game.health++
+				game.health += 4
 				for(local i = 0; i < 4; i++) {
 					newActor(Heal, gvPlayer.x - 16 + randInt(32), gvPlayer.y - 16 + randInt(32))
 				}
@@ -268,7 +292,7 @@
 
 		if(gvPlayer) if(inDistance2(x, y, gvPlayer.x, gvPlayer.y, 14)) {
 			if(game.health < game.maxHealth - 3) {
-				game.health += 4
+				game.health += 12
 				for(local i = 0; i < 4; i++) {
 					newActor(Heal, gvPlayer.x - 16 + randInt(32), gvPlayer.y - 16 + randInt(32))
 				}
@@ -346,6 +370,63 @@
 	}
 }
 
+::Onedown <- class extends Actor{
+	frame = 0.0
+
+	constructor(_x, _y, _arr = null)
+	{
+		base.constructor(_x, _y)
+		frame = randFloat(4)
+	}
+
+	function run()
+	{
+		if(getFrames() % 20 == 0){
+		newActor(FlameTiny, x - 8 + randInt(16), y - 8 + randInt(16))
+		}
+		frame += 0.2
+		drawSprite(spr1down, frame, x - camx, y - camy)
+		if(gvPlayer) if(inDistance2(x, y, gvPlayer.x, gvPlayer.y + 2, 16)) {
+			deleteActor(id)
+			gvPlayer.hurt = 16
+		}
+	}
+
+	function _typeof() { return "Coin" }
+}
+
+::Darknyan <- class extends PhysAct {
+	hspeed = 0
+	vspeed = -3
+
+	constructor(_x, _y, _arr = null) {
+		base.constructor(_x, _y)
+
+		if(gvPlayer) if(gvPlayer.x > x) hspeed = -2
+		else hspeed = 2
+
+		shape = Rec(x, y, 6, 6, 0)
+	}
+
+	function run() {
+		if(!placeFree(x, y + 2)) vspeed = -5
+		if(!placeFree(x + 2, y)) hspeed = -2
+		if(!placeFree(x - 2, y)) hspeed = 2
+		vspeed += 0.2
+
+		if(placeFree(x + hspeed, y)) x += hspeed
+		if(placeFree(x, y + vspeed)) y += vspeed
+		else vspeed /= 2
+		shape.setPos(x, y)
+
+		if(gvPlayer) if(inDistance2(x, y, gvPlayer.x, gvPlayer.y, 16)) {
+			gvPlayer.hurt = 6
+		}
+
+		drawSprite(sprDarkStar, getFrames() / 10, x - camx, y - camy)
+	}
+}
+
 ::Starnyan <- class extends PhysAct {
 	hspeed = 0
 	vspeed = -4
@@ -353,16 +434,16 @@
 	constructor(_x, _y, _arr = null) {
 		base.constructor(_x, _y)
 
-		if(gvPlayer) if(gvPlayer.x > x) hspeed = -1
-		else hspeed = 1
+		if(gvPlayer) if(gvPlayer.x > x) hspeed = -2
+		else hspeed = 2
 
 		shape = Rec(x, y, 6, 6, 0)
 	}
 
 	function run() {
-		if(!placeFree(x, y + 1)) vspeed = -5
-		if(!placeFree(x + 1, y)) hspeed = -2
-		if(!placeFree(x - 1, y)) hspeed = 2
+		if(!placeFree(x, y + 2)) vspeed = -5
+		if(!placeFree(x + 2, y)) hspeed = -2
+		if(!placeFree(x - 2, y)) hspeed = 2
 		vspeed += 0.25
 
 		if(placeFree(x + hspeed, y)) x += hspeed
@@ -412,10 +493,13 @@
 
 		if(gvPlayer) if(hitTest(shape, gvPlayer.shape)){
 			playSoundChannel(sndHeal, 0, 1)
-			if(game.weapon == 0) game.weapon = 3
+			if(game.weapon == 0) {
+				game.weapon = 3
+				game.maxEnergy = 4 - game.difficulty + game.airBonus
+			}
 			else {
 				game.subitem = game.weapon
-				game.maxEnergy = 1
+				game.maxEnergy = 4 - game.difficulty + game.airBonus
 				game.weapon = 3
 			}
 			if(gvPlayer.rawin("tftime")) gvPlayer.tftime = 0
@@ -459,7 +543,7 @@
 		shape.setPos(x, y)
 
 		if(gvPlayer) if(inDistance2(x, y, gvPlayer.x, gvPlayer.y, 16)) {
-			game.levelCoins += 50
+			game.canres = true
 			playSound(snd1up, 0)
 			deleteActor(id)
 		}
@@ -543,11 +627,11 @@
 			deleteActor(id)
 			if(game.weapon == 0) {
 				game.weapon = 4
-				game.maxEnergy = 4 - game.difficulty
+				game.maxEnergy = 4 - game.difficulty + game.earthBonus
 			}
 			else {
 				game.subitem = game.weapon
-				game.maxEnergy = 4 - game.difficulty
+				game.maxEnergy = 4 - game.difficulty + game.earthBonus
 				game.weapon = 4
 			}
 			playSoundChannel(sndHeal, 0, 1)
@@ -625,7 +709,6 @@
 		//Pickup
 		if(gvPlayer) if(inDistance2(x, y, gvPlayer.x, gvPlayer.y, 16)) {
 			deleteActor(id)
-			game.health += 4
 			switch(color) {
 				case 0:
 					gvKeyCopper = true
@@ -666,3 +749,4 @@
 		}
 	}
 }
+

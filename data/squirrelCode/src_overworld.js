@@ -155,46 +155,34 @@ vspeed = 0 ;
  } 
   
   if ( getcon ( "right" , "hold" )  &&  (  ! placeFree ( x + 16 , y )  || debug )  && hspeed == 0 && vspeed == 0 )  { 
-  if ( level == "" || game . owd == 0 )  { 
+  if ( level == "" || game . owd == 0 || game . completed . rawin ( level )  )  { 
  hspeed = 2 ; 
 game . owd = 2 ; 
  } 
   
-  else  if ( game . completed . rawin ( level )  ) hspeed = 2 ; 
- 
-  
   } 
   
   if ( getcon ( "up" , "hold" )  &&  (  ! placeFree ( x , y - 16 )  || debug )  && hspeed == 0 && vspeed == 0 )  { 
-  if ( level == "" || game . owd == 1 )  { 
+  if ( level == "" || game . owd == 1 || game . completed . rawin ( level )  )  { 
  vspeed =  - 2 ; 
 game . owd = 3 ; 
  } 
   
-  else  if ( game . completed . rawin ( level )  ) vspeed =  - 2 ; 
- 
-  
   } 
   
   if ( getcon ( "left" , "hold" )  &&  (  ! placeFree ( x - 16 , y )  || debug )  && hspeed == 0 && vspeed == 0 )  { 
-  if ( level == "" || game . owd == 2 )  { 
+  if ( level == "" || game . owd == 2 || game . completed . rawin ( level )  )  { 
  hspeed =  - 2 ; 
 game . owd = 0 ; 
  } 
   
-  else  if ( game . completed . rawin ( level )  ) hspeed =  - 2 ; 
- 
-  
   } 
   
   if ( getcon ( "down" , "hold" )  &&  (  ! placeFree ( x , y + 16 )  || debug )  && hspeed == 0 && vspeed == 0 )  { 
-  if ( level == "" || game . owd == 3 )  { 
+  if ( level == "" || game . owd == 3 || game . completed . rawin ( level )  )  { 
  vspeed = 2 ; 
 game . owd = 1 ; 
  } 
-  
-  else  if ( game . completed . rawin ( level )  ) vspeed = 2 ; 
- 
   
   } 
   
@@ -307,10 +295,12 @@ startOverworld ( "res/map/" + world + ".json" )  ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
-startOverworld =  function ( world ) { gvPlayer = false ; 
+startOverworld =  function ( world ) { setFPS ( 60 )  ; 
+gvPlayer = false ; 
 actor . clear (  )  ; 
 gvIGT = 0 ; 
 autocon =  { up : false , down : false , left : false , right : false }  ; 
+gfxReset (  )  ; 
  if ( gvMap != 0 ) gvMap . del (  )  ; 
  
  gvMap = Tilemap ( world )  ; 
@@ -407,7 +397,6 @@ drawAmbientLight (  )  ;
   
  drawSprite ( sprCoin , 0 , 16 , screenH (  )  - 16 )  ; 
 drawText ( font2 , 24 , screenH (  )  - 23 , game . coins . tostring (  )  )  ; 
-drawSprite ( getroottable (  )  [ game . characters [ game . playerChar ]  [ 1 ]  ]  , game . weapon , screenW (  )  - 16 , screenH (  )  - 12 )  ; 
 drawDebug (  )  ; 
 game . igt ++  ; 
  if ( config . showglobaligt )  { 

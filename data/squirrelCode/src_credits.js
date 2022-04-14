@@ -9,7 +9,7 @@ creditsOffset = 0 ;
 creditsTimer = 0 ; 
 creditsLength = 0 ; 
 creditsSprites =  [  ]  ; 
-startCredits =  function (  ) {  if ( creditsData == null ) creditsData = jsonRead ( fileRead ( "res/credits.json" )  )  ; 
+startCredits =  function ( folder = "res" ) {  if ( creditsData == null ) creditsData = jsonRead ( fileRead ( folder + "/credits.json" )  )  ; 
  
  gvGameMode = gmCredits ; 
 creditsOffset = 0 ; 
@@ -42,11 +42,16 @@ creditsLength += creditsData [ "credits" ]  [ i ]  [ "h" ]  ;
 update (  )  ; 
  }  ; 
 gmCredits =  function (  ) {  var y = 0 ;
-  for (  var i = 0 ;
+ setDrawTarget ( gvScreen )  ; 
+setDrawColor ( 0x000000ff )  ; 
+drawRec ( 0 , 0 , screenW (  )  , screenH (  )  , true )  ; 
+ for (  var i = 0 ;
  i < creditsData [ "credits" ]  . len (  )  ; i += 1 )  { 
-  switch ( creditsData [ "credits" ]  [ i ]  [ "type" ]  )  {  case "normal" : drawText ( font ,  ( screenW (  )  / 2 )  - creditsData [ "credits" ]  [ i ]  [ "text" ]  . len (  )  * 3 , y + screenH (  )  - creditsOffset , creditsData [ "credits" ]  [ i ]  [ "text" ]  )  ; 
+  switch ( creditsData [ "credits" ]  [ i ]  [ "type" ]  )  {  case "normal" :  var text = creditsData [ "credits" ]  [ i ]  . rawin ( "trText" )  ? gvLangObj [ "credits" ]  [ creditsData [ "credits" ]  [ i ]  [ "trText" ]  ]  : creditsData [ "credits" ]  [ i ]  [ "text" ]  ;
+ drawText ( font ,  ( screenW (  )  / 2 )  - text . len (  )  * 3 , y + screenH (  )  - creditsOffset , text )  ; 
 y += fontH ; 
- break ;  case "header" : drawText ( font2 ,  ( screenW (  )  / 2 )  - creditsData [ "credits" ]  [ i ]  [ "text" ]  . len (  )  * 4 , y + screenH (  )  - creditsOffset , creditsData [ "credits" ]  [ i ]  [ "text" ]  )  ; 
+ break ;  case "header" :  var text = creditsData [ "credits" ]  [ i ]  . rawin ( "trText" )  ? gvLangObj [ "credits" ]  [ creditsData [ "credits" ]  [ i ]  [ "trText" ]  ]  : creditsData [ "credits" ]  [ i ]  [ "text" ]  ;
+ drawText ( font2 ,  ( screenW (  )  / 2 )  - text . len (  )  * 4 , y + screenH (  )  - creditsOffset , text )  ; 
 y += fontH + 4 ; 
  break ;  case "image" : drawSprite ( creditsSprites [ i ]  , creditsData [ "credits" ]  [ i ]  [ "f" ]  +  (  ( getFrames (  )  * creditsData [ "credits" ]  [ i ]  [ "s" ]  )  % creditsData [ "credits" ]  [ i ]  [ "l" ]  )  ,  ( screenW (  )  - creditsData [ "credits" ]  [ i ]  [ "w" ]  )  / 2 , y + screenH (  )  - creditsOffset )  ; 
 y += creditsData [ "credits" ]  [ i ]  [ "h" ]  + 5 ; 
@@ -64,7 +69,9 @@ creditsOffset -= getcon ( "up" , "hold" )  && creditsOffset >=  - 10 ? 2 : 0 ;
  gvGameMode = gmMain ; 
  } 
   
-  }  ; 
+ resetDrawTarget (  )  ; 
+drawImage ( gvScreen , 0 , 0 )  ; 
+ }  ; 
 
 
 

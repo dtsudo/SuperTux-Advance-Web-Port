@@ -28,6 +28,14 @@ window.squirrelForEach = function (expression) {
 	};
 };
 
+window.squirrelThreeWaysCompare = function (x, y) {
+	if (x < y)
+		return -1;
+	if (x > y)
+		return 1;
+	return 0;
+};
+
 window.squirrelTypeOf = function (obj) {
 	if ((typeof obj === "object") && obj._typeof)
 		return obj._typeof();
@@ -41,6 +49,8 @@ window.squirrelTypeOf = function (obj) {
 		return "class";
 	if ((typeof obj === "number") && Math.round(obj) === obj)
 		return "integer";
+	if (typeof obj === "boolean")
+		return "bool";
 	
 	throw "squirrelTypeOf: unrecognized obj";
 };

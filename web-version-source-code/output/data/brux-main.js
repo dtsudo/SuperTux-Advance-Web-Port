@@ -63,7 +63,7 @@
 	};
 
 	window.bruxVersion = function () {
-		return "v.0.2.5";
+		return "v.0.2.9";
 	};
 	
 	window.toggleFullscreen = function () {

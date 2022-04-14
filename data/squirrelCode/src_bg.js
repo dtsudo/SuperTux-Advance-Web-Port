@@ -13,41 +13,41 @@ setDrawColor ( 0x20 )  ;
 drawRec ( 0 , 0 , screenW (  )  , screenH (  )  , true )  ; 
  }  ; 
 dbgCave =  function (  ) {  for (  var i = 0 ;
- i < 5 ; i ++  )  { 
+ i < 6 ; i ++  )  { 
   for (  var j = 0 ;
- j < 5 ; j ++  )  { 
+ j < 6 ; j ++  )  { 
  drawSprite ( bgIridia , 0 ,  (  (  - camx / 8 )  % 100 )  +  ( i * 100 )  ,  (  (  - camy / 8 )  % 56 )  +  ( j * 56 )  )  ; 
  } 
   } 
   for (  var i = 0 ;
- i < 2 ; i ++  )  { 
+ i < 4 ; i ++  )  { 
   for (  var j = 0 ;
- j < 2 ; j ++  )  { 
+ j < 4 ; j ++  )  { 
  drawSprite ( bgCaveHoles , 0 ,  (  (  - camx / 4 )  % 400 )  +  ( i * 400 )  ,  (  (  - camy / 4 )  % 392 )  +  ( j * 392 )  )  ; 
  } 
   } 
   }  ; 
 dbgForest =  function (  ) {  if ( gvMap != 0 )  { 
   for (  var i = 0 ;
- i < 2 ; i ++  ) drawSprite ( bgWoodedMountain , 0 ,  (  (  - camx / 8 )  % 640 )  +  ( i * 640 )  ,  ( screenH (  )  / 2 )  - 120 )  ; 
+ i < 3 ; i ++  ) drawSprite ( bgWoodedMountain , 0 ,  (  (  - camx / 8 )  % 640 )  +  ( i * 640 )  ,  ( screenH (  )  / 2 )  - 120 )  ; 
  for (  var i = 0 ;
- i < 4 ; i ++  ) drawSprite ( bgForest0 , 0 ,  (  (  - camx / 2 )  % 128 )  +  ( i * 128 )  , gvMap . h - camy - 180 )  ; 
+ i < 5 ; i ++  ) drawSprite ( bgForest0 , 0 ,  (  (  - camx / 2 )  % 128 )  +  ( i * 128 )  , gvMap . h - camy - 180 )  ; 
  for (  var i = 0 ;
- i < 4 ; i ++  ) drawSprite ( bgForest1 , 0 ,  (  - camx % 128 )  +  ( i * 128 )  , gvMap . h - camy - 180 )  ; 
+ i < 5 ; i ++  ) drawSprite ( bgForest1 , 0 ,  (  - camx % 128 )  +  ( i * 128 )  , gvMap . h - camy - 180 )  ; 
  } 
   
   else  { 
   for (  var i = 0 ;
- i < 2 ; i ++  ) drawSprite ( bgWoodedMountain , 0 ,  (  (  - camx / 8 )  % 640 )  +  ( i * 640 )  ,  ( screenH (  )  / 2 )  - 120 )  ; 
+ i < 3 ; i ++  ) drawSprite ( bgWoodedMountain , 0 ,  (  (  - camx / 8 )  % 640 )  +  ( i * 640 )  ,  ( screenH (  )  / 2 )  - 120 )  ; 
  for (  var i = 0 ;
- i < 4 ; i ++  ) drawSprite ( bgForest0 , 0 ,  (  (  - camx / 2 )  % 128 )  +  ( i * 128 )  , screenH (  )  - camy - 180 )  ; 
+ i < 5 ; i ++  ) drawSprite ( bgForest0 , 0 ,  (  (  - camx / 2 )  % 128 )  +  ( i * 128 )  , screenH (  )  - camy - 180 )  ; 
  for (  var i = 0 ;
- i < 4 ; i ++  ) drawSprite ( bgForest1 , 0 ,  (  - camx % 128 )  +  ( i * 128 )  , screenH (  )  - camy - 180 )  ; 
+ i < 5 ; i ++  ) drawSprite ( bgForest1 , 0 ,  (  - camx % 128 )  +  ( i * 128 )  , screenH (  )  - camy - 180 )  ; 
  } 
   
   }  ; 
 dbgMountain =  function (  ) {  for (  var i = 0 ;
- i < 2 ; i ++  ) drawSprite ( bgWoodedMountain , 0 ,  (  (  - camx / 8 )  % 640 )  +  ( i * 640 )  ,  ( screenH (  )  / 2 )  - 120 )  ; 
+ i < 3 ; i ++  ) drawSprite ( bgWoodedMountain , 0 ,  (  (  - camx / 8 )  % 640 )  +  ( i * 640 )  ,  ( screenH (  )  / 2 )  - 120 )  ; 
  }  ; 
 dbgAurora =  function (  ) {  for (  var i = 0 ;
  i < 2 ; i ++  )  { 
@@ -108,7 +108,13 @@ dbgStarSky =  function (  ) {  for (  var i = 0 ;
 dbgUnderwater =  function (  ) { drawSprite ( bgUnderwater , 0 , 0 ,  ( screenH (  )  / 2 )  - 120 )  ; 
  }  ; 
 dbgCastle =  function (  ) { drawSprite ( bgCastle , 0 , 0 ,  ( screenH (  )  / 2 )  - 120 )  ; 
+drawSprite ( bgCastle , 0 , 320 ,  ( screenH (  )  / 2 )  - 120 )  ; 
  }  ; 
+dbgFortMagma =  function (  ) {  for (  var i = 0 ;
+ i < 2 ; i ++  )  { 
+ drawSprite ( bgFortMagma , 0 ,  (  (  - camx / 8 )  % 960 )  +  ( i * 960 )  ,  ( screenH (  )  / 2 )  - 120 )  ; 
+ } 
+  }  ; 
 
 
 

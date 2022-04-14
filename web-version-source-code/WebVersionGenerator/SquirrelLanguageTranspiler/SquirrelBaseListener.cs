@@ -8,6 +8,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+// Generated from ./web-version-source-code/SquirrelLanguageGrammar/Squirrel.g4 by ANTLR 4.9.3
+
 // Unreachable code detected
 #pragma warning disable 0162
 // The variable '...' is assigned but its value is never used

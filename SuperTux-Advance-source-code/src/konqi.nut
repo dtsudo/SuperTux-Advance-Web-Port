@@ -19,7 +19,7 @@
 	hurt = 0
 	swimming = false
 	endMode = false
-	canstomp = true //If they can use jumping as an attack
+	canStomp = true //If they can use jumping as an attack
 	sprite = sprKonqi
 	invincible = 0
 	shapeStand = 0
@@ -33,6 +33,10 @@
 	wasInWater = false
 	cooldown = 0
 	antigrav = 0
+	groundx = 0.0 //Remember last coordinates over solid ground
+	groundy = 0.0
+	held = null
+	blastResist = false
 
 	//Animations
 	anim = [] //Animation frame delimiters: [start, end, speed]
@@ -106,7 +110,7 @@
 
 
 		if(game.weapon == 0) game.maxEnergy = 0
-		if(game.weapon == 3) game.maxEnergy = 4
+		if(game.weapon == 3) game.maxEnergy = 4 + game.airBonus
 		if(energy > game.maxEnergy) energy = game.maxEnergy
 
 		/////////////
@@ -317,7 +321,7 @@
 			//Controls
 			if(!freeDown2 || anim == anClimb) {
 				canJump = 16
-				if(game.weapon == 3 && energy < 4) energy += 0.2
+				if(game.weapon == 3 && energy < game.maxEnergy) energy += 0.2
 			}
 			else {
 				if(canJump > 0) canJump--
@@ -400,7 +404,7 @@
 						frame = anim[0]
 						hspeed = 0
 						vspeed = 0
-						x = (x - (x % 16)) + 7
+						x = (x - (x % 16)) + 8
 					}
 				}
 
@@ -545,10 +549,10 @@
 					if(hspeed < 0) hspeed += friction / 3.0
 				} else {
 					if(hspeed > 0) {
-						if(!(mspeed > 2 && getcon("right", "hold")) || anim == anCrawl) hspeed -= friction
+						if(!(mspeed > 2 && getcon("right", "hold")) || anim == anCrawl || !canMove) hspeed -= friction
 					}
 					if(hspeed < 0) {
-						if(!(mspeed > 2 && getcon("left", "hold")) || anim == anCrawl) hspeed += friction
+						if(!(mspeed > 2 && getcon("left", "hold")) || anim == anCrawl || !canMove) hspeed += friction
 					}
 				}
 			}
@@ -611,7 +615,8 @@
 				newActor(StompPoof, x + 8, y + 12)
 				newActor(StompPoof, x - 8, y + 12)
 			}
-			switch(game.weapon) {
+
+			if(canMove) switch(game.weapon) {
 				case 0:
 					if(cooldown > 0) break
 					if(getcon("shoot", "press")) {
@@ -689,6 +694,11 @@
 				if(anim == anCrawl) c.y += 8
 			}
 
+			//Check solid ground position
+			if(!placeFree(x, y + 1) && !onPlatform()) {
+				groundx = x
+				groundy = y
+			}
 		}
 		//////////////
 		// IN WATER //
@@ -768,7 +778,7 @@
 			}
 
 			//Attacks
-			switch(game.weapon) {
+			if(canMove) switch(game.weapon) {
 				case 1:
 					if(getcon("shoot", "press") && anim != anSlide && anim != anHurt && energy > 0) {
 						local fx = 6
@@ -901,15 +911,14 @@
 		else friction = 0.1
 
 		//Hurt
-		if(onHazard(x, y)) hurt = 1
+		if(onHazard(x, y)) hurt = 2
 		if(onDeath(x, y)) game.health = 0
 
 		if(hurt > 0 && invincible == 0) {
 			if(blinking == 0) {
-				blinking = 120
+				blinking = 60
 				playSound(sndHurt, 0)
 				if(game.weapon == 4 && anim == anSlide && energy > 0) {
-					blinking = 60
 					energy--
 					firetime = 120
 					newActor(Spark, x, y)
@@ -978,6 +987,8 @@
 			} else tftime = -1
 		}
 
+		drawLight(sprLightBasic, 0, x - camx, y - camy)
+
 		hidden = false
 
 		if(debug) drawText(font, x - camx - 8, y - 32 - camy, anim[2] + "\n" + frame.tostring())
@@ -1014,10 +1025,20 @@
 	}
 
 	function die() {
-		deleteActor(id)
-		gvPlayer = false
-		newActor(KonqiDie, x, y)
-		game.health = 0
+		if(game.canres) {
+			game.health = game.maxHealth
+			blinking = 120
+			if(y > gvMap.h) playerTeleport(groundx, groundy)
+			game.canres = false
+			hspeed = 0.0
+			vspeed = 0.0
+		}
+		else {
+			deleteActor(id)
+			gvPlayer = false
+			newActor(KonqiDie, x, y)
+			game.health = 0
+		}
 	}
 
 	function swapitem() {
@@ -1090,7 +1111,10 @@
 		timer--
 		if(timer == 0) {
 			startPlay(gvMap.file)
-			if(game.check == false) gvIGT = 0
+			if(game.check == false) {
+				gvIGT = 0
+				game.weapon = 0
+			}
 		}
 		switch(game.weapon) {
 			case 0:

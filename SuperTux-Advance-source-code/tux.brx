@@ -51,6 +51,8 @@ donut("src/pickchar.nut")
 donut("src/weather.nut")
 donut("src/light.nut")
 donut("src/credits.nut")
+donut("src/cursor.nut")
+donut("src/shop.nut")
 
 //Load mods
 local modlist = lsdir("mods")
@@ -60,11 +62,17 @@ for(local i = 0; i < modlist.len(); i++) if(modlist[i] != "." && modlist[i] != "
 //    MAIN    //
 ////////////////
 
+if(fileExists("config.json")) config = mergeTable(config, jsonRead(fileRead("config.json")))
+
+//Set volume
+setSoundVolume(config.soundVolume)
+setMusicVolume(config.musicVolume)
+
 //Detect resolution
 //Aspects may not perfectly match, so the closest one will be picked
 local disres = displayW().tofloat() / displayH().tofloat()
 local reschoice = 0
-local aspects = [(16.0 / 9.0), (8.0 / 5.0), (4.0 / 3.0)]
+local aspects = [(16.0 / 9.0), (5.0 / 3.0), (4.0 / 3.0)]
 local resdiff = 100 //Arbitrary high starting number
 for(local i = 0; i < aspects.len(); i++) {
 	if(abs(disres - aspects[i]) < resdiff) {
@@ -74,10 +82,10 @@ for(local i = 0; i < aspects.len(); i++) {
 }
 switch(reschoice) {
 	case 0:
-		setResolution(320, 180)
+		setResolution(424, 240)
 		break
 	case 1:
-		setResolution(320, 200)
+		setResolution(400, 240)
 		break
 	case 2:
 		setResolution(320, 240)
@@ -90,10 +98,16 @@ switch(reschoice) {
 
 //Uncomment this function if you want to play at actual GBA resolution
 //setResolution(240, 160)
+//Uncomment this function if you want to play at the old resolution
+//setResolution(320, 180)
 
+gvTextW = floor(screenW() / 6) - 1
+
+if(config.usefilter) setScalingFilter(1)
 gvScreen = newTexture(screenW(), screenH())
-gvPlayScreen = newTexture(screenW(), screenH())
 bgPause = newTexture(screenW(), screenH())
+setScalingFilter(0)
+gvPlayScreen = newTexture(screenW(), screenH())
 gvLightScreen = newTexture(screenW(), screenH())
 textureSetBlendMode(gvLightScreen, bm_sub)
 
@@ -107,7 +121,7 @@ tileSearchDir.push("res/snd")
 setFPS(60)
 
 //Load game text
-if(fileExists("config.json")) config = jsonRead(fileRead("config.json"))
+
 gvLangObj = jsonRead(fileRead("lang/en.json"))
 gvLangObj = mergeTable(gvLangObj, jsonRead(fileRead("lang/" + config.lang + ".json")))
 
@@ -124,12 +138,10 @@ startMain()
 menu = meMain
 config.playerChar = "Tux"
 
-update()
-
 // webBrowserVersionChange: the web version handles the game loop directly in javascript
 if (!isWebBrowserVersion)
 {
-	while(!getQuit() && !gvQuit)	
+	while(!getQuit() && !gvQuit) //Entire game happens here
 	{
 		if(keyPress(k_f11)) toggleFullscreen()
 		if(getcon("pause", "press") && levelEndRunner == 0 && gvGameMode != gmMain) togglePause()

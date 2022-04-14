@@ -2,10 +2,11 @@
 
 ::gmPause <- function() {
 	setDrawTarget(gvScreen)
-	drawText(font2, (screenW() / 2) - 20, screenH() / 2, "PAUSE")
+	drawImage(bgPause, 0, 0)
+	drawText(font2, (screenW() / 2) - 20, screenH() / 2 - 64, gvLangObj["pause-menu"]["pause"])
+	textMenu()
 	resetDrawTarget()
 	drawImage(gvScreen, 0, 0)
-	textMenu()
 }
 
 ::togglePause <- function() {
@@ -13,8 +14,10 @@
 	if(gvGameMode == gmPlay) {
 		if(actor.rawin("DeadPlayer")) {
 			startPlay(gvMap.file)
-			if(game.check == true || game.difficulty > 0) 
-			if(game.check == false) gvIGT = 0
+			if(game.check == false) {
+				gvIGT = 0
+				game.weapon = 0
+			}
 		}
 		else {
 			gvGameMode = gmPause
@@ -31,6 +34,7 @@
 		}
 	}
 	else if(gvGameMode == gmOverworld){
+		if(gvPlayer) if(gvPlayer.hspeed != 0 || gvPlayer.vspeed != 0) return
 		gvGameMode = gmPause
 		setDrawTarget(bgPause)
 		drawImage(gvScreen, 0, 0)

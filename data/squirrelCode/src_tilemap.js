@@ -36,20 +36,20 @@ frameTime =  [  ]  ;
  
   } 
  sprite = _sprite ; 
- } ;  returnVal . draw = function ( x , y , alpha ) {  var currentTime = wrap ( getTicks (  )  , 0 , frameTime . top (  )  )  ;
+ } ;  returnVal . draw = function ( x , y , alpha , color = 0xffffffff ) {  var currentTime = wrap ( getTicks (  )  , 0 , frameTime . top (  )  )  ;
   for (  var i = 0 ;
  i < frameList . len (  )  ; i ++  )  { 
   if ( currentTime >= frameTime [ i ]  )  { 
   if ( i < frameTime . len (  )  - 1 )  { 
   if ( currentTime < frameTime [ i + 1 ]  )  { 
- drawSpriteEx ( sprite , frameList [ i ]  , floor ( x )  , floor ( y )  , 0 , 0 , 1 , 1 , alpha )  ; 
+ drawSpriteExMod ( sprite , frameList [ i ]  , floor ( x )  , floor ( y )  , 0 , 0 , 1 , 1 , alpha , color )  ; 
  return ; 
   } 
   
   } 
   
   else  if ( currentTime <= frameTime [ i ]  && i == 0 )  { 
- drawSpriteEx ( sprite , frameList [ i ]  , floor ( x )  , floor ( y )  , 0 , 0 , 1 , 1 , alpha )  ; 
+ drawSpriteExMod ( sprite , frameList [ i ]  , floor ( x )  , floor ( y )  , 0 , 0 , 1 , 1 , alpha , color )  ; 
  return ; 
   } 
   
@@ -57,7 +57,7 @@ frameTime =  [  ]  ;
   } 
   
   } 
- drawSpriteEx ( sprite , frameList . top (  )  , floor ( x )  , floor ( y )  , 0 , 0 , 1 , 1 , alpha )  ; 
+ drawSpriteExMod ( sprite , frameList . top (  )  , floor ( x )  , floor ( y )  , 0 , 0 , 1 , 1 , alpha , color )  ; 
  } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
@@ -77,6 +77,7 @@ Tilemap =  function ( ) { var returnVal = { constructor: function(){} } ;  retur
  returnVal . shape = null ; 
  returnVal . anim = null ; 
  returnVal . solidLayer = null ; 
+ returnVal . plat = null ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( filename ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
@@ -194,9 +195,11 @@ c . dh = obj . height / 16 ;
   else print ( "Map file " + filename + " does not exist!" )  ; 
  
   } ;  returnVal . drawTiles = function ( x , y , mx , my , mw , mh , l , a = 1 ) {  var t =  - 1 ;
+  var dataLayers = data . layers ;
+  var dataLayersLen = dataLayers . len (  )  ;
   for (  var i = 0 ;
- i < data . layers . len (  )  ; i ++  )  { 
-  if ( data . layers [ i ]  . type == "tilelayer" && data . layers [ i ]  . name == l )  { 
+ i < dataLayersLen ; i ++  )  { 
+  if ( dataLayers [ i ]  . type == "tilelayer" && dataLayers [ i ]  . name == l )  { 
  t = i ; 
  break ;  } 
   
@@ -205,37 +208,49 @@ c . dh = obj . height / 16 ;
   return ; 
   } 
   
-  if ( data . layers [ t ]  . width < mx + mw ) mw = data . layers [ t ]  . width - mx ; 
+  var dataLayersT = dataLayers [ t ]  ;
+  var dataLayersTWidth = dataLayersT . width ;
+  var dataLayersTHeight = dataLayersT . height ;
+  if ( dataLayersTWidth < mx + mw ) mw = dataLayersTWidth - mx ; 
  
-  if ( data . layers [ t ]  . height < my + mh ) mh = data . layers [ t ]  . height - my ; 
+  if ( dataLayersTHeight < my + mh ) mh = dataLayersTHeight - my ; 
  
   if ( mx < 0 ) mx = 0 ; 
  
   if ( my < 0 ) my = 0 ; 
  
-  if ( mx > data . layers [ t ]  . width ) mx = data . layers [ t ]  . width ; 
+  if ( mx > dataLayersTWidth ) mx = dataLayersTWidth ; 
  
-  if ( my > data . layers [ t ]  . height ) my = data . layers [ t ]  . height ; 
+  if ( my > dataLayersTHeight ) my = dataLayersTHeight ; 
  
+  var myPlusMh = my + mh ;
+  var mxPlusMw = mx + mw ;
+  var dataLayersTData = dataLayersT . data ;
+  var dataLayersTDataLen = dataLayersTData . len (  )  ;
+  var dataTilesetsLen = data . tilesets . len (  )  ;
+  var dataLayersTOpacityTimesA = dataLayersT . opacity * a ;
   for (  var i = my ;
- i < my + mh ; i ++  )  { 
+ i < myPlusMh ; i ++  )  { 
+  var iTimesDataLayersTWidth = i * dataLayersTWidth ;
+  var yPlusITimesDataTileheight = y + i * data . tileheight ;
   for (  var j = mx ;
- j < mx + mw ; j ++  )  { 
-  if ( i * data . layers [ t ]  . width + j >= data . layers [ t ]  . data . len (  )  )  return ; 
+ j < mxPlusMw ; j ++  )  { 
+  if ( iTimesDataLayersTWidth + j >= dataLayersTDataLen )  return ; 
   
-  var n = data . layers [ t ]  . data [  ( i * data . layers [ t ]  . width )  + j ]  ;
+  var n = dataLayersTData [ iTimesDataLayersTWidth + j ]  ;
   if ( n != 0 )  { 
-  for (  var k = data . tilesets . len (  )  - 1 ;
+  var xPlusJTimesDataTilewidth = x + j * data . tilewidth ;
+  for (  var k = dataTilesetsLen - 1 ;
  k >= 0 ; k --  )  { 
   if ( n >= data . tilesets [ k ]  . firstgid )  { 
   if ( anim . rawin ( n )  )  { 
-  if ( tileset [ k ]  == anim [ n ]  . sprite ) anim [ n ]  . draw ( x +  ( j * data . tilewidth )  , y +  ( i * data . tileheight )  , data . layers [ t ]  . opacity * a )  ; 
+  if ( tileset [ k ]  == anim [ n ]  . sprite ) anim [ n ]  . draw ( xPlusJTimesDataTilewidth , yPlusITimesDataTileheight , dataLayersTOpacityTimesA )  ; 
  
-  else drawSpriteEx ( tileset [ k ]  , n - data . tilesets [ k ]  . firstgid , x +  ( j * data . tilewidth )  , y +  ( i * data . tileheight )  , 0 , 0 , 1 , 1 , data . layers [ t ]  . opacity * a )  ; 
+  else drawSpriteEx ( tileset [ k ]  , n - data . tilesets [ k ]  . firstgid , xPlusJTimesDataTilewidth , yPlusITimesDataTileheight , 0 , 0 , 1 , 1 , dataLayersTOpacityTimesA )  ; 
  
   } 
   
-  else drawSpriteEx ( tileset [ k ]  , n - data . tilesets [ k ]  . firstgid , x +  ( j * data . tilewidth )  , y +  ( i * data . tileheight )  , 0 , 0 , 1 , 1 , data . layers [ t ]  . opacity * a )  ; 
+  else drawSpriteEx ( tileset [ k ]  , n - data . tilesets [ k ]  . firstgid , xPlusJTimesDataTilewidth , yPlusITimesDataTileheight , 0 , 0 , 1 , 1 , dataLayersTOpacityTimesA )  ; 
  
  k =  - 1 ; 
  break ;  } 
@@ -281,7 +296,7 @@ c . dh = obj . height / 16 ;
  k >= 0 ; k --  )  { 
   if ( n >= data . tilesets [ k ]  . firstgid )  { 
   if ( anim . rawin ( n )  )  { 
-  if ( tileset [ k ]  == anim [ n ]  . sprite ) anim [ n ]  . draw ( x +  ( j * data . tilewidth )  , y +  ( i * data . tileheight )  , data . layers [ t ]  . opacity * a )  ; 
+  if ( tileset [ k ]  == anim [ n ]  . sprite ) anim [ n ]  . draw ( x +  ( j * data . tilewidth )  , y +  ( i * data . tileheight )  , data . layers [ t ]  . opacity * a , c )  ; 
  
   else drawSpriteExMod ( tileset [ k ]  , n - data . tilesets [ k ]  . firstgid , x +  ( j * data . tilewidth )  , y +  ( i * data . tileheight )  , 0 , 0 , 1 , 1 , data . layers [ t ]  . opacity * a , c )  ; 
  

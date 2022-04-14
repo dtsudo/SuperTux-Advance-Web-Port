@@ -531,7 +531,7 @@ game . chx = x ;
 game . chy = y ; 
 playSoundChannel ( sndBell , 0 , 4 )  ; 
  if ( game . difficulty < 3 )  { 
-  if ( game . health < game . maxHealth ) game . health ++  ; 
+  if ( game . health < game . maxHealth ) game . health += 4 ; 
  
   else  if ( game . subitem == 0 ) game . subitem = 5 ; 
  
@@ -725,7 +725,7 @@ newActor ( Darknyan , x , y - 16 )  ;
   } 
   
  drawSpriteZ ( 2 , sprBoxItem , getFrames (  )  / 16 , x - 8 - camx , y - 8 - camy )  ; 
- } ;  returnVal . _typeof = function (  ) {  return "WoodBlock" ;
+ } ;  returnVal . _typeof = function (  ) {  return "EvilBlock" ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
@@ -755,7 +755,7 @@ newActor ( MuffinBomb , x , y - 16 )  ;
   } 
   
  drawSpriteZ ( 2 , sprBoxItem , getFrames (  )  / 16 , x - 8 - camx , y - 8 - camy )  ; 
- } ;  returnVal . _typeof = function (  ) {  return "WoodBlock" ;
+ } ;  returnVal . _typeof = function (  ) {  return "EvilBlockB" ;
   } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
@@ -848,9 +848,16 @@ playSound ( sndBump , 0 )  ;
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
 BossDoor =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . dy = 0 ; 
  returnVal . moving = false ; 
+ returnVal . delay = 0 ; 
+ returnVal . opening = false ; 
  
  with ( returnVal ) { 
-  returnVal . run = function (  ) {  if ( gvWarning == 0 && dy == 0 )  { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
+ if ( _arr != "" ) delay = _arr . tointeger (  )  ; 
+ 
+  } ;  returnVal . run = function (  ) {  if ( gvWarning == 0 && dy == 0 )  { 
  moving = true ; 
 tileSetSolid ( x , y , 1 )  ; 
 tileSetSolid ( x , y - 16 , 1 )  ; 
@@ -858,12 +865,92 @@ tileSetSolid ( x , y - 32 , 1 )  ;
 tileSetSolid ( x , y - 48 , 1 )  ; 
  } 
   
-  if ( moving && dy < 32 ) dy ++  ; 
+  if ( moving && dy < 32 &&  ! opening )  { 
+  if ( delay > 0 ) delay --  ; 
  
+  else dy ++  ; 
+ 
+  } 
+  
+  else  if ( opening && dy > 0 )  { 
+ dy --  ; 
+tileSetSolid ( x , y , 0 )  ; 
+tileSetSolid ( x , y - 16 , 0 )  ; 
+tileSetSolid ( x , y - 32 , 0 )  ; 
+tileSetSolid ( x , y - 48 , 0 )  ; 
+ } 
+  
+  
  drawSpriteZ ( 4 , sprBossDoor , 0 , x - camx , y - camy - dy + 16 )  ; 
 drawSpriteZ ( 4 , sprBossDoor , 0 , x - camx , y - camy - 80 + dy )  ; 
  } ;  returnVal . _typeof = function (  ) {  return "BossDoor" ;
   } ; 
+ } 
+ returnVal.constructor(...arguments); return returnVal ;  }  ; 
+Fishy =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
+ returnVal . slideshape = 0 ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
+tileSetSolid ( x , y , 1 )  ; 
+shape = Rec ( x , y + 2 , 8 , 8 , 0 )  ; 
+slideshape = Rec ( x , y - 1 , 12 , 8 , 0 )  ; 
+ } ;  returnVal . run = function (  ) {  if ( gvPlayer )  { 
+  if ( inDistance2 ( x , y , gvPlayer . x , gvPlayer . y , 64 )  )  if ( game . maxredcoins == game . levelredcoins )  { 
+ deleteActor ( id )  ; 
+newActor ( Poof , x , y )  ; 
+tileSetSolid ( x , y , 0 )  ; 
+ } 
+  
+  
+  } 
+  
+ drawSprite ( sprFishBlock , 0 , x - 8 - camx , y - 8 - camy )  ; 
+ } ;  returnVal . _typeof = function (  ) {  return "Fishy" ;
+  } ; 
+ } 
+ returnVal.constructor(...arguments); return returnVal ;  }  ; 
+FireBlock =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  returnVal . shape = 0 ; 
+ returnVal . slideshape = 0 ; 
+ returnVal . fireshape = 0 ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   baseConstructor  ( _x , _y )  ; 
+shape = Rec ( x , y + 2 , 8 , 8 , 0 )  ; 
+slideshape = Rec ( x , y - 1 , 12 , 8 , 0 )  ; 
+fireshape = Rec ( x , y , 16 , 16 , 0 )  ; 
+tileSetSolid ( x , y , 1 )  ; 
+ } ;  returnVal . run = function (  ) {  if ( actor . rawin ( "Fireball" )  )  {     var foreachOutput = squirrelForEach ( actor [ "Fireball" ]  ) ;     while ( true )     {        foreachOutput . next ( ) ;        if ( foreachOutput . isDone ( ) ) break ; i = foreachOutput . getValue ( ) ;  if ( hitTest ( fireshape , i . shape )  )  { 
+ tileSetSolid ( x , y , 0 )  ; 
+deleteActor ( id )  ; 
+deleteActor ( i . id )  ; 
+newActor ( Flame , x , y )  ; 
+playSound ( sndFlame , 0 )  ; 
+ } 
+  
+     }  }  
+  if ( actor . rawin ( "ExplodeF" )  )  {     var foreachOutput = squirrelForEach ( actor [ "ExplodeF" ]  ) ;     while ( true )     {        foreachOutput . next ( ) ;        if ( foreachOutput . isDone ( ) ) break ; i = foreachOutput . getValue ( ) ;  if ( hitTest ( fireshape , i . shape )  )  { 
+ tileSetSolid ( x , y , 0 )  ; 
+deleteActor ( id )  ; 
+newActor ( Flame , x , y )  ; 
+playSound ( sndFlame , 0 )  ; 
+ } 
+  
+     }  }  
+  if ( actor . rawin ( "Flame" )  )  {     var foreachOutput = squirrelForEach ( actor [ "Flame" ]  ) ;     while ( true )     {        foreachOutput . next ( ) ;        if ( foreachOutput . isDone ( ) ) break ; i = foreachOutput . getValue ( ) ;  if ( inDistance2 ( x , y , i . x , i . y , 20 )  && i . frame >= 2 )  { 
+ tileSetSolid ( x , y , 0 )  ; 
+deleteActor ( id )  ; 
+newActor ( Flame , x , y )  ; 
+playSound ( sndFlame , 0 )  ; 
+ } 
+  
+     }  }  
+ drawSprite ( sprFireBlock , 0 , x - 8 - camx , y - 8 - camy )  ; 
+ } ; 
  } 
  returnVal.constructor(...arguments); return returnVal ;  }  ; 
 

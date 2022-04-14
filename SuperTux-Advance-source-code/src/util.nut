@@ -45,6 +45,7 @@
 				for(local i = 0; i < 10; i++) {
 					if(str[0].tochar() == i.tostring()) return true
 				}
+				if(str[0] == "-") return true
 			}
 			return false
 			break
@@ -52,4 +53,19 @@
 			return false
 			break
 	}
+}
+
+// webBrowserVersionChange: comment this out since it overwrites the built-in window.eval function
+//::eval <- function(str) {
+//	//Does not work properly right now
+//	//Needs modification in the runtime
+//	return dostr("return " + str)
+//}
+
+::minNum <- function(a, b) {
+	return (a * (a < b)) + (b * (b <= a))
+}
+
+::maxNum <- function(a, b) {
+	return (a * (a > b)) + (b * (b >= a))
 }

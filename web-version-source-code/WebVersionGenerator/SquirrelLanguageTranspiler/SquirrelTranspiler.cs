@@ -4,25 +4,69 @@ namespace SquirrelLanguageTranspiler
 	using Antlr4.Runtime;
 	using System;
 	using System.Collections.Generic;
+	using System.IO;
 	using System.Linq;
 	using WebVersionGeneratorLibrary;
 
 	public class SquirrelTranspiler : ISquirrelTranspiler
 	{
+		private bool hasHitError;
+
 		public SquirrelTranspiler()
 		{
+			this.hasHitError = false;
+		}
+
+		private class SquirrelLexerErrorListener : IAntlrErrorListener<int>
+		{
+			private SquirrelTranspiler squirrelTranspiler;
+
+			public SquirrelLexerErrorListener(SquirrelTranspiler squirrelTranspiler)
+			{
+				this.squirrelTranspiler = squirrelTranspiler;
+			}
+
+			public void SyntaxError(TextWriter output, IRecognizer recognizer, int offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
+			{
+				this.squirrelTranspiler.hasHitError = true;
+			}
+		}
+
+		private class SquirrelParserErrorListener : IAntlrErrorListener<IToken>
+		{
+			private SquirrelTranspiler squirrelTranspiler;
+
+			public SquirrelParserErrorListener(SquirrelTranspiler squirrelTranspiler)
+			{
+				this.squirrelTranspiler = squirrelTranspiler;
+			}
+
+			public void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
+			{
+				this.squirrelTranspiler.hasHitError = true;
+			}
 		}
 
 		public string TranspileSquirrelCode(string squirrelCode)
 		{
+			this.hasHitError = false;
+
 			AntlrInputStream inputStream = new AntlrInputStream(squirrelCode);
 			SquirrelLexer squirrelLexer = new SquirrelLexer(inputStream);
+			squirrelLexer.AddErrorListener(new SquirrelLexerErrorListener(squirrelTranspiler: this));
 			CommonTokenStream commonTokenStream = new CommonTokenStream(squirrelLexer);
 			SquirrelParser squirrelParser = new SquirrelParser(commonTokenStream);
+			squirrelParser.AddErrorListener(new SquirrelParserErrorListener(squirrelTranspiler: this));
 			SquirrelParser.StatsContext context = squirrelParser.stats();
 			SquirrelTranspilerVisitor visitor = new SquirrelTranspilerVisitor();
 
+			if (this.hasHitError)
+				throw new SquirrelTranspilationException();
+
 			string transpiledOutput = visitor.Visit(context);
+			
+			if (this.hasHitError)
+				throw new SquirrelTranspilationException();
 
 			return transpiledOutput;
 		}

@@ -5,6 +5,7 @@ window.superTuxAdvanceWebVersion.squirrelFiles['contrib/extras/script.nut'] = fu
 
 
 print ( "Loaded extras world" )  ; 
+freeKonqi (  )  ; 
 
 
 

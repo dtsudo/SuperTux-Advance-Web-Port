@@ -4,6 +4,9 @@
 	if (!window.superTuxAdvanceWebVersion)
 		window.superTuxAdvanceWebVersion = {};
 	
+	let bodyMargin = 8;
+	let disableArrowKeyScrolling = false;
+	
 	let urlParams = (new URL(document.location)).searchParams;
 				
 	let unlockAllLevels = urlParams.get("unlocklevels") !== null
@@ -20,7 +23,7 @@
 		
 	window.superTuxAdvanceWebVersion.superTuxAdvanceCanvasWidth = urlParams.get("width") !== null
 		? parseInt(urlParams.get("width"), 10)
-		: 320;
+		: 424;
 		
 	window.superTuxAdvanceWebVersion.superTuxAdvanceCanvasHeight = urlParams.get("height") !== null
 		? parseInt(urlParams.get("height"), 10)
@@ -29,6 +32,17 @@
 	let superTuxAdvanceCanvasScalingFactor = urlParams.get("scalingfactor") !== null
 		? parseInt(urlParams.get("scalingfactor"), 10)
 		: 3;
+	
+	let setBodyMargin;
+	setBodyMargin = function () {
+		if (document.body)
+			document.body.style.margin = bodyMargin + "px";
+		else
+			setTimeout(setBodyMargin, 50);
+	};
+	setBodyMargin();
+	
+	window.superTuxAdvanceWebVersion.disableArrowKeyScrolling = disableArrowKeyScrolling;
 	
 	let createCanvas;
 	createCanvas = function () {
@@ -89,6 +103,8 @@
 			game.completed["Fw-7"] = true;
 			game.completed["Fw-8"] = true;
 			game.completed["Fw-9"] = true;
+			game.completed["B-1"] = true;
+			game.completed["B-2"] = true;
 		}
 	};
 	
@@ -102,7 +118,7 @@
 			let now = Date.now();
 			
 			if (nextTimeToAct > now) {
-				setTimeout(computeAndRenderNextFrame, 5);
+				requestAnimationFrame(computeAndRenderNextFrame);
 				return;
 			}
 			
@@ -122,10 +138,10 @@
 			debugCommands();
 				
 			if (!shouldStopGame)
-				setTimeout(computeAndRenderNextFrame, 0);
+				requestAnimationFrame(computeAndRenderNextFrame);
 		};
 
-		setTimeout(computeAndRenderNextFrame, 0);
+		requestAnimationFrame(computeAndRenderNextFrame);
 	};
 	
 	let numberOfSquirrelFilesLoaded = 0;

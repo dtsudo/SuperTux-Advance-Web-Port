@@ -3,9 +3,9 @@
 ::creditsTimer <- 0
 ::creditsLength <- 0
 ::creditsSprites <- []
-::startCredits <- function(){
+::startCredits <- function(folder = "res"){
 	if(creditsData==null)
-		creditsData = jsonRead(fileRead("res/credits.json"))
+		creditsData = jsonRead(fileRead(folder + "/credits.json"))
 	gvGameMode = gmCredits
 	creditsOffset = 0
 	creditsTimer = 0
@@ -30,16 +30,22 @@
 	creditsLength += 30 //Padding
 	update()
 }
+
 ::gmCredits <- function(){
 	local y=0
+	setDrawTarget(gvScreen)
+	setDrawColor(0x000000ff)
+	drawRec(0, 0, screenW(), screenH(), true)
 	for(local i = 0; i<creditsData["credits"].len(); i+=1){
 		switch(creditsData["credits"][i]["type"]){
 			case "normal":
-				drawText(font, (screenW() / 2) - creditsData["credits"][i]["text"].len()*3, y + screenH() - creditsOffset, creditsData["credits"][i]["text"])
+				local text=creditsData["credits"][i].rawin("trText")?gvLangObj["credits"][creditsData["credits"][i]["trText"]]:creditsData["credits"][i]["text"]
+				drawText(font, (screenW() / 2) - text.len()*3, y + screenH() - creditsOffset, text)
 				y += fontH
 				break
 			case "header":
-				drawText(font2, (screenW() / 2) - creditsData["credits"][i]["text"].len()*4, y + screenH() - creditsOffset, creditsData["credits"][i]["text"])
+				local text=creditsData["credits"][i].rawin("trText")?gvLangObj["credits"][creditsData["credits"][i]["trText"]]:creditsData["credits"][i]["text"]
+				drawText(font2, (screenW() / 2) - text.len()*4, y + screenH() - creditsOffset, text)
 				y += fontH + 4
 				break
 			case "image":
@@ -61,4 +67,6 @@
 		}
 		gvGameMode = gmMain
 	}
+	resetDrawTarget()
+	drawImage(gvScreen, 0, 0)
 }

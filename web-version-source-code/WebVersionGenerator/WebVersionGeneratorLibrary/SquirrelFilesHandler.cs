@@ -27,7 +27,17 @@ namespace WebVersionGeneratorLibrary
 				string fileContents = Util.GetFileContentsAsString(file.FullyQualifiedFileName);
 				fileContents = fileContents.Replace("#!/usr/bin/brux", "");
 				fileContents = fileContents.Replace("::isWebBrowserVersion <- false", "::isWebBrowserVersion <- true");
-				string transpiledFileContents = squirrelTranspiler.TranspileSquirrelCode(fileContents);
+				string transpiledFileContents;
+
+				try
+				{
+					transpiledFileContents = squirrelTranspiler.TranspileSquirrelCode(fileContents);
+				}
+				catch (SquirrelTranspilationException)
+				{
+					Console.WriteLine("Failed to transpile file: " + file.PartiallyQualifiedFileName);
+					throw new Exception();
+				}
 
 				transpiledFileContents = "if (!window.superTuxAdvanceWebVersion) window.superTuxAdvanceWebVersion = {}; \n"
 					+ "if (!window.superTuxAdvanceWebVersion.squirrelFiles) window.superTuxAdvanceWebVersion.squirrelFiles = {}; \n\n"

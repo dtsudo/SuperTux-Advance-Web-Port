@@ -20,7 +20,7 @@ Tux =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal
  returnVal . hurt = 0 ; 
  returnVal . swimming = false ; 
  returnVal . endMode = false ; 
- returnVal . canstomp = true ; 
+ returnVal . canStomp = true ; 
  returnVal . sprite = sprTux ; 
  returnVal . invincible = 0 ; 
  returnVal . shapeStand = 0 ; 
@@ -33,6 +33,10 @@ Tux =  function ( ) { var returnVal = { constructor: function(){} } ;  returnVal
  returnVal . slideframe = 0.0 ; 
  returnVal . wasInWater = false ; 
  returnVal . antigrav = 0 ; 
+ returnVal . groundx = 0.0 ; 
+ returnVal . groundy = 0.0 ; 
+ returnVal . held = null ; 
+ returnVal . blastResist = false ; 
  returnVal . anim =  [  ]  ; 
  returnVal . anStand =  [ 0.0 , 3.0 , "stand" ]  ; 
  returnVal . anWalk =  [ 8.0 , 15.0 , "walk" ]  ; 
@@ -97,7 +101,7 @@ firetime = 60 ;
   
   if ( game . weapon == 0 ) game . maxEnergy = 0 ; 
  
-  if ( game . weapon == 3 ) game . maxEnergy = 4 ; 
+  if ( game . weapon == 3 ) game . maxEnergy = 4 + game . airBonus ; 
  
   if ( energy > game . maxEnergy ) energy = game . maxEnergy ; 
  
@@ -293,7 +297,7 @@ frame = anim [ 0 ]  ;
   
   if (  ! freeDown2 || anim == anClimb )  { 
  canJump = 16 ; 
- if ( game . weapon == 3 && energy < 4 ) energy += 0.2 ; 
+ if ( game . weapon == 3 && energy < game . maxEnergy ) energy += 0.2 ; 
  
   } 
   
@@ -403,7 +407,7 @@ frame = anim [ 0 ]  ;
 frame = anim [ 0 ]  ; 
 hspeed = 0 ; 
 vspeed = 0 ; 
-x =  ( x -  ( x % 16 )  )  + 7 ; 
+x =  ( x -  ( x % 16 )  )  + 8 ; 
  } 
   
   } 
@@ -594,12 +598,12 @@ shape = shapeSlide ;
   
   else  { 
   if ( hspeed > 0 )  { 
-  if (  !  ( mspeed > 2 && getcon ( "right" , "hold" )  )  || anim == anCrawl ) hspeed -= friction ; 
+  if (  !  ( mspeed > 2 && getcon ( "right" , "hold" )  )  || anim == anCrawl ||  ! canMove ) hspeed -= friction ; 
  
   } 
   
   if ( hspeed < 0 )  { 
-  if (  !  ( mspeed > 2 && getcon ( "left" , "hold" )  )  || anim == anCrawl ) hspeed += friction ; 
+  if (  !  ( mspeed > 2 && getcon ( "left" , "hold" )  )  || anim == anCrawl ||  ! canMove ) hspeed += friction ; 
  
   } 
   
@@ -666,7 +670,7 @@ newActor ( Splash , x , y )  ;
  
   if ( anim == anClimb || anim == anWall ) gravity = 0 ; 
  
-  switch ( game . weapon )  {  case 1 :  if ( getcon ( "shoot" , "press" )  && anim != anSlide && anim != anHurt && energy > 0 )  { 
+  if ( canMove )  switch ( game . weapon )  {  case 1 :  if ( getcon ( "shoot" , "press" )  && anim != anSlide && anim != anHurt && energy > 0 )  { 
   var fx = 6 ;
   if ( flip == 1 ) fx =  - 5 ; 
  
@@ -738,7 +742,13 @@ playSound ( sndSlide , 0 )  ;
  
   } 
   
-  break ;  }  } 
+  break ;  }  
+  if (  ! placeFree ( x , y + 1 )  &&  ! onPlatform (  )  )  { 
+ groundx = x ; 
+groundy = y ; 
+ } 
+  
+  } 
   
   else  { 
  swimming = true ; 
@@ -824,7 +834,7 @@ frame = anim [ 0 ]  ;
  
   } 
   
-  switch ( game . weapon )  {  case 1 :  if ( getcon ( "shoot" , "press" )  && anim != anSlide && anim != anHurt && energy > 0 )  { 
+  if ( canMove )  switch ( game . weapon )  {  case 1 :  if ( getcon ( "shoot" , "press" )  && anim != anSlide && anim != anHurt && energy > 0 )  { 
   var fx = 6 ;
   if ( flip == 1 ) fx =  - 5 ; 
  
@@ -900,7 +910,8 @@ energy --  ;
 firetime = 60 ; 
  } 
   
-  break ;  }  } 
+  break ;  }  
+  } 
   
   if ( canMove && getcon ( "swap" , "press" )  ) swapitem (  )  ; 
  
@@ -980,17 +991,16 @@ shapeSlide . setPos ( x , y )  ;
  
   else friction = 0.1 ; 
  
-  if ( onHazard ( x , y )  ) hurt = 1 ; 
+  if ( onHazard ( x , y )  ) hurt = 2 ; 
  
   if ( onDeath ( x , y )  ) game . health = 0 ; 
  
   if ( hurt > 0 && invincible == 0 )  { 
   if ( blinking == 0 )  { 
- blinking = 120 ; 
+ blinking = 60 ; 
 playSound ( sndHurt , 0 )  ; 
  if ( game . weapon == 4 && anim == anSlide && energy > 0 )  { 
- blinking = 60 ; 
-energy --  ; 
+ energy --  ; 
 firetime = 120 ; 
 newActor ( Spark , x , y )  ; 
  } 
@@ -1086,11 +1096,24 @@ gvMap . shape . h = 12.0 ;
   } 
   
   return false ;
-  } ;  returnVal . die = function (  ) { deleteActor ( id )  ; 
+  } ;  returnVal . die = function (  ) {  if ( game . canres )  { 
+ game . health = game . maxHealth ; 
+blinking = 120 ; 
+ if ( y > gvMap . h ) playerTeleport ( groundx , groundy )  ; 
+ 
+ game . canres = false ; 
+hspeed = 0.0 ; 
+vspeed = 0.0 ; 
+ } 
+  
+  else  { 
+ deleteActor ( id )  ; 
 gvPlayer = false ; 
 newActor ( TuxDie , x , y )  ; 
 game . health = 0 ; 
- } ;  returnVal . swapitem = function (  ) {  if ( game . subitem == 0 )  return ; 
+ } 
+  
+  } ;  returnVal . swapitem = function (  ) {  if ( game . subitem == 0 )  return ; 
   
   var swap = game . subitem ;
   if ( game . weapon == game . subitem )  { 
@@ -1142,8 +1165,11 @@ y += vspeed ;
 timer --  ; 
  if ( timer == 0 )  { 
  startPlay ( gvMap . file )  ; 
- if ( game . check == false ) gvIGT = 0 ; 
- 
+ if ( game . check == false )  { 
+ gvIGT = 0 ; 
+game . weapon = 0 ; 
+ } 
+  
   } 
   
   switch ( game . weapon )  {  case 0 : drawSprite ( sprTux , wrap ( getFrames (  )  / 15 , 50 , 51 )  , floor ( x - camx )  , floor ( y - camy )  )  ; 

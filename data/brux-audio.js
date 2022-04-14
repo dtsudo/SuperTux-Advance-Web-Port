@@ -41,6 +41,9 @@
 	document.addEventListener("keydown", function () { hasUserInteractedWithPage = true; }, false);
 	document.addEventListener('mousedown', function () { hasUserInteractedWithPage = true; }, false);
 	
+	let musicVolume = 128;
+	let soundVolume = 128;
+	
 	let soundIndex = 1;
 	let soundIndexMapping = {};
 	window.loadSound = function (file) {
@@ -76,6 +79,11 @@
 				audioArray[i] = audioArray[i+1];
 		}
 		
+		audio.volume = soundVolume / 128.0;
+		if (file === "res/snd/explodeF.ogg")
+			audio.volume = soundVolume / 128.0 * 0.5;
+		else if (file === "res/snd/fizz.ogg") 
+			audio.volume = soundVolume / 128.0 * 0.3;
 		audio.play();
 		
 		if (loops > 0)
@@ -105,6 +113,7 @@
 	};
 
 	let currentlyPlayingMusic = null;
+	let currentlyPlayingMusicVolumeModifier = 1.0;
 	window.playMusic = function (m, loops) {
 		if (!hasUserInteractedWithPage) {
 			setTimeout(function () { window.playMusic(m, loops); }, 100);
@@ -126,12 +135,16 @@
 		
 		music.loop = true;
 		
-		if (musicFile === "res/snd/retro-2.ogg")
-			music.volume = 0.2;
+		if (musicFile === "res/mus/retro-2.ogg")
+			currentlyPlayingMusicVolumeModifier = 0.2;
+		else
+			currentlyPlayingMusicVolumeModifier = 1.0;
+		
+		music.volume = musicVolume / 128.0 * currentlyPlayingMusicVolumeModifier;
 		
 		let promise = music.play();
 		
-		promise.catch(err => { setTimeout(function () { window.playMusic(m, loops); }, 100); });
+		promise.catch(err => { console.log("Warning: playMusic failed with error: " + err); });
 	};
 
 	window.deleteSound = function (sound) {
@@ -187,6 +200,24 @@
 		console.log("Warning: fadeMusic currently ignores the time parameter");
 		
 		window.stopMusic();
+	};
+	
+	window.setMusicVolume = function (volume) {
+		musicVolume = volume;
+		if (currentlyPlayingMusic !== null)
+			currentlyPlayingMusic.volume = musicVolume / 128.0 * currentlyPlayingMusicVolumeModifier;
+	};
+	
+	window.setSoundVolume = function (volume) {
+		soundVolume = volume;
+	};
+	
+	window.getMusicVolume = function () {
+		return musicVolume;
+	};
+	
+	window.getSoundVolume = function () {
+		return soundVolume;
 	};
 	
 })());

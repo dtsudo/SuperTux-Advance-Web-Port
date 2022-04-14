@@ -1,6 +1,7 @@
 ﻿
 namespace WebVersionGeneratorLibrary
 {
+	using System;
 	using System.Collections.Generic;
 	using System.Linq;
 
@@ -19,7 +20,17 @@ namespace WebVersionGeneratorLibrary
 			foreach (FileNameInfo file in files)
 			{
 				string fileContents = Util.GetFileContentsAsString(file.FullyQualifiedFileName);
-				string transpiledFileContents = SquirrelTranspilationUtil.TranspileEmbeddedSquirrelCodeInDataFile(fileContents: fileContents, squirrelTranspiler: squirrelTranspiler);
+				string transpiledFileContents;
+
+				try
+				{
+					transpiledFileContents = SquirrelTranspilationUtil.TranspileEmbeddedSquirrelCodeInDataFile(fileContents: fileContents, squirrelTranspiler: squirrelTranspiler);
+				}
+				catch (SquirrelTranspilationException)
+				{
+					Console.WriteLine("Failed to transpile file: " + file.PartiallyQualifiedFileName);
+					throw new Exception();
+				}
 
 				jsonDataJsFileContents += "window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( \n";
 				jsonDataJsFileContents += $"    '{file.PartiallyQualifiedFileName}', \n";

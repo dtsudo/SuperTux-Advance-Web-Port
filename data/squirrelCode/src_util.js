@@ -37,11 +37,17 @@ canint =  function ( str ) {  switch (  squirrelTypeOf ( str )  )  {  case "floa
   if ( str [ 0 ]  . tochar (  )  == i . tostring (  )  )  return true ;
   
   } 
+  if ( str [ 0 ]  == "-" )  return true ;
+  
   } 
   
   return false ;
   break ;  default :  return false ;
   break ;  }  }  ; 
+minNum =  function ( a , b ) {  return  ( a *  ( a < b )  )  +  ( b *  ( b <= a )  )  ;
+  }  ; 
+maxNum =  function ( a , b ) {  return  ( a *  ( a > b )  )  +  ( b *  ( b >= a )  )  ;
+  }  ; 
 
 
 

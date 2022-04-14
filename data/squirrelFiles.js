@@ -58,13 +58,6 @@ window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile(
     '' 
 ); 
 
-window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_charselect.js'); 
-
-window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
-    'src/charselect.nut', 
-    '' 
-); 
-
 window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_contriblevels.js'); 
 
 window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
@@ -83,6 +76,13 @@ window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_cr
 
 window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
     'src/credits.nut', 
+    '' 
+); 
+
+window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_cursor.js'); 
+
+window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
+    'src/cursor.nut', 
     '' 
 ); 
 
@@ -240,10 +240,10 @@ window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile(
     '' 
 ); 
 
-window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_stactor.js'); 
+window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_shop.js'); 
 
 window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
-    'src/stactor.nut', 
+    'src/shop.nut', 
     '' 
 ); 
 
