@@ -3,13 +3,26 @@ namespace WebVersionGeneratorLibrary
 {
 	using System;
 	using System.Collections.Generic;
+	using System.IO;
 	using System.Linq;
 
 	public class ImageFilesHandler
 	{
-		public static void CopyImageFiles()
+		public static void CopyImageFiles(bool keepPreviouslyGeneratedFiles, bool verbose)
 		{
-			List<FileNameInfo> files = Util.GetAllFilesInSuperTuxAdvanceSourceCodeFolder()
+			string webVersionSourceCodeFolder = Util.GetWebVersionSourceCodeFolder();
+
+			string partiallyQualifiedOutputFileName = "output/data/images.js";
+			string fullyQualifiedOutputFileName = webVersionSourceCodeFolder + partiallyQualifiedOutputFileName;
+
+			if (keepPreviouslyGeneratedFiles && File.Exists(fullyQualifiedOutputFileName))
+			{
+				if (verbose)
+					Console.WriteLine(partiallyQualifiedOutputFileName + " already exists");
+				return;
+			}
+
+			List<FileNameInfo> files = Util.GetAllFilesInSuperTuxAdvanceSourceCodeFolderInSortedOrder()
 				.Where(x => x.FileExtension.ToLowerInvariant() == "png")
 				.ToList();
 
@@ -20,6 +33,9 @@ namespace WebVersionGeneratorLibrary
 			{
 				FileNameInfo file = files[i];
 
+				if (verbose)
+					Console.WriteLine("Copying " + file.PartiallyQualifiedFileName);
+
 				List<byte> fileContents = Util.GetFileContentsAsBytes(file.FullyQualifiedFileName);
 				string fileContentsBase64 = Convert.ToBase64String(fileContents.ToArray());
 
@@ -28,10 +44,8 @@ namespace WebVersionGeneratorLibrary
 				imageJsFileContents += $"window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile('{file.PartiallyQualifiedFileName}', '{fileContentsBase64}'); \n\n";
 			}
 
-			string webVersionSourceCodeFolder = Util.GetWebVersionSourceCodeFolder();
-
 			Util.WriteFileContents(
-				fileName: webVersionSourceCodeFolder + "output/data/images.js",
+				fileName: fullyQualifiedOutputFileName,
 				text: imageJsFileContents);
 		}
 	}

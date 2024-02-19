@@ -16,6 +16,13 @@
 		"quit" : "Quit Game"
 	},
 
+	"time-attack-menu" : {
+		"world" : "World: %s",
+		"player1" : "Player 1: %s",
+		"player2" : "Player 2: %s",
+		"start-run" : "Begin Run"
+	},
+
 	"extras-menu" : {
 		"achievements" : "Achievements",
 		"credits" : "Credits"
@@ -34,66 +41,114 @@
 	},
 
 	"options-menu" : {
+		"graphics" : "Graphics",
+		"input" : "Input",
+		"audio" : "Audio",
 		"difficulty" : "Difficulty",
 		"language" : "Language",
+		"accessibility" : "Accessibility",
 		"keyboard" : "Keyboard Controls",
 		"joystick" : "Gamepad Controls",
-		"cursor" : "Show Mouse Cursor: ",
-		"timers" : "Speedrun Timers",
-		"light" : "Lighting: ",
+		"joystick1" : "Gamepad Controls",
+		"joystick2" : "Gamepad 2 Controls",
+		"cursor" : "Show Mouse Cursor: %s",
+		"webBrowserVersionChange_speedrun" : "Fix typo",
+		"speedrun" : "Speedrunning",
+		"light" : "Lighting: %s",
 		"fullscreen" : "Toggle Fullscreen",
-		"autorun" : "Invert Run Button: ",
-		"stickspeed" : "Stick Controls Speed: ",
-		"usefilter" : "Use Graphics Filter: ",
+		"stickspeed" : "Stick Controls Speed: %s",
+		"stickactive" : "Use gamepad sticks: %s",
+		"stickcam" : "Stick Camera: %s",
+		"usefilter" : "Use Graphics Filter: %s",
 		"sound-volume" : "Sound Volume",
 		"music-volume" : "Music Volume",
-		"charsel" : "Select Your Character"
+		"charsel" : "Select Your Character",
+		"lookahead" : "Dynamic Camera: %s",
+		"nearbars" : "Near-Sighted Healthbars: %s",
+		"weather" : "Weather effects: %s",
+		"showkeys" : "Show Keys: %s",
+		"completion" : "Completion Stats: %s",
+		"usebeam" : "Race Beam: %s",
+		"joymode" : "Joystick Display Mode: %s",
+		"big-items" : "Big Items: %s"
 	},
 
-	"options-menu-desc": {
+	"options-joymodes" : {
+		"xbox" : "XBox",
+		"dinput" : "XBox (D Mode)",
+		"generic" : "Generic",
+		"psx" : "Playstation"
+	},
+
+	"options-menu-desc" : {
 		"difficulty" : "Change game difficulty",
 		"language" : "Change game language",
 		"keyboard" : "Change keyboard controls",
 		"joystick" : "Change gamepad controls",
 		"cursor" : "Toggle the mouse cursor",
-		"timers" : "Toggle speedrun timers",
+		"speedrun" : "Options for on-screen timers and controls",
 		"light" : "Toggle light effects",
 		"fullscreen" : "Toggle fullscreen mode",
-		"autorun" : "Slow down when run button is pressed",
 		"stickspeed" : "Toggle stick controls speed",
-		"usefilter" : "Bilinear filtering (requires restart)",
-		"fullgame" : "All standard worlds from SuperTux Advance"
+		"stickactive" : "If off, only D-pad will move player",
+		"stickcam" : "Toggle allowing gamepad stick to move camera",
+		"usefilter" : "Bilinear filtering",
+		"fullgame" : "All standard worlds from SuperTux Advance",
+		"lookahead" : "Camera stays ahead of player and moves smoothly",
+		"nearbars" : "Health and energy bars appear near the player",
+		"weather" : "Turning off weather can help with near-sightedness and recording",
+		"showkeys" : "On-screen controls for speedrun recording",
+		"completion" : "Show remaining coins, enemies, and secrets in level",
+		"usebeam" : "Beam will appear in completed levels to race you",
+		"big-items" : "Increase the size of smaller items"
 	},
 
-	"timers-menu" : {
-		"speedrun-timer-level" : "Level Speedrun Timer",
-		"speedrun-timer-global" : "Global Speedrun Timer"
+	"speedrun-menu" : {
+		"speedrun-timer-level" : "Level Speedrun Timer: %s",
+		"speedrun-timer-global" : "Global Speedrun Timer: %s"
 	},
 
 	"controls-menu" : {
-		"press-key-for" : "Press key for",
-		"press-button-for" : "Press button for",
+		"press-key-for" : "Press key for %s...",
+		"press-button-for" : "Press button for %s...",
 		"clear" : "Press Backspace to clear.",
-		"peek-axis" : "Move axis for ",
+		"peek-axis" : "Move axis for %s",
 		"peek-horizontal" : "horizontal camera movement.",
 		"peek-vertical" : "vertical camera movement",
-		"up" : "Up",
-		"down" : "Down",
-		"left" : "Left",
-		"right" : "Right",
-		"jump" : "Jump",
-		"shoot" : "Shoot",
-		"run" : "Run",
-		"sneak" : "Sneak",
-		"pause" : "Pause",
-		"item-swap" : "Item Swap",
-		"menu-accept" : "Menu Accept",
-		"cam-left-peek" : "Peek Left",
-		"cam-right-peek" : "Peek Right",
-		"cam-down-peek" : "Peek Down",
-		"cam-up-peek" : "Peek Up",
-		"cam-peek-x" : "Peek X",
-		"cam-peek-y" : "Peek Y"
+		"up" : "Up: %s",
+		"down" : "Down: %s",
+		"left" : "Left: %s",
+		"right" : "Right: %s",
+		"jump" : "Jump: %s",
+		"shoot" : "Shoot: %s",
+		"spec1" : "Alt Fire: %s",
+		"spec2" : "Special: %s",
+		"pause" : "Pause: %s",
+		"item-swap" : "Item Swap: %s",
+		"menu-accept" : "Menu Accept: %s",
+		"cam-left-peek" : "Peek Left: %s",
+		"cam-right-peek" : "Peek Right: %s",
+		"cam-down-peek" : "Peek Down: %s",
+		"cam-up-peek" : "Peek Up: %s",
+		"cam-peek-x" : "Peek X: %s",
+		"cam-peek-y" : "Peek Y: %s",
+		"up-selection" : "Up",
+		"down-selection" : "Down",
+		"left-selection" : "Left",
+		"right-selection" : "Right",
+		"jump-selection" : "Jump",
+		"shoot-selection" : "Shoot",
+		"spec1-selection" : "Special 1",
+		"spec2-selection" : "Special 2",
+		"pause-selection" : "Pause",
+		"item-swap-selection" : "Item Swap",
+		"menu-accept-selection" : "Menu Accept",
+		"cam-left-peek-selection" : "Peek Left",
+		"cam-right-peek-selection" : "Peek Right",
+		"cam-down-peek-selection" : "Peek Down",
+		"cam-up-peek-selection" : "Peek Up",
+		"cam-peek-x-selection" : "Peek X",
+		"cam-peek-y-selection" : "Peek Y"
 	},
 
 	"menu-commons" : {
@@ -102,7 +157,8 @@
 		"back" : "Back",
 		"cancel" : "Cancel",
 		"on" : "On",
-		"off" : "Off"
+		"off" : "Off",
+		"noone" : "No One"
 	},
 
 	"bool" : {
@@ -144,7 +200,9 @@
 	"pause-menu" : {
 		"pause" : "PAUSE",
 		"continue" : "Continue",
+		"webBrowserVersionChange_character" : "Updated text since the web version doesn't support a second player",
 		"character" : "Change Character",
+		"character2" : "Change Player 2",
 		"restart" : "Restart Level",
 		"quit-game" : "Quit Game",
 		"quit-level" : "Quit Level",
@@ -165,29 +223,27 @@
 	"info" : {
 		"webBrowserVersionChange_welcome": "update text to specify the tilde key for developer commentary instead",
 		"welcome" :
-		"Welcome to SuperTux Advance! This message will go away when you walk away from the block. Press ~ (tilde) if you would like to see developer commentary. Press UP near NPCs to talk to them. Some have more than one thing to say. If you see a ? over your head, it means your character themself has something to say. Press up to read it.",
-		"webBrowserVersionChange_tutWall": "specify that Z is the jump button",
+		["Welcome to SuperTux Advance! This message will go away when you walk away from the block. Press ~ (tilde) if you would like to see developer commentary. Press %s near NPCs to talk to them. Some have more than one thing to say. If you see a ? over your head, it means your character themself has something to say. Press %s to read it.", "getConName(\"up\")", "getConName(\"up\")"],
 		"tutWall" :
-		"Press JUMP (Z) against the wall to do a wall jump.",
+		["Press %s against the wall to do a wall jump.", "getConName(\"jump\")"],
 		"tutSlide" :
-		"Press DOWN while running or on a hill to slide.",
-		"webBrowserVersionChange_waterjump": "specify that Z is the jump button and left shift is the run button",
+		["Press %s while running or on a hill to slide.", "getConName(\"down\")"],
 		"waterjump" :
-		"Hold JUMP (Z) when leaving the water to gain height. Mix it with the RUN button (left shift) to go even higher.",
+		["Hold %s when leaving the water to gain height.", "getConName(\"jump\")"],
 		"webBrowserVersionChange_noend": "specify that ESC is the pause menu button",
 		"noend" :
-		"Levels that you don't need to complete to move on also do not have normal exits. Use the pause menu (ESC) to leave areas like this.",
+		"Levels that you don't need to complete to move on also do not have normal exits. Use the pause menu (ESC) to leave areas like this, or walk against the edge of the map.\n\nYou can also change characters from the overworld in the pause menu.",
 		"hills" :
 		"Hills are very important! Practice sliding every chance you get.",
 		"pipes" :
-		"Pipes can be entered just by falling in. You can also hold DOWN to funnel yourself into them.",
+		["Pipes can be entered just by falling in. You can also hold %s to funnel yourself into them.", "getConName(\"down\")"],
 		"webBrowserVersionChange_controls": "replace text",
 		"controls" :
 		"Hello!",
 		"secrets" :
 		"Secret passages are everywhere! Feel against the wall to reveal them, or watch for enemy movements.",
 		"T-reminder" :
-		"here's a reminder that you don't have to beat towns (such as this) in order to progress!",
+		"Here's a reminder that you don't have to beat towns (such as this) in order to progress!",
 		"coyotetime" :
 		"You have a brief moment after leaving the ground when you can still jump. Practice running off the edges and jumping just after your feet leave the ground.",
 		"tntex" :
@@ -196,26 +252,50 @@
 		"TNT blocks are also set off by explosions, which can lead to a sort of chain reaction when many TNT blocks are close to one another.",
 		"fireex" :
 		"Fireballs can set off TNT blocks, get a fire flower and try it out!",
-		"webBrowserVersionChange_owplats": "specify that Z is the jump button",
 		"owplats" :
-		"One-way platforms can be dropped down from by pressing DOWN and JUMP (Z) at once. If you drop on accident, you have twice as long as when going over an edge to jump back up.",
+		["One-way platforms can be dropped down from by pressing %s and %s at once. If you drop on accident, you have twice as long as when going over an edge to jump back up.", "getConName(\"down\")", "getConName(\"jump\")"],
 		"slidewarn" :
-		"Levels like this will force you to slide! (It's going to be replaced with something else in the future.)",
+		"These levels are built with speed in mind! Keep your speed up, or you may not survive!",
 		"konqi" :
 		"Konqi can breath fire and stomp the ground, but he isn't as fast as Tux.",
-		"webBrowserVersionChange_momentum": "specify that left shift is the run button",
 		"momentum" :
-		"You won't lose speed if you keep running! Be sure to hold the run button (left shift), and you'll keep whatever speed you gain from sliding. Icy hills will speed you up even if you can't slide.",
+		"You won't lose speed if you keep running! Icy hills will speed you up even if you can't slide.",
 		"warned" :
 		"You were warned...",
 		"iceguy" :
-		"Some enemies like Mr. Iceguy can be carried when stunned. Simply touch them while holding ATTACK to pick them up.",
+		["Some enemies like Mr. Iceguy can be carried when stunned. Simply touch them while holding SHOOT or ALT FIRE to pick them up.", "getConName(\"shoot\")", "getConName(\"spec1\")"],
 		"elements-fire-ice" :
 		"Your elemental form doesn't just change your attack; it changes how elemental damage affects you. Elements will take double damage from their opposites, and half damage from themselves. For instance, with a fire flower, ice enemies will damage you twice as much, but with an ice flower, they'll do half as much.",
 		"iceflower" :
 		"With the ice flower, you can freeze enemies in place and reduce damage from ice attacks. Frozen enemies are solid and can be stood on safely, or used to wall jump from. You'll also move faster!",
 		"tuxdoll" :
-		"If you find a doll of your character, grab it! It will protect you from KO when you run out of life."
+		"If you find a doll of your character, grab it! It will protect you from KO when you run out of life.",
+		"altfire" :
+		["You can use an alternate attack if you have an elemental item in your pocket by pressing %s.", "getConName(\"spec1\")"],
+		"earthshell" :
+		["The earth shell grants special defensive boosts. With Tux, you can roll into a ball and even drop dash if you press %s while landing. As Konqi, you can stomp by pressing %s to become a statue, and can still spit rocks. These earth guarding techniques will cost stamina so you can still shoot with another element in your pocket.", "getConName(\"shoot\")", "getConName(\"down\")"],
+		"subitem" :
+		["If you have an item in your pocket, you can use it by pressing %s. Muffins will heal you, coffee will let you run faster, and element charms will change your form.", "getConName(\"swap\")"],
+		"carry-enemies" : 
+		["Remember, you can carry some stunned enemies by holding %s or %s. Hold %s while letting them go to throw them in the air, and hold %s to drop them straight down.", "getConName(\"shoot\")", "getConName(\"spec1\")", "getConName(\"up\")", "getConName(\"down\")"],
+		"switch-player" :
+		"You can change your character from the overworld in the pause menu.",
+		"switch-explanation" :
+		["Hitting the switch in this block will cause various extra blocks to show up throughout the levels, depending on the color of the switch you hit! You can press %s before entering a level to turn them on or off.", "getConName(\"spec1\")"],
+		"konqi-charge" :
+		["Konqi and Katie can break bricks by ramming into them. Press %s while moving to charge forward. This move costs stamina, so use it carefully.", "getConName(\"spec2\")"],
+		"konqi-stomp" :
+		["Konqi and Katie can also break bricks by stomping on them. Press %s while in the air.", "getConName(\"down\")"],
+		"konqi-defense" :
+		"The dragons have higher defense than the other standard characters. Don't be afraid to throw your weight around!",
+		"konqi-flame" :
+		["You can breathe fire as Konqi or Katie if you have no other element set to your main or sub weapon. Press %s or %s. Even at zero energy, they'll still be able to use a short-range fire attack. Fire blocks like these can be burned by other characters' fire attacks as well.", "getConName(\"shoot\")", "getConName(\"spec1\")"],
+		"fly-refresher" :
+		"Spinning air feathers suspended in tornados will refresh your stamina when in air form. Use these to fly longer over long stretches.",
+		"trapper-plant" :
+		"Trapper plants and puffranahs will swallow you whole! If they catch you, mash the buttons to escape!",
+		"tux-dash" :
+		["Pressing %s will do different things depending on your character and location. Try it in many places!", "getConName(\"spec2\")"]
 	},
 
 	"devcom" : {
@@ -230,7 +310,7 @@
 		"coins" :
 		"KELVIN: Coins were originally just for achievements, but this made players who didn't care for that not bother picking them up. We went with lives for a while, but lives are an archaic concept of game design that were scrapped shortly after. Finally, we decided on adding upgrades to shops, on top of the free powerups.",
 		"sliding" :
-		"KELVIN: The mechanic of increasing speed from dropping off a ledge came from needing to compensate for slopes not accelerating the player enough. It's tech- nically a glitch that I decided to throw in because it was fun. Many mechanics are actually that.",
+		"KELVIN: The mechanic of increasing speed from dropping off a ledge came from needing to compensate for slopes not accelerating the player enough. It's technically a glitch that I decided to throw in because it was fun. Many mechanics are actually that.",
 		"trees" :
 		"KELVIN: Trees don't grow in Antarctica. That's why penguins carve them out of ice.",
 		"snakes" :
@@ -240,11 +320,11 @@
 		"loops" :
 		"KELVIN: Sorry, did you expect this loop to work? Ha! I'm nowhere near good enough to program that... yet.",
 		"contrib" :
-		"FROSTC: Hello! This is the first dev commentary not written by Kelvin.",
+		"FROSTC: Hello! This is the first dev comment not written by Kelvin.",
 		"walldev" :
 		"FROSTC: I didn't actually know you could just wall jump to get up here when I first made this area. I later thought of adding something to keep you from doing that, but decided against it",
 		"tnt" :
-		"FROSTC: I saw that TNT was used in Xtreme hills, so I decided to make a level showing it off. Also, fun fact, V1 of this map was finished before subsea. You can find V1 in the extras world.",
+		"FROSTC: I saw that TNT was used in Xtreme hills, so I decided to make a level showing it off.",
 		"trans" :
 		"FROSTC: It took me a good while to get the background transition to work, as this was for the most part the first time I used triggers.",
 		"lifenote" :
@@ -252,7 +332,7 @@
 		"signnote" :
 		"FROSTC: If you are feeling a little lazy, you can just blast the pipe with a fireball to open it instead of sliding. Maybe a good speedrunning strat??",
 		"sense":
-		"FROSTC: My 3rd level, just wanted to make a level losely inspired off of Grumbel's Sense of Snow from the classic SuperTux. The funny part is, that level isn't even in modern versions of OG SuperTux!",
+		"FROSTC: My 3rd level, just wanted to make a level losely inspired off of Grumbel's Sense of Snow from the classic SuperTux. Being that Grumbel's sense of snow was removed from supertux, you could say the level lives on through this level.",
 		"subsea" :
 		"KELVIN: I wasn't sure how I wanted to handle underwater levels at first. I thought of the levels from SMB 1 and 3, but they seemed like something Tux could just shoot right through. Then I remembered DKC's underwater levels, how they were more like mazes where you had to dodge dangerous enemies. I figured that would work well for this game, since Tux is fast under water, and Konqi and Midi retain offensive capabilities in their neutral forms.",
 		"subsea-name" :
@@ -268,7 +348,7 @@
 		"mezex":
 		"FROSTC: I had to make a few custom tiles to make this maze look good. It was worth it, I think! It's for sure the best part of this level.",
 		"outage":
-		"FROSTC: this level was completely different in earlier versions. you can find the old version in the extras world",
+		"FROSTC: The oldest version of this level was awful. Because of that I remade it from the ground up. I would say the remake is pretty good. For sure better then the old one.",
 		"speedComp":
 		"FROSTC: Congrats to Pomelux for being the winner of the speedrun competition, with a time of 49:98. Just barely a sub 50. (keep in mind competitions with rewards like this won't be held again)",
 		"oldxtreme":
@@ -294,9 +374,13 @@
 		"sunken":
 		"FROSTC: My original idea for this level was to have a gimmick where there's patches of deep snow that tux can walk or maybe even slide through, like the powered snow from Minecraft.",
 		"continue":
-		"FROSTC: This was where Kelvin's part ends, and where mine starts. Do keep in mind I also touched up some part of Kelvin's section. You can find the old version in the extras world.",
-		"secret-sunk":
-		"FROSTC: If I were you, I would keep an eye out for little dents in the land like this; they often lead to secrets."
+		"FROSTC: This was another level that had to be remade because of it's quality, with the first one being the ocean bridge, which is the level after this. Honestly kinda sad the old one had to go, because it was one of the few levels Kelvin had a large part in making.",
+		"Forest-lefttext":
+		"FROSTC: If you played the old version of frostlands, you might be familiar with the name of this level. When making the updated version of frostlands, I had decided to that i would remake the level to the left, and replace it with a better one. which ended up being lost ruins. For some reason, Kelvin decided to put the old to the left into the forest world. why? idk! the level sucked. To avoid the forest world having such an awful first level, I remade it from scratch. The remake is what you should be playing now.",
+		"Forest-coinblock":
+		"FROSTC: It was hard to resist the urge to place like a million coins in this block",
+		"TBR":
+		"FROSTC: Expect a remake of this level in 0.4.0"
 	},
 
 	"npc" : {
@@ -330,7 +414,7 @@
 		"penny-0-Kiki" :
 		"How are you fighting without your brush? Oh, you're copying and pasting Midi's bombs? I didn't know you can do that.",
 		"penny-0" :
-		"Pleased to meet you. Are you helping Tux save our friends? I'm so happy to hear that.",
+		["Pleased to meet you, %s. Are you helping Tux save our friends? I'm so happy to hear that.", "gvCharacters[game.playerChar].shortname"],
 
 		"rad-t0-Tux" :
 		"Yo, Tux! Mayor Penny is looking for ya. By the way, catch me on the slopes sometime. I wanna see if you live up to your rep as a snow racer.",
@@ -344,6 +428,8 @@
 		"You're gonna go adventuring in a dress? Seems like it would get in the way. You're braver than me.",
 		"rad-t0-Kiki" :
 		"Ah, a fellow artist. Yeah, my art is painting the slopes with the lines I leave with my board here.",
+		"rad-t0-Cyra" :
+		"You're from another universe? Tubular.",
 		"rad-t0" :
 		"Whoa, new face. I dunno about you. If you're looking for Mayor Penny, she should be in the big igloo in the middle of town. I like to call it the bigloo. Ha ha!",
 
@@ -431,7 +517,7 @@
 		"garuda-pt-Kiki" :
 		"Hang on, Kelvin needs to write lines for you.",
 		"garuda-pt" :
-		"Thanks for your help. It feels so good being able to fly again.",
+		["Thanks for your help, %s. It feels so good being able to fly again.", "gvCharacters[game.playerChar].shortname"],
 
 		"breeze-c-Konqi" :
 		"Konqi! I knew you'd come for me! I'm so happy to see you! Let's get out of here! I'll be right behind you.",
@@ -478,6 +564,8 @@
 		"Before you can push on, you must be committed.",
 		"gnu-pt-11" :
 		"Wisdom compiled from many sources makes a plan executable.",
+		"gnu-pt-12" :
+		"Planning to move from Python to C? Better brace yourself.",
 
 		"midi-c" :
 		"Yo! I was just minding my own business, and these weird mushroom things started swarming me. I'm sick of sitting around in here. How's about I join ya and kick that Nolok guy's tail?",
@@ -511,7 +599,9 @@
 		"Have you seen Duke? He likes to get fish the lazy way: by pretending his rod's broken and bumming fish off others. I'd ignore him if he wasn't able to block roads just by sitting on them.",
 
 		"not-done" :
-		"We're working hard on Nessland, and will have new levels soon. Have you played the contrib levels? You should check them out! In the meantime, I've got some more coding and drawing to do. I hope you've enjoyed what you've played so far! If you'd like to support development, please consider donating at https://patreon.com/kelvin.",
+		"You've reached the end of what's been completed so far in the main game. Have you played the contrib levels? You should check them out! In the meantime, I've got some more coding and spriting to do. I hope you've enjoyed what you've played so far! If you have, consider giving us a star on GitHub: https://github.com/kelvinshadewing/supertux-advance",
+		"cameo-hotel" :
+		"Welcome to the Cameo Hotel! Here you'll get to meet awesome people from around the inter-erm-the multiverse. Yeah...",
 
 		"pennyton-Tux" :
 		"This is Penny's new town. Sure was nice of her to give so many displaced people a place to stay. I wonder if they'll ever find their way back...",
@@ -519,6 +609,8 @@
 		"I'm glad the ice here can stand up to my flames. I'd hate to sneeze and melt someone's house!",
 		"pennyton-Midi" :
 		"I get she's trying to help, but I just couldn't live in a place like this. I'd rather keep on the move and find a way home.",
+		"pennyton-Cyra" :
+		"This place is sure cold out here, but it's a nice place for them to stay, even if they made more igloos for people from different worlds. Just we have to find our way homes.",
 
 		"fish-mines-Tux" :
 		"These mines are where we get most of our fish these days. It's much safer than swimming for live ones.",
@@ -526,6 +618,8 @@
 		"Who would have thought so many frozen fish could be found in the ice?",
 		"fish-mines-Midi" :
 		"Heh, I bet I'd be great at mining. Maybe I'll take it up after we beat Nolok. Not much else for a merc to do around here.",
+		"fish-mines-Cyra" :
+		"So many frozen fish to pick out of the ice for those who like seafood, but mainly I eat fruits, especially strawberries.",
 
 		"ocean-bridge-Tux" :
 		"Look what Nolok's minions have done to the bridge! This place is like a maze now.",
@@ -555,6 +649,8 @@
 		"Brr, it's warm in here, but I still get shivers thinking about the Yeti.",
 		"borealis2-Midi" :
 		"Dang, this place is creepy. If the penguins didn't need this place, I'd totally blow it up.",
+		"borealis2-Cyra" :
+		"It's kinda warm in here, but not safe inside here when there's a Yeti inside this fort.",
 
 		"duke-0a" :
 		"I'm so hungry! If you can bring me some fish, I'll open these blocks for you.",
@@ -564,12 +660,16 @@
 		"I know a secret path that leads around the forest. If you bring me some fish, I'll open it for you.",
 		"duke-1b" :
 		"Thanks a bunch! I was starving! I hope the caves are easier for you than the forest. Who even builds a forest out of ice anyway?",
+		"duke-2a" :
+		["Hey, %s, I left one of my fish in the mines. Could you please get it back for me?", "gvCharacters[game.playerChar].shortname"],
+		"duke-2b" :
+		"Thanks for that!",
 		"no-touch-fishy-a" :
 		"That is my fish. You don't actually need it.",
 		"no-touch-fishy-b" :
 		"You took my fish. >:(",
 		"wood-door" :
-		"Who's idea was it to use wood doors? They freeze themselves to the wall and can't be closed!",
+		"Whose idea was it to use wood doors? They freeze themselves to the wall and can't be closed!",
 		"see-tuckles" :
 		"Have you seen Tuckles? I've never seen a penguin so buff! He doesn't even use a pick for mining. Everything he dug out, he did with his own beak!",
 		"take-duke" :
@@ -591,11 +691,79 @@
 		"The darker the roast, the less caffeine in the brew. Green coffee is unroasted and has the most caffeine of all.",
 		"bearista-7" :
 		"Please don't drink civet coffee. It comes from civet cats that are wrangled and overfed coffee beans with little water or other food. Please don't support such abuse and boycot civet coffee wherever you can. Artificial civet enzymes exist, but civet farmers have been fighting against this so they can keep trapping cats.",
+		"bearista-8" :
+		"Coffee plants use caffeine as a natural pesticide. They produce more caffeine at lower altitudes where there are many bugs, while higher altitudes, like on mountains, will have less bugs, and so the plants make less caffeine. This is also why coffee from different locations have different flavors.",
 
+		"amara-0" :
+		"Live fast, eat trash, be the good you want to see, and GIVE ME ALL YOUR COFFEE!",
+		"pumpkin-otter" :
+		"Hang on, I gotta save the animals!",
+		"pumpkin-otter-PumpkinOtter" :
+		"Wow, I'm so fast, I'm in two places at once!",
+		"starwalf" :
+		"Maybe I can debug my way to those animals...",
+		"starwalf-PumpkinOtter" :
+		"Double Pumpkin?! I'm all for it!",
+		"harkin-0" :
+		"Howdy haroo and much awoo, with fuzziest hugs from me to you!",
+		"myr-moth-0" :
+		"Hello, fellow Earthling, the Void blesses us with sterile neutrinos and phaetons today~ Rejoice!",
+		"selene-kobold" :
+		"Yip, yip! Got shinies?",
+
+		"twang-1" :
+		"hi",
+		
 		"tix-newpeople" :
 		"So many new people have been spilling into our world. It was cool at first, but I hope it doesn't get too crowded.",
 		"blame-nolok-displaced" :
-		"More and more displaced are ending up in our world. I think Nolok may be to blame for this. Remember when he tapped into the Ghost Tree's power? I have a theory that he may have harmed Ygdrasil in doing that."
+		"More and more displaced are ending up in our world. I think Nolok may be to blame for this. Remember when he tapped into the Ghost Tree's power? I have a theory that he may have harmed Yggdrasil in doing that.",
+
+		"xtreme-orbs-Tux" :
+		"I've never seen orbs like those before. Why did they draw me there?",
+		"xtreme-orbs-Penny" :
+		"That looks like Tux in this mural. Just how old is this?",
+		"xtreme-orbs-Konqi" :
+		"I thought magic orbs were mostly popular with dragons. Do penguins use them too?",
+		"xtreme-orbs-Katie" :
+		"Tux looks so powerful in this piece. Does it mean something about the orbs?",
+		"xtreme-orbs-Midi" :
+		"Hmm, I wonder if Rad knows why these orbs are so special.",
+		"xtreme-orbs-Kiki" :
+		"I wonder what tools they used to make an ice mural like this last so long.",
+		"xtreme-orbs-Surge" :
+		"Why do I feel oddly ripped off looking at this?",
+
+		"mines-0" :
+		["Hey there, %s! Do you have a moment? If you haven't heard, Nolok robbed the treasury and stole the funds to keep the mines open. If you're able to, could you donate any coins you find? If we can't keep the mine open, we'll have to find fish in the sea and contend with the orcas!", "gvCharacters[game.playerChar].shortname"],
+		"mines-1" :
+		"Thanks to you, we've been able to keep the mine open a bit longer. Tuckles thinks something big is down under the ice and wants to keep digging. Any chance you could donate more and help us keep going?",
+
+		"construction-burned-a" :
+		"You shouldn't be climbing buildings under construction. This area is dangerous, you know!",
+		"construction-burned-b" :
+		"Could you please not burn our materials? That'd be great.",
+
+		"floating-island-Tux" :
+		"What in the world could be keeping this island afloat?",
+		"floating-island-Penny" :
+		"I bet Nolok wouldn't have been able to kidnap our friends if I'd built my town on one of these.",
+		"floating-island-Konqi" :
+		"I'd love to live on one of these if I had wings all the time. Why do I feel like I used to have them normally?",
+		"floating-island-Katie" :
+		"Oh dear, first that tall stone tower, and now this island! All these heights are making me dizzy!",
+		"floating-island-Midi" :
+		"Tall trees, floating islands. This place is starting to remind me of home.",
+		"floating-island-Kiki" :
+		"The view from up here is breathtaking! I need to come back with my brush and paint this scene!",
+		"floating-island-Surge" :
+		"Hard to believe they have an island like this but not a single loop.",
+		"floating-island-Dashie" :
+		"I'm betting I could make it up here in under a minute.",
+		"floating-island-Cyra" :
+		"I don't think my world would have some floating islands like that!",
+		"floating-island-Pepper" :
+		"This flying island is starting to remind me of Komona."
 	},
 
 	"level" : {
@@ -624,9 +792,23 @@
 		"aurora-iceguy" : "Oh No, More Mr. Iceguy",
 		"aurora-fishy" : "Wishy for Fishy",
 		"aurora-forest" : "Icyfall Forest",
-		"nessland-welcome" : "Wellcome to Nessland",
+		"nessland-welcome" : "Nessland Port Town",
+		"nessland-wood" : "Owl's Outpost",
 		"nessland-left" : "To the Left",
-		"nessland-henge" : "Lonehenge"
+		"nessland-henge" : "Lonehenge",
+		"nessland-owl" : "Owl's Revenge",
+		"nessland-earth" : "Down to Earth",
+		"nessland-mint" : "Minty Greens",
+		"nessland-shells" : "Shells by the Shore",
+		"nessland-situation" : "Fishy Situation",
+		"nessland-fly" : "Fly High, Little Penguin!",
+		"nessland-well" : "Fish, Medium Well",
+		"nessland-bedrock" : "Beyond Bedrock",
+		"nessland-crush" : "Petrichor",
+		"nessland-switch" : "Orange Switch Trial",
+		"nessland-attack" : "Attack From Above",
+		"nessland-cliffs" : "Cliff Notes",
+		"nessland-night" : "Black Night Woods"
 	},
 
 	"achi-name" : {
@@ -921,5 +1103,51 @@
 		"282" : "Sleep",
 		"283" : "Wake Up",
 		"284" : "???"
+	},
+
+	"joymode" : "xbox",
+	"joy" : {
+		"xbox" : {
+			"0" : "(A)",
+			"1" : "(B)",
+			"2" : "(X)",
+			"3" : "(Y)",
+			"4" : "(LB)",
+			"5" : "(RB)",
+			"6" : "(<)",
+			"7" : "(>)",
+			"8" : "(O)",
+			"9" : "(LS)",
+			"10" : "(RS)",
+			"11" : "(N/A)"
+		},
+		"dinput" : {
+			"0" : "(X)",
+			"1" : "(A)",
+			"2" : "(B)",
+			"3" : "(Y)",
+			"4" : "(LB)",
+			"5" : "(RB)",
+			"6" : "(LS)",
+			"7" : "(RS)",
+			"8" : "(<)",
+			"9" : "(>)",
+			"10" : "(LS)",
+			"11" : "(RS)"
+		},
+		"generic" : {
+			"0" : "(1)",
+			"1" : "(2)",
+			"2" : "(3)",
+			"3" : "(4)",
+			"4" : "(5)",
+			"5" : "(6)",
+			"6" : "(7)",
+			"7" : "(8)",
+			"8" : "(9)",
+			"9" : "(10)",
+			"10" : "(11)",
+			"11" : "(12)"
+		}
 	}
 }

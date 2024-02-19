@@ -4,7 +4,7 @@ if (!window.superTuxAdvanceWebVersion.squirrelFiles) window.superTuxAdvanceWebVe
 window.superTuxAdvanceWebVersion.squirrelFiles['src/spawner.nut'] = function () { 
 
 
-Spawner =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+Spawner =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -25,38 +25,32 @@ Spawner =  ((function(){ let squirrelClassFunction = function ( ) { var returnVa
   if (  squirrelTypeOf ( _arr )  == "array" ) arg = _arr ; 
  
  myClass = arg [ 0 ]  ; 
- if ( (arg[1] !== undefined) )  if ( canint ( arg [ 1 ]  )  )  { 
+ if (  ( (arg[ ( 1 ) ] !== undefined) )  && canint ( arg [ 1 ]  )  )  { 
  maxTime = arg [ 1 ]  . tointeger (  )  ; 
 timer = arg [ 1 ]  . tointeger (  )  ; 
  } 
   
-  
-  if ( (arg[2] !== undefined) )  if ( arg [ 2 ]  ) infinite = true ; 
+  if (  ( (arg[ ( 2 ) ] !== undefined) )  && arg [ 2 ]  != "0" && arg [ 2 ]  != "false" ) infinite = true ; 
  
-  
-  if ( (getroottable (  ) [myClass] !== undefined) )  { 
+  if (  ( (arg[ ( 3 ) ] !== undefined) )  )  if (  ( (getroottable (  ) [ ( myClass ) ] !== undefined) )  )  { 
  myob = newActor ( getroottable (  )  [ myClass ]  , x , y )  ; 
- if ( (actor [ myob ] ["nocount"] !== undefined) ) actor [ myob ]  . nocount = true ; 
+ if (  ( (actor [ myob ] [ ( "nocount" ) ] !== undefined) )  ) actor [ myob ]  . nocount = true ; 
  
   } 
   
   else deleteActor ( id )  ; 
  
-  } ;  returnVal . run = function (  ) {  if ( x < camx )  return ; 
   
-  if ( y < camy )  return ; 
+ shape = Rec ( x , y , 8 , 8 , 0 )  ; 
+ } ;  returnVal . run = function (  ) {  if (  ! isOnScreen (  )  )  return ; 
   
-  if ( x > camx + screenW (  )  )  return ; 
-  
-  if ( y > camy + screenH (  )  )  return ; 
-  
-  if ( infinite ||  !  ( (actor[myob] !== undefined) )  )  { 
+  if ( infinite ||  !  (  ( (actor[ ( myob ) ] !== undefined) )  )  )  { 
  timer --  ; 
  if ( timer == 0 )  { 
  timer = maxTime ; 
- if ( (getroottable (  ) [myClass] !== undefined) ) myob = newActor ( getroottable (  )  [ myClass ]  , x , y )  ; 
+ if (  ( (getroottable (  ) [ ( myClass ) ] !== undefined) )  ) myob = newActor ( getroottable (  )  [ myClass ]  , x , y )  ; 
  
-  if ( (actor [ myob ] ["nocount"] !== undefined) ) actor [ myob ]  . nocount = true ; 
+  if (  ( (actor [ myob ] [ ( "nocount" ) ] !== undefined) )  ) actor [ myob ]  . nocount = true ; 
  
   } 
   
@@ -64,13 +58,13 @@ timer = arg [ 1 ]  . tointeger (  )  ;
   
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . myob =  - 1 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . myob =  - 1 ; 
  squirrelClassFunction . timer = 60 ; 
  squirrelClassFunction . maxTime = 60 ; 
  squirrelClassFunction . myClass = "" ; 
  squirrelClassFunction . infinite = false ; 
  squirrelClassFunction . shape = null ; 
- return squirrelClassFunction; })()) ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = PhysAct;  return squirrelClassFunction; })()) ; 
 
 
 

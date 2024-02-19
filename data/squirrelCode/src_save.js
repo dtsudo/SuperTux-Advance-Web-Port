@@ -9,23 +9,35 @@ newGame =  function ( f ) {  var newdif = game . difficulty ;
 game . file = f ; 
 gvDoIGT = false ; 
 game . difficulty = newdif ; 
+game . state =  { pennyton : 0 , fishmines : 0 }  ; 
  if ( game . difficulty > 1 ) game . maxHealth =  ( 4 - game . difficulty )  * 4 ; 
  
  startPlay ( "res/map/aurora-pennyton.json" , true , true )  ; 
  }  ; 
 newTimeAttack =  function (  ) {  var path = game . path ;
   var newdif = game . difficulty ;
+  var tempPlayer1 = game . playerChar ;
+  var tempPlayer2 = game . playerChar2 ;
  game = createNewGameObject (  )  ; 
+game . playerChar = tempPlayer1 ; 
+game . playerChar2 = tempPlayer2 ; 
 game . file =  - 1 ; 
 gvDoIGT = true ; 
 game . difficulty = newdif ; 
 game . path = path ; 
  if ( game . difficulty > 1 ) game . maxHealth =  ( 4 - game . difficulty )  * 4 ; 
  
- startPlay ( game . path + gvTAStart + ".json" , true , true )  ; 
+  if ( fileExists ( path + "/text.json" )  )  { 
+ gvLangObj = mergeTable ( gvLangObj , jsonRead ( fileRead ( path + "/text.json" )  )  )  ; 
+print ( "Found text.json" )  ; 
+ } 
+  
+ startPlay ( game . path + gvTACourse [ 0 ]  + ".json" , true , true )  ; 
 gvLight = 0xffffffff ; 
 gvLightTarget = 0xffffffff ; 
 drawWeather = 0 ; 
+gvIGT = 0 ; 
+gvTAStep = 0 ; 
  }  ; 
 saveGame =  function (  ) {  if ( game . file !=  - 1 ) fileWrite ( "save/" + game . file . tostring (  )  + ".json" , jsonWrite ( game )  )  ; 
  
@@ -36,8 +48,9 @@ loadGame =  function ( f ) {  if ( fileExists ( "save/" + f . tostring (  )  + "
   while ( foundMissing )  { 
  foundMissing = false ; 
  {     var foreachOutput1 = squirrelForEach( game . characters );     while(true)     {        foreachOutput1.next();        if (foreachOutput1.isDone()) break; key = foreachOutput1.getKey(); i = foreachOutput1.getValue();  { 
-  if (  !  ( (getroottable (  ) [i . normal] !== undefined) )  )  { 
- foundMissing = true ; 
+  if (  !  (  ( (gvCharacters[ ( key ) ] !== undefined) )  )  )  { 
+  delete game . characters [ key ]  ; 
+foundMissing = true ; 
  } 
   
   } 
@@ -54,7 +67,7 @@ selectLoadGame =  function (  ) {  var hasSaveFiles = false ;
  for (  var i = 0 ;
  i < dir . len (  )  ; i ++  )  { 
   var f = "" ;
-  if ( dir [ i ]  != "." && i != ".." && dir [ i ]  != "delete.me" && dir [ i ]  . find ( ".json" )  == dir [ i ]  . len (  )  - 5 && canint ( dir [ i ]  )  ) f = dir [ i ]  . slice ( 0 ,  - 5 )  ; 
+  if ( dir [ i ]  != "." && i != ".." && dir [ i ]  != "delete.me" && dir [ i ]  . squirrelFind ( ".json" )  == dir [ i ]  . len (  )  - 5 && canint ( dir [ i ]  )  ) f = dir [ i ]  . slice ( 0 ,  - 5 )  ; 
  
   else continue ; 
  

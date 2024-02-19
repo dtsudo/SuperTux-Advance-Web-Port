@@ -4,7 +4,7 @@ if (!window.superTuxAdvanceWebVersion.squirrelFiles) window.superTuxAdvanceWebVe
 window.superTuxAdvanceWebVersion.squirrelFiles['src/weapons_OLD.nut'] = function () { 
 
 
-Fireball =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+Fireball =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -43,9 +43,9 @@ newActor ( Poof , x , y )  ;
  } ;  returnVal . _typeof = function (  ) {  return "Fireball" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . timer = 90 ; 
- return squirrelClassFunction; })()) ; 
-Iceball =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . timer = 90 ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = PhysAct;  return squirrelClassFunction; })()) ; 
+Iceball =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -102,16 +102,16 @@ newActor ( Poof , x , y )  ;
  } 
   
  drawSprite ( sprIceball , getFrames (  )  / 2 , x - camx , y - camy )  ; 
-drawLightEx ( sprLightIce , 0 , x - camx , y - camy , 0 , 0 , 1.0 / 8.0 , 1.0 / 8.0 )  ; 
+drawLight ( sprLightIce , 0 , x - camx , y - camy , 0 , 0 , 1.0 / 8.0 , 1.0 / 8.0 )  ; 
  if ( getFrames (  )  % 5 == 0 ) newActor ( Glimmer , x - 4 + randInt ( 8 )  , y - 4 + randInt ( 8 )  )  ; 
  
  shape . setPos ( x , y )  ; 
  } ;  returnVal . _typeof = function (  ) {  return "Iceball" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . timer = 90 ; 
- return squirrelClassFunction; })()) ; 
-FlameBreath =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . timer = 90 ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = PhysAct;  return squirrelClassFunction; })()) ; 
+FlameBreath =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -138,14 +138,14 @@ y += vspeed ;
  
   else drawSpriteEx ( sprFlameTiny , floor ( frame )  , x - camx , y - camy , angle , 0 , 1 , 1 , 1 )  ; 
  
- drawLightEx ( sprLightFire , 0 , x - camx , y - camy , 0 , 0 , 1.0 / 8.0 , 1.0 / 8.0 )  ; 
+ drawLight ( sprLightFire , 0 , x - camx , y - camy , 0 , 0 , 1.0 / 8.0 , 1.0 / 8.0 )  ; 
  } ;  returnVal . _typeof = function (  ) {  return "Fireball" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . angle = 0 ; 
- return squirrelClassFunction; })()) ; 
-IceBreath =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = PhysAct;  return squirrelClassFunction; })()) ; 
+IceBreath =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -171,14 +171,14 @@ y += vspeed ;
  
   else drawSpriteEx ( sprGlimmer , floor ( frame )  , x - camx , y - camy , angle , 0 , 1 , 1 , 1 )  ; 
  
- drawLightEx ( sprLightIce , 0 , x - camx , y - camy , 0 , 0 , 1.0 / 8.0 , 1.0 / 8.0 )  ; 
+ drawLight ( sprLightIce , 0 , x - camx , y - camy , 0 , 0 , 1.0 / 8.0 , 1.0 / 8.0 )  ; 
  } ;  returnVal . _typeof = function (  ) {  return "Iceball" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . angle = 0 ; 
- return squirrelClassFunction; })()) ; 
-ExplodeF =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = PhysAct;  return squirrelClassFunction; })()) ; 
+ExplodeF =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -193,7 +193,7 @@ stopSound ( sndExplodeF )  ;
 playSound ( sndExplodeF , 0 )  ; 
 shape = Cir ( x , y , 16 )  ; 
  } ;  returnVal . run = function (  ) { drawSpriteEx ( sprExplodeF , frame , x - camx , y - camy , randInt ( 360 )  , 0 , 1 , 1 , 1 )  ; 
-drawLightEx ( sprLightFire , 0 , x - camx , y - camy , 0 , 0 , 0.75 -  ( frame / 10.0 )  , 0.75 -  ( frame / 10.0 )  )  ; 
+drawLight ( sprLightFire , 0 , x - camx , y - camy , 0 , 0 , 0.75 -  ( frame / 10.0 )  , 0.75 -  ( frame / 10.0 )  )  ; 
 frame += 0.2 ; 
  if ( frame >= 1 )  { 
   if ( actor . rawin ( "TNT" )  )  {     var foreachOutput1 = squirrelForEach( actor [ "TNT" ]  );     while(true)     {        foreachOutput1.next();        if (foreachOutput1.isDone()) break; i = foreachOutput1.getValue();  { 
@@ -212,10 +212,10 @@ deleteActor ( i . id )  ;
   } ;  returnVal . _typeof = function (  ) {  return "ExplodeF" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . shape = 0 ; 
- return squirrelClassFunction; })()) ; 
-ExplodeN =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Actor;  return squirrelClassFunction; })()) ; 
+ExplodeN =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -230,17 +230,17 @@ stopSound ( sndBump )  ;
 playSound ( sndBump , 0 )  ; 
 shape = Rec ( x , y , 16 , 16 , 0 )  ; 
  } ;  returnVal . run = function (  ) { drawSpriteEx ( sprExplodeN , frame , x - camx , y - camy , randInt ( 360 )  , 0 , 1 , 1 , 1 )  ; 
-drawLightEx ( sprLightFire , 0 , x - camx , y - camy , 0 , 0 , 0.75 -  ( frame / 10.0 )  , 0.75 -  ( frame / 10.0 )  )  ; 
+drawLight ( sprLightFire , 0 , x - camx , y - camy , 0 , 0 , 0.75 -  ( frame / 10.0 )  , 0.75 -  ( frame / 10.0 )  )  ; 
 frame += 0.2 ; 
  if ( frame >= 5 ) deleteActor ( id )  ; 
  
   } ;  returnVal . _typeof = function (  ) {  return "ExplodeN" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . shape = 0 ; 
- return squirrelClassFunction; })()) ; 
-StompPoof =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Actor;  return squirrelClassFunction; })()) ; 
+StompPoof =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -261,10 +261,10 @@ frame += 0.2 ;
   } ;  returnVal . _typeof = function (  ) {  return "ExplodeN" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . shape = 0 ; 
- return squirrelClassFunction; })()) ; 
-FireballK =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Actor;  return squirrelClassFunction; })()) ; 
+FireballK =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -298,15 +298,15 @@ newActor ( Poof , x , y )  ;
  
   else drawSpriteEx ( sprFlame ,  ( getFrames (  )  / 8 )  % 4 , x - camx , y - camy , angle , 1 , 1 , 1 , 1 )  ; 
  
- drawLightEx ( sprLightFire , 0 , x - camx , y - camy , 0 , 0 , 1.0 / 4.0 , 1.0 / 4.0 )  ; 
+ drawLight ( sprLightFire , 0 , x - camx , y - camy , 0 , 0 , 1.0 / 4.0 , 1.0 / 4.0 )  ; 
 shape . setPos ( x , y )  ; 
  } ;  returnVal . _typeof = function (  ) {  return "FireballK" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . timer = 90 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . timer = 90 ; 
  squirrelClassFunction . angle = 0 ; 
- return squirrelClassFunction; })()) ; 
-AfterFlame =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = PhysAct;  return squirrelClassFunction; })()) ; 
+AfterFlame =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -323,9 +323,9 @@ shape = Rec ( x , y , 4 , 4 , 0 )  ;
   } ;  returnVal . _typeof = function (  ) {  return "Fireball" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . timer = 4 ; 
- return squirrelClassFunction; })()) ; 
-AfterIce =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . timer = 4 ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = PhysAct;  return squirrelClassFunction; })()) ; 
+AfterIce =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -342,8 +342,8 @@ shape = Rec ( x , y , 4 , 4 , 0 )  ;
   } ;  returnVal . _typeof = function (  ) {  return "Iceball" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . timer = 4 ; 
- return squirrelClassFunction; })()) ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . timer = 4 ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = PhysAct;  return squirrelClassFunction; })()) ; 
 
 
 

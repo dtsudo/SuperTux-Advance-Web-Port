@@ -38,10 +38,11 @@ namespace WebVersionGeneratorLibrary
 				.Replace(@"\n", "\n")
 				.Replace("\\\"", "\"")
 				.Replace("\\t", "\t")
+				.Replace(@"\\", @"\")
 				// Tiled Map Editor also escapes the forward slash
 				.Replace("\\/", "/");
 
-			string transpiledCode = "/*js*/" + squirrelTranspiler.TranspileSquirrelCode(code).Replace("\n", "\\n").Replace("\"", "\\\"").Replace("\t", "\\t");
+			string transpiledCode = "/*js*/" + squirrelTranspiler.TranspileSquirrelCode(code).Replace("\\", "\\\\").Replace("\n", "\\n").Replace("\"", "\\\"").Replace("\t", "\\t");
 
 			string modifiedDataFile = fileContents.Substring(0, startIndex) + transpiledCode + fileContents.Substring(endIndex);
 			return TranspileEmbeddedSquirrelCodeInDataFileHelper(modifiedDataFile, startIndex, squirrelTranspiler);

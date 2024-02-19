@@ -269,12 +269,16 @@ namespace SquirrelLanguageTranspiler
 		public override string VisitTypeOf(SquirrelParser.TypeOfContext context)
 		{
 			if (context.openSquareBracket() != null && context.openParen() != null)
-				return " squirrelTypeOf ( " + this.VisitId(context.id()) + " ( ) [ " + this.VisitExp(context.exp()) + " ] ) ";
+				return " squirrelTypeOf ( " + this.VisitId(context.id(0)) + " ( ) [ " + this.VisitExp(context.exp()) + " ] ) ";
+			if (context.openSquareBracket() != null && context.id().Length == 2)
+				return " squirrelTypeOf ( " + this.VisitId(context.id(0)) + " [ " + this.VisitExp(context.exp()) + " ] . " + this.VisitId(context.id(1)) + " ( ) ) ";
 			if (context.openSquareBracket() != null)
-				return " squirrelTypeOf ( " + this.VisitId(context.id()) + " [ " + this.VisitExp(context.exp()) + " ] ) ";
+				return " squirrelTypeOf ( " + this.VisitId(context.id(0)) + " [ " + this.VisitExp(context.exp()) + " ] ) ";
 			if (context.openParen() != null)
-				return " squirrelTypeOf ( " + this.VisitId(context.id()) + " ( ) ) ";
-			return " squirrelTypeOf ( " + this.VisitId(context.id()) + " ) ";
+				return " squirrelTypeOf ( " + this.VisitId(context.id(0)) + " ( ) ) ";
+			if (context.id().Length == 2)
+				return " squirrelTypeOf ( " + this.VisitId(context.id(0)) + " . " + this.VisitId(context.id(1)) + " ) ";
+			return " squirrelTypeOf ( " + this.VisitId(context.id(0)) + " ) ";
 		}
 
 		public override string VisitAssignmentModificationOperator(SquirrelParser.AssignmentModificationOperatorContext context)
@@ -379,7 +383,7 @@ namespace SquirrelLanguageTranspiler
 		{
 			if (context.classStatements() != null)
 			{
-				string str = " ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ; ";
+				string str = " ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ; ";
 
 				if (context.id() != null)
 					str += " returnVal = " + this.VisitId(context.id()) + " ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor; ";
@@ -393,7 +397,7 @@ namespace SquirrelLanguageTranspiler
 				}
 
 				str += this.VisitClassStatements(context.classStatements());
-				str += " returnVal.constructor(...arguments); return returnVal ; ";
+				str += " returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ; ";
 				str += " }; ";
 
 				SquirrelParser.ClassStatementsContext classStatementsContext = context.classStatements();
@@ -405,11 +409,19 @@ namespace SquirrelLanguageTranspiler
 					str += classVariable;
 				}
 
+				str += " squirrelClassFunction.IS_CLASS_DECLARATION = true; ";
+
+				if (context.id() != null)
+					str += " squirrelClassFunction.SQUIRREL_SUPER_CLASS = " + this.VisitId(context.id()) + "; ";
+
 				str += " return squirrelClassFunction; ";
 				str += "})())";
 
 				return str;
 			}
+
+			if (context.deleteKeyword() != null)
+				return " delete " + this.VisitExp(context.exp(0));
 
 			if (context.GetText().StartsWith("base", StringComparison.Ordinal) && context.arguments() != null && context.id() != null)
 				return " baseMethods . " + this.VisitId(context.id()) + " " + this.VisitArguments(context.arguments());
@@ -429,11 +441,28 @@ namespace SquirrelLanguageTranspiler
 			if (context.typeOf() != null)
 				return this.VisitTypeOf(context.typeOf());
 
+			if (context.instanceofOperator() != null)
+				return " squirrelInstanceOf( "
+					+ this.VisitExpNotIncludingObjectLiteral(context.expNotIncludingObjectLiteral())
+					+ " , "
+					+ this.VisitId(context.id())
+					+ ") ";
+
+			if (context.cloneOperator() != null)
+				return " window.clone( " + this.VisitExp(context.exp(0)) + ") ";
+
 			if (context.assignmentModificationOperator() != null)
 			{
-				return this.VisitDerefexp(context.derefexp())
-					+ this.VisitAssignmentModificationOperator(context.assignmentModificationOperator())
-					+ this.VisitExp(context.exp(0));
+				if (context.id() != null)
+					return this.VisitDerefexp(context.derefexp())
+						+ " . "
+						+ this.VisitId(context.id())
+						+ this.VisitAssignmentModificationOperator(context.assignmentModificationOperator())
+						+ this.VisitExp(context.exp(0));
+				else
+					return this.VisitDerefexp(context.derefexp())
+						+ this.VisitAssignmentModificationOperator(context.assignmentModificationOperator())
+						+ this.VisitExp(context.exp(0));
 			}
 
 			if (context.derefexp() != null)
@@ -488,7 +517,13 @@ namespace SquirrelLanguageTranspiler
 				else if (expression[0] == '/')
 					op = " / ";
 				else if (expression[0] == '%')
+				{
+					string secondExp = context.exp(0).GetText();
+					if (secondExp.Contains("<=>"))
+						throw new Exception("Potential order-of-operation issue involving the '%' operator: [" + context.GetText() + "]");
+
 					op = " % ";
+				}
 				else if (expression[0] == '+')
 					op = " + ";
 				else if (expression[0] == '-')

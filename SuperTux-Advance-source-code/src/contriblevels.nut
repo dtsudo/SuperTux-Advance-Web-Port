@@ -11,7 +11,7 @@
 		// webBrowserVersionChange: filter out worlds that still seem to be in development (and not yet complete)
 		local contribFiltered = [];
 		foreach(item in contrib) {
-			if (item != "azzy" && item != "osop-prequel")
+			if (item != "osop-prequel")
 				contribFiltered.push(item);
 		}
 		contrib = contribFiltered;
@@ -37,6 +37,11 @@
 								if(tileSearchDir[i] == "contrib/" + contribFolder + "/gfx") searchDirExists = true
 							}
 							if(!searchDirExists) tileSearchDir.push("contrib/" + contribFolder + "/gfx")
+							searchDirExists = false
+							for(local i = 0; i < tileSearchDir.len(); i++) {
+								if(tileSearchDir[i] == "contrib/" + contribFolder) searchDirExists = true
+							}
+							if(!searchDirExists) tileSearchDir.push("contrib/" + contribFolder)
 							gvDoIGT = false
 							if(fileExists("contrib/" + contribFolder + "/text.json")) {
 								gvLangObj = mergeTable(gvLangObj, jsonRead(fileRead("contrib/" + contribFolder + "/text.json")))
@@ -90,17 +95,7 @@
 							if(fileExists("save/" + contribFolder + ".json")) {
 								local contribWorldmapSaveData = jsonRead(fileRead("save/" + contribFolder + ".json"))
 								foreach(level, levelCompleted in contribWorldmapSaveData["completed"]) {
-									// webBrowserVersionChange: avoid using array.find since squirrel and javascript 
-									// have different semantics for this function
-									if(levelCompleted) {
-										local wasFound = false;
-										for (local searchIndex = 0; searchIndex < levels.len(); searchIndex++) {
-											if (levels[searchIndex] == level)
-												wasFound = true;
-										}
-										if (wasFound)
-											completedLevelsCount++
-									}
+									if(levelCompleted && levels.find(level) != null) completedLevelsCount++
 								}
 							}
 

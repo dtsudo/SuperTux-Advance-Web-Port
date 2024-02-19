@@ -8,11 +8,11 @@ namespace WebVersionGeneratorLibrary
 
 	public class SquirrelFilesHandler
 	{
-		public static void CopySquirrelFiles(ISquirrelTranspiler squirrelTranspiler)
+		public static void CopySquirrelFiles(ISquirrelTranspiler squirrelTranspiler, bool keepPreviouslyGeneratedFiles, bool verbose)
 		{
 			string webVersionSourceCodeFolder = Util.GetWebVersionSourceCodeFolder();
 
-			List<FileNameInfo> files = Util.GetAllFilesInSuperTuxAdvanceSourceCodeFolder()
+			List<FileNameInfo> files = Util.GetAllFilesInSuperTuxAdvanceSourceCodeFolderInSortedOrder()
 				.Where(x => x.FileExtension.ToLowerInvariant() == "nut" || x.FileExtension.ToLowerInvariant() == "brx")
 				.ToList();
 
@@ -24,6 +24,36 @@ namespace WebVersionGeneratorLibrary
 
 			foreach (FileNameInfo file in files)
 			{
+				string outputFileName = file.PartiallyQualifiedFileName;
+				if (outputFileName.ToLowerInvariant().EndsWith(".nut", StringComparison.Ordinal))
+					outputFileName = outputFileName.Substring(0, outputFileName.Length - 4) + ".js";
+				if (outputFileName.ToLowerInvariant().EndsWith(".brx", StringComparison.Ordinal))
+					outputFileName = outputFileName.Substring(0, outputFileName.Length - 4) + ".js";
+
+				outputFileName = outputFileName.Replace('\\', '_').Replace('/', '_');
+
+				squirrelFilesJs += $"window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/{outputFileName}'); \n\n";
+
+				squirrelFilesJs += "window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( \n";
+				squirrelFilesJs += $"    '{file.PartiallyQualifiedFileName}', \n";
+				squirrelFilesJs += $"    '' \n";
+				squirrelFilesJs += "); \n\n";
+
+				string partiallyQualifiedOutputFileName = "output/data/squirrelCode/" + outputFileName;
+				string fullyQualifiedOutputFileName = webVersionSourceCodeFolder + partiallyQualifiedOutputFileName;
+
+				if (keepPreviouslyGeneratedFiles && File.Exists(fullyQualifiedOutputFileName))
+				{
+					if (verbose)
+						Console.WriteLine(partiallyQualifiedOutputFileName + " already exists");
+					continue;
+				}
+
+				long startTime = DateTime.Now.Ticks;
+
+				if (verbose)
+					Console.Write("Copying " + file.PartiallyQualifiedFileName + " ");
+
 				string fileContents = Util.GetFileContentsAsString(file.FullyQualifiedFileName);
 				fileContents = fileContents.Replace("#!/usr/bin/brux", "");
 				fileContents = fileContents.Replace("::isWebBrowserVersion <- false", "::isWebBrowserVersion <- true");
@@ -44,25 +74,17 @@ namespace WebVersionGeneratorLibrary
 					+ $"window.superTuxAdvanceWebVersion.squirrelFiles['{file.PartiallyQualifiedFileName}'] = function () {{ \n\n\n"
 					+ transpiledFileContents + "\n\n\n"
 					+ "}; \n";
-
-				string outputFileName = file.PartiallyQualifiedFileName;
-				if (outputFileName.ToLowerInvariant().EndsWith(".nut", StringComparison.Ordinal))
-					outputFileName = outputFileName.Substring(0, outputFileName.Length - 4) + ".js";
-				if (outputFileName.ToLowerInvariant().EndsWith(".brx", StringComparison.Ordinal))
-					outputFileName = outputFileName.Substring(0, outputFileName.Length - 4) + ".js";
-
-				outputFileName = outputFileName.Replace('\\', '_').Replace('/', '_');
 				
 				Util.WriteFileContents(
-					fileName: webVersionSourceCodeFolder + "output/data/squirrelCode/" + outputFileName,
+					fileName: fullyQualifiedOutputFileName,
 					text: transpiledFileContents);
 
-				squirrelFilesJs += $"window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/{outputFileName}'); \n\n";
+				long endTime = DateTime.Now.Ticks;
 
-				squirrelFilesJs += "window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( \n";
-				squirrelFilesJs += $"    '{file.PartiallyQualifiedFileName}', \n";
-				squirrelFilesJs += $"    '' \n";
-				squirrelFilesJs += "); \n\n";
+				int durationMillis = (int) ((endTime - startTime) / 10000L);
+
+				if (verbose)
+					Console.WriteLine("(" + durationMillis.ToStringCultureInvariant() + " ms)");
 			}
 
 			Util.WriteFileContents(

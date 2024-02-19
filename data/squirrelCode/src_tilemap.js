@@ -16,7 +16,7 @@ findFileName =  function ( path ) {  if (  squirrelTypeOf ( path )  != "string" 
   } 
   return path ;
   }  ; 
-AnimTile =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal . frameID = null ; 
+AnimTile =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal . frameID = null ; 
  returnVal . frameList = null ; 
  returnVal . frameTime = null ; 
  returnVal . sprite = null ; 
@@ -27,7 +27,7 @@ AnimTile =  ((function(){ let squirrelClassFunction = function ( ) { var returnV
   frameID = animList . id ; 
 frameList =  [  ]  ; 
 frameTime =  [  ]  ; 
- if ( (animList["animation"] !== undefined) )  { 
+ if (  ( (animList[ ( "animation" ) ] !== undefined) )  )  { 
   for (  var i = 0 ;
  i < animList . animation . len (  )  ; i ++  )  { 
  frameList . push ( animList . animation [ i ]  . tileid )  ; 
@@ -63,13 +63,14 @@ frameTime =  [  ]  ;
  drawSpriteExMod ( sprite , frameList . top (  )  , floor ( x )  , floor ( y )  , 0 , 0 , 1 , 1 , alpha , color )  ; 
  } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . frameID = null ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frameID = null ; 
  squirrelClassFunction . frameList = null ; 
  squirrelClassFunction . frameTime = null ; 
  squirrelClassFunction . sprite = null ; 
- return squirrelClassFunction; })()) ; 
-Tilemap =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal . data = null ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  return squirrelClassFunction; })()) ; 
+Tilemap =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal . data = null ; 
  returnVal . tileset = null ; 
+ returnVal . image = null ; 
  returnVal . tilef = null ; 
  returnVal . tilew = 0 ; 
  returnVal . tileh = 0 ; 
@@ -86,11 +87,13 @@ Tilemap =  ((function(){ let squirrelClassFunction = function ( ) { var returnVa
  returnVal . anim = null ; 
  returnVal . solidLayer = null ; 
  returnVal . plat = null ; 
+ returnVal . infinite = false ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( filename ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
 
   tileset =  [  ]  ; 
+image =  {  }  ; 
 tilef =  [  ]  ; 
 geo =  [  ]  ; 
 data =  {  }  ; 
@@ -109,6 +112,22 @@ name = name . slice ( 0 ,  - 5 )  ;
 print ( "\nLoading map: " + name )  ; 
  for (  var i = 0 ;
  i < data . tilesets . len (  )  ; i ++  )  { 
+  if (  ( (data . tilesets [ i ] [ ( "source" ) ] !== undefined) )  )  for (  var j = 0 ;
+ j < tileSearchDir . len (  )  ; j ++  )  { 
+  var sourcefile = findFileName ( data . tilesets [ i ]  . source )  ;
+  if ( fileExists ( tileSearchDir [ j ]  + "/" + sourcefile )  )  { 
+ print ( "Found external tileset: " + sourcefile )  ; 
+ var newgid = data . tilesets [ i ]  . firstgid ;
+ data . tilesets [ i ] = jsonRead ( fileRead ( tileSearchDir [ j ]  + "/" + sourcefile )  )  ; 
+data . tilesets [ i ]  . firstgid = newgid ; 
+ break ;  } 
+  
+  else print ( "Unable to find external tile: " + sourcefile + " in " + tileSearchDir [ j ]  )  ; 
+ 
+  } 
+  
+  if (  !  (  ( (data . tilesets [ i ] [ ( "image" ) ] !== undefined) )  )  ) print ( jsonWrite ( data . tilesets [ i ]  )  )  ; 
+ 
   var filename = data . tilesets [ i ]  . image ;
   var shortname = findFileName ( filename )  ;
  print ( "Searching for tileset: " + shortname )  ; 
@@ -140,33 +159,39 @@ tileset . push ( newSprite ( tileSearchDir [ j ]  + "/" + shortname , data . til
  
   if ( data . tilesets [ i ]  . rawin ( "tiles" )  )  for (  var j = 0 ;
  j < data . tilesets [ i ]  . tiles . len (  )  ; j ++  )  { 
-  if ( (data . tilesets [ i ]  . tiles [ j ] ["animation"] !== undefined) ) anim [ data . tilesets [ i ]  . firstgid + data . tilesets [ i ]  . tiles [ j ]  . id ] = AnimTile ( data . tilesets [ i ]  . tiles [ j ]  , tileset . top (  )  )  ; 
+  if (  ( (data . tilesets [ i ]  . tiles [ j ] [ ( "animation" ) ] !== undefined) )  ) anim [ data . tilesets [ i ]  . firstgid + data . tilesets [ i ]  . tiles [ j ]  . id ] = AnimTile ( data . tilesets [ i ]  . tiles [ j ]  , tileset . top (  )  )  ; 
  
   } 
   
   } 
  shape =  ( Rec ( 0 , 0 , 8 , 8 , 0 )  )  ; 
- var l =  - 1 ;
-  for (  var i = 0 ;
- i < data . layers . len (  )  ; i ++  )  { 
-  if ( data . layers [ i ]  . name == "solid" )  { 
- l = data . layers [ i ]  ; 
- break ;  } 
-  
-  } 
-  if ( l !=  - 1 )  { 
-  for (  var i = 0 ;
- i < l . width ; i ++  )  { 
-  if ( l . data [ i ]  != 0 ) geo . push ( Rec (  ( i * 16 )  + 8 ,  - 1000 , 8 , 1000 , 0 )  )  ; 
- 
-  } 
-  } 
-  
-  for (  var i = 0 ;
+ for (  var i = 0 ;
  i < data . layers . len (  )  ; i ++  )  { 
   if ( data . layers [ i ]  . type == "tilelayer" && data . layers [ i ]  . name == "solid" )  { 
  solidLayer = data . layers [ i ]  ; 
  break ;  } 
+  
+  } 
+  for (  var i = 0 ;
+ i < data . layers . len (  )  ; i ++  )  { 
+  if ( data . layers [ i ]  . type == "imagelayer" )  { 
+  var imageSource = findTexture ( findFileName ( data . layers [ i ]  . image )  )  ;
+  if ( imageSource <= 0 )  { 
+  for (  var j = 0 ;
+ j < tileSearchDir . len (  )  ; j ++  )  { 
+  var sourcefile = findFileName ( data . layers [ i ]  . image )  ;
+  if ( fileExists ( tileSearchDir [ j ]  + "/" + sourcefile )  )  { 
+ print ( "Found external image: " + sourcefile )  ; 
+imageSource = loadImage ( tileSearchDir [ j ]  + "/" + sourcefile )  ; 
+ break ;  } 
+  
+  else print ( "Unable to find external image: " + sourcefile + " in " + tileSearchDir [ j ]  )  ; 
+ 
+  } 
+  } 
+  
+ image [ data . layers [ i ]  . name ] = imageSource ; 
+ } 
   
   } 
   } 
@@ -211,25 +236,25 @@ tileset . push ( newSprite ( tileSearchDir [ j ]  + "/" + shortname , data . til
   for (  var i = my ;
  i < myPlusMh ; i ++  )  { 
   var iTimesDataLayersTWidth = i * dataLayersTWidth ;
-  var yPlusITimesDataTileheightTimesSy = y + i * data . tileheight * sy ;
+  var yPlusRoundITimesDataTileheightTimesSy = y + round ( i * data . tileheight * sy )  ;
   for (  var j = mx ;
  j < mxPlusMw ; j ++  )  { 
   if ( iTimesDataLayersTWidth + j >= dataLayersTDataLen )  return ; 
   
   var n = dataLayersTData [ iTimesDataLayersTWidth + j ]  ;
   if ( n != 0 )  { 
-  var xPlusJTimesDataTilewidthTimesSx = x + j * data . tilewidth * sx ;
+  var xPlusRoundJTimesDataTilewidthTimesSx = x + round ( j * data . tilewidth * sx )  ;
   for (  var k = dataTilesetsLen - 1 ;
  k >= 0 ; k --  )  { 
   if ( n >= data . tilesets [ k ]  . firstgid )  { 
   if ( anim . rawin ( n )  )  { 
-  if ( tileset [ k ]  == anim [ n ]  . sprite ) anim [ n ]  . draw ( xPlusJTimesDataTilewidthTimesSx , yPlusITimesDataTileheightTimesSy , dataLayersTOpacityTimesA )  ; 
+  if ( tileset [ k ]  == anim [ n ]  . sprite ) anim [ n ]  . draw ( xPlusRoundJTimesDataTilewidthTimesSx , yPlusRoundITimesDataTileheightTimesSy , dataLayersTOpacityTimesA )  ; 
  
-  else drawSpriteEx ( tileset [ k ]  , n - data . tilesets [ k ]  . firstgid , xPlusJTimesDataTilewidthTimesSx , yPlusITimesDataTileheightTimesSy , 0 , 0 , sx , sy , dataLayersTOpacityTimesA )  ; 
+  else drawSpriteEx ( tileset [ k ]  , n - data . tilesets [ k ]  . firstgid , xPlusRoundJTimesDataTilewidthTimesSx , yPlusRoundITimesDataTileheightTimesSy , 0 , 0 , sx , sy , dataLayersTOpacityTimesA )  ; 
  
   } 
   
-  else drawSpriteEx ( tileset [ k ]  , n - data . tilesets [ k ]  . firstgid , xPlusJTimesDataTilewidthTimesSx , yPlusITimesDataTileheightTimesSy , 0 , 0 , sx , sy , dataLayersTOpacityTimesA )  ; 
+  else drawSpriteEx ( tileset [ k ]  , n - data . tilesets [ k ]  . firstgid , xPlusRoundJTimesDataTilewidthTimesSx , yPlusRoundITimesDataTileheightTimesSy , 0 , 0 , sx , sy , dataLayersTOpacityTimesA )  ; 
  
  k =  - 1 ; 
  break ;  } 
@@ -275,13 +300,13 @@ tileset . push ( newSprite ( tileSearchDir [ j ]  + "/" + shortname , data . til
  k >= 0 ; k --  )  { 
   if ( n >= data . tilesets [ k ]  . firstgid )  { 
   if ( anim . rawin ( n )  )  { 
-  if ( tileset [ k ]  == anim [ n ]  . sprite ) anim [ n ]  . draw ( x +  ( j * data . tilewidth * sx )  , y +  ( i * data . tileheight * sy )  , data . layers [ t ]  . opacity * a , c )  ; 
+  if ( tileset [ k ]  == anim [ n ]  . sprite ) anim [ n ]  . draw ( x + floor ( j * data . tilewidth * sx )  , y + floor ( i * data . tileheight * sy )  , data . layers [ t ]  . opacity * a , c )  ; 
  
-  else drawSpriteExMod ( tileset [ k ]  , n - data . tilesets [ k ]  . firstgid , x +  ( j * data . tilewidth * sx )  , y +  ( i * data . tileheight * sy )  , 0 , 0 , 1 , 1 , data . layers [ t ]  . opacity * a , c )  ; 
+  else drawSpriteExMod ( tileset [ k ]  , n - data . tilesets [ k ]  . firstgid , x + floor ( j * data . tilewidth * sx )  , y + floor ( i * data . tileheight * sy )  , 0 , 0 , sx , sy , data . layers [ t ]  . opacity * a , c )  ; 
  
   } 
   
-  else drawSpriteExMod ( tileset [ k ]  , n - data . tilesets [ k ]  . firstgid , x +  ( j * data . tilewidth * sx )  , y +  ( i * data . tileheight * sy )  , 0 , 0 , 1 , 1 , data . layers [ t ]  . opacity * a , c )  ; 
+  else drawSpriteExMod ( tileset [ k ]  , n - data . tilesets [ k ]  . firstgid , x + floor ( j * data . tilewidth * sx )  , y + floor ( i * data . tileheight * sy )  , 0 , 0 , sx , sy , data . layers [ t ]  . opacity * a , c )  ; 
  
  k =  - 1 ; 
  break ;  } 
@@ -291,15 +316,19 @@ tileset . push ( newSprite ( tileSearchDir [ j ]  + "/" + shortname , data . til
   
   } 
   } 
+  } ;  returnVal . drawImageLayer = function ( l , x , y ) {  if (  ( (image[ ( l ) ] !== undefined) )  ) drawImage ( image [ l ]  , x , y )  ; 
+ 
   } ;  returnVal . del = function (  ) {  return ; 
   for (  var i = 0 ;
  i < tileset . len (  )  ; i ++  )  { 
  deleteSprite ( tileset [ i ]  )  ; 
  } 
+  } ;  returnVal . _typeof = function (  ) {  return "Tilemap" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . data = null ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . data = null ; 
  squirrelClassFunction . tileset = null ; 
+ squirrelClassFunction . image = null ; 
  squirrelClassFunction . tilef = null ; 
  squirrelClassFunction . tilew = 0 ; 
  squirrelClassFunction . tileh = 0 ; 
@@ -316,11 +345,12 @@ tileset . push ( newSprite ( tileSearchDir [ j ]  + "/" + shortname , data . til
  squirrelClassFunction . anim = null ; 
  squirrelClassFunction . solidLayer = null ; 
  squirrelClassFunction . plat = null ; 
- return squirrelClassFunction; })()) ; 
+ squirrelClassFunction . infinite = false ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  return squirrelClassFunction; })()) ; 
 mapNewSolid =  function ( shape ) { gvMap . geo . push ( shape )  ; 
  return gvMap . geo . len (  )  - 1 ;
   }  ; 
-mapDeleteSolid =  function ( index ) {  if ( index >= 0 && index < gvMap . geo . len (  )  && gvMap . geo . len (  )  > 0 )  { 
+mapDeleteSolid =  function ( index ) {  if (  ( (gvMap . geo[ ( index ) ] !== undefined) )  && index >= 0 && index < gvMap . geo . len (  )  && gvMap . geo . len (  )  > 0 )  { 
  gvMap . geo [ index ] = null ; 
  } 
   
@@ -347,6 +377,18 @@ tileGetSolid =  function ( tx , ty ) {  var tile = floor ( tx / 16 )  +  ( floor
   
   } 
   
+  }  ; 
+loadTileMapWorld =  function ( filename ) {  if (  ! fileExists ( filename )  )  return  {  }  ;
+  
+  var file = jsonRead ( fileRead ( filename )  )  ;
+  var nw =  {  }  ;
+  if (  ( (file[ (  ! "maps" ) ] !== undefined) )  )  return  {  }  ;
+  
+  for (  var i = 0 ;
+ i < file . maps . len (  )  ; i ++  )  { 
+  var name = findFileName ( file . maps [ i ]  [ "fileName" ]  )  ;
+ nw [ name ] =  [ file . maps [ i ]  [ "x" ]  , file . maps [ i ]  [ "y" ]  ]  ; 
+ } 
   }  ; 
 
 

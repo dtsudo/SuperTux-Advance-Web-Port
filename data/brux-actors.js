@@ -92,7 +92,12 @@
 	};
 
 	window.checkActor = function (id) {
-		return !!window.actor[id];
+		let returnVal = !!window.actor[id];
+		
+		if (returnVal && window.actor[id].isActorSubTable)
+			return Object.keys(window.actor[id]).length > 1;
+		
+		return returnVal;
 	};
 	
 })());

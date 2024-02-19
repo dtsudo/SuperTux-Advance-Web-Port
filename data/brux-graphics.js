@@ -13,8 +13,13 @@ window.bm_mod = 4;
 
 ((function () {
 	
+	const IMAGE_CREATED_BY_LOAD_IMAGE = "imageCreatedByLoadImage";
+	
 	window.clearScreen = function () {
-		console.log("Warning: clearScreen is not implemented");
+		let canvas = window.superTuxAdvanceWebVersion.superTuxAdvanceCanvases[window.superTuxAdvanceWebVersion.currentCanvas].canvas;
+		let context = window.superTuxAdvanceWebVersion.superTuxAdvanceCanvases[window.superTuxAdvanceWebVersion.currentCanvas].context;
+		
+		context.clearRect(0, 0, canvas.width, canvas.height);
 	};
 		
 	window.setDrawTarget = function (img) {
@@ -22,16 +27,18 @@ window.bm_mod = 4;
 	};
 	
 	window.getDrawTarget = function () {
-		console.log("Warning: getDrawTarget is not implemented");
+		return window.superTuxAdvanceWebVersion.currentCanvas;
 	};
 	
 	window.drawImage = function (img, x, y) {
+		let context = window.superTuxAdvanceWebVersion.superTuxAdvanceCanvases[window.superTuxAdvanceWebVersion.currentCanvas].context;
+		
 		if ((typeof img) === "number") {
-			let context = window.superTuxAdvanceWebVersion.superTuxAdvanceCanvases[window.superTuxAdvanceWebVersion.currentCanvas].context;
-						
 			let canvasImage = window.superTuxAdvanceWebVersion.superTuxAdvanceCanvases[img].canvas;
-			
 			context.drawImage(canvasImage, 0, 0, canvasImage.width, canvasImage.height, x, y, canvasImage.width, canvasImage.height);
+		} else if (img.type === IMAGE_CREATED_BY_LOAD_IMAGE) {
+			let imageObject = window.bruxGraphics_getImageObjectFromFileName(img.file);
+			context.drawImage(imageObject, x, y);
 		} else {
 			console.log("Warning: drawImage did not recognize input image");
 		}
@@ -75,7 +82,10 @@ window.bm_mod = 4;
 	};
 	
 	window.loadImage = function (file) {
-		console.log("Warning: loadImage is not implemented");
+		return {
+			type: IMAGE_CREATED_BY_LOAD_IMAGE,
+			file: file
+		};
 	};
 	
 	window.loadImageKeyed = function (file, color) {
@@ -137,6 +147,24 @@ window.bm_mod = 4;
 	
 	window.drawLine = function (x1, y1, x2, y2) {
 		console.log("Warning: drawLine is not implemented");
+	};
+	
+	window.drawLineWide = function (x1, y1, x2, y2, width) {
+		let context = window.superTuxAdvanceWebVersion.superTuxAdvanceCanvases[window.superTuxAdvanceWebVersion.currentCanvas].context;
+		
+		let red = (graphicsDrawColor >> 24) & 0xff;
+		let green = (graphicsDrawColor >> 16) & 0xff;
+		let blue = (graphicsDrawColor >> 8) & 0xff;
+		let alpha = graphicsDrawColor & 0xff;
+		
+		context.fillStyle = 'rgba(' + red.toString() + ', ' + green.toString() + ', ' + blue.toString() + ', ' + (alpha / 255).toString() + ')';
+		context.strokeStyle = 'rgba(' + red.toString() + ', ' + green.toString() + ', ' + blue.toString() + ', ' + (alpha / 255).toString() + ')';
+		
+		context.beginPath();
+		context.moveTo(x1, y1);
+		context.lineTo(x2, y2);
+		context.lineWidth = width;
+		context.stroke();
 	};
 	
 	window.drawPoint = function (x, y) {

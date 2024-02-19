@@ -7,6 +7,15 @@
 
 ((function () {
 	
+	let normalizeFileName = function (fileName) {
+		while (true) {
+			let newName = fileName.replace("//", "/");
+			if (newName === fileName)
+				return fileName;
+			fileName = newName;
+		}
+	};
+	
 	window.mount = function (string1, string2, bool) {
 		console.log("Warning: mount is not implemented");
 	};
@@ -16,6 +25,9 @@
 	};
 	
 	window.fileExists = function (name) {
+		
+		name = normalizeFileName(name);
+		
 		if (window.superTuxAdvanceWebVersion.simulatedFileSystem.fileExists(name))
 			return true;
 		
@@ -26,10 +38,16 @@
 	};
 	
 	window.fileWrite = function (name, str) {
+		
+		name = normalizeFileName(name);
+		
 		window.superTuxAdvanceWebVersion.localStorageFileSystem.fileWrite(name, str);
 	};
 	
 	window.fileRead = function (str) {
+		
+		str = normalizeFileName(str);
+		
 		let simulatedFile = window.superTuxAdvanceWebVersion.simulatedFileSystem.fileRead(str);
 		let localStorageFile = window.superTuxAdvanceWebVersion.localStorageFileSystem.fileRead(str);
 		
@@ -89,6 +107,9 @@
 	};
 	
 	window.lsdir = function (str) {
+		
+		str = normalizeFileName(str);
+		
 		let localStorageFiles = window.superTuxAdvanceWebVersion.localStorageFileSystem.lsdir(str);
 		let simulatedFileSystemFiles = window.superTuxAdvanceWebVersion.simulatedFileSystem.lsdir(str);
 		
@@ -106,6 +127,8 @@
 	};
 		
 	window.isdir = function (str) {
+		str = normalizeFileName(str);
+		
 		return window.lsdir(str).filter(x => x !== "." && x !== "..").length > 0;
 	};
 	

@@ -170,6 +170,12 @@ public interface ISquirrelVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitCloseParen([NotNull] SquirrelParser.CloseParenContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="SquirrelParser.deleteKeyword"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitDeleteKeyword([NotNull] SquirrelParser.DeleteKeywordContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="SquirrelParser.objectLiteral"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -241,6 +247,18 @@ public interface ISquirrelVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitClassFunctionDeclaration([NotNull] SquirrelParser.ClassFunctionDeclarationContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="SquirrelParser.instanceofOperator"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitInstanceofOperator([NotNull] SquirrelParser.InstanceofOperatorContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="SquirrelParser.cloneOperator"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitCloneOperator([NotNull] SquirrelParser.CloneOperatorContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="SquirrelParser.expNotIncludingObjectLiteral"/>.
 	/// </summary>

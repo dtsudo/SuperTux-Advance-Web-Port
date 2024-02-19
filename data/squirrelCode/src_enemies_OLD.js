@@ -4,7 +4,7 @@ if (!window.superTuxAdvanceWebVersion.squirrelFiles) window.superTuxAdvanceWebVe
 window.superTuxAdvanceWebVersion.squirrelFiles['src/enemies_OLD.nut'] = function () { 
 
 
-Wildcap =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+Wildcap =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -213,13 +213,13 @@ playSound ( sndFlame , 0 )  ;
  } ;  returnVal . _typeof = function (  ) {  return "Deathcap" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . flip = false ; 
  squirrelClassFunction . squish = false ; 
  squirrelClassFunction . squishTime = 0.0 ; 
  squirrelClassFunction . smart = false ; 
  squirrelClassFunction . moving = false ; 
- return squirrelClassFunction; })()) ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
 
 
 

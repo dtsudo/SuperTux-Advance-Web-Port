@@ -312,6 +312,18 @@ public partial class SquirrelBaseListener : ISquirrelListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitCloseParen([NotNull] SquirrelParser.CloseParenContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="SquirrelParser.deleteKeyword"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterDeleteKeyword([NotNull] SquirrelParser.DeleteKeywordContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="SquirrelParser.deleteKeyword"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitDeleteKeyword([NotNull] SquirrelParser.DeleteKeywordContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="SquirrelParser.objectLiteral"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
@@ -455,6 +467,30 @@ public partial class SquirrelBaseListener : ISquirrelListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitClassFunctionDeclaration([NotNull] SquirrelParser.ClassFunctionDeclarationContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="SquirrelParser.instanceofOperator"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterInstanceofOperator([NotNull] SquirrelParser.InstanceofOperatorContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="SquirrelParser.instanceofOperator"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitInstanceofOperator([NotNull] SquirrelParser.InstanceofOperatorContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="SquirrelParser.cloneOperator"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterCloneOperator([NotNull] SquirrelParser.CloneOperatorContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="SquirrelParser.cloneOperator"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitCloneOperator([NotNull] SquirrelParser.CloneOperatorContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="SquirrelParser.expNotIncludingObjectLiteral"/>.
 	/// <para>The default implementation does nothing.</para>

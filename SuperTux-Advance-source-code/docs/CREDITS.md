@@ -12,11 +12,13 @@
 
 [dtsudo](https://github.com/dtsudo) - Bug fixes
 
+[IoIxD](https://github.com/IoIxD) - Overworld block switching
+
 ## Graphics
 
 [Kelvin Shadewing](http://kelvinshadewing.net) - Tux, Cannon Bob, Igloo edits, Mama Bear, pipe tiles, pipe snake, muffin, deathcap, star nyan, heart, fonts, item blocks, debug graphics, elemental explosions
 
-[Adam Atomic](http://www.adamatomic.com) - Iridia BG
+[Adam Atomic](http://www.adamatomic.com) - Iridia BG\*
 
 [Luke Bunday](http://pixeljoint.com/p/43158.htm) - Anneroy
 
@@ -24,39 +26,39 @@
 
 [Nemysis](https://opengameart.org/users/nemisys) - Sign post
 
-[devnewton](https://opengameart.org/users/devnewton) - Cloud tiles
+[devnewton](https://opengameart.org/users/devnewton) - Cloud tiles\*, Tornado\*
 
 [TheNess](https://opengameart.org/users/theness) - Forest parallax
 
-[RodHakGames](https://opengameart.org/users/rodhakgames) - Portals
+[RodHakGames](https://opengameart.org/users/rodhakgames) - Portals\*
 
 [bluecarrot16](https://opengameart.org/users/bluecarrot16) - Palm trees
 
-[KnoblePersona](https://opengameart.org/users/knoblepersona) - Ocean BG
+[KnoblePersona](https://opengameart.org/users/knoblepersona) - Ocean BG\*
 
 [SugarMoonWitch](http://sugarmoonwitch.com/) - Underwater BG
 
-[Soluna Software](https://opengameart.org/users/soluna-software)-  STA Logo Upper Half
+[Soluna Software](https://opengameart.org/users/soluna-software)-  STA Logo Upper Half\*
 
-[ZiNGOT Games](https://opengameart.org/users/zingot) - STA Logo Lower Half
+[ZiNGOT Games](https://opengameart.org/users/zingot) - STA Logo Lower Half\*
 
-[Iaavis](https://opengameart.org/users/laavis) - 2D Pixel City Pack
+[Iaavis](https://opengameart.org/users/laavis) - 2D Pixel City Pack\*
 
-[BenCreating](https://opengameart.org/users/bencreating) - Overworld Tiles
+[BenCreating](https://opengameart.org/users/bencreating) - Overworld Tiles\*
 
 [Lanea Zimmerman](https://opengameart.org/users/sharm) - Moon sprite, street light
 
-[Spring](https://opengameart.org/users/spring-spring) - Large flame
+[Spring](https://opengameart.org/users/spring-spring) - Large flame, waspy boi\*
 
-[FrostC](https://www.youtube.com/channel/UCy9RpAf9M8icNBRXf3S6rmw) - Toxic muffin, strawberry muffin, bomb muffin, Haywire, Tux doll, Orange, Darknyan, Livewire, Blazeborn
+[FrostC](https://www.youtube.com/channel/UCy9RpAf9M8icNBRXf3S6rmw) - Toxic muffin\*, strawberry muffin\*, bomb muffin\*, Haywire\*, Tux doll\*, Orange\*, Darknyan, Livewire, Blazeborn
 
-[TheCheeseWeez]() - Mega muffin
+[TheCheeseWeez]() - Mega muffin\*
 
-[Neorice](https://www.deviantart.com/neoriceisgood) - Rock tiles (edited), sand tiles (edited)
+[Neorice](https://www.deviantart.com/neoriceisgood) - Rock tiles\*, sand tiles\*
 
-[XSSheep](https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/resource-packs/1242533-pixel-perfection-now-with-polar-bears-1-11) - Pixel Perfection (Minecraft-like tiles, with edits)
+[XSSheep](https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/resource-packs/1242533-pixel-perfection-now-with-polar-bears-1-11) - Pixel Perfection\*
 
-[bluecarrot16](https://opengameart.org/users/bluecarrot16) - Barrel (with edits), end gate (edited from cage)
+[bluecarrot16](https://opengameart.org/users/bluecarrot16) - Barrel\*, end gate\*
 
 [Kutejnikov](https://opengameart.org/users/kutejnikov) - Shipwreck tiles
 
@@ -64,13 +66,19 @@
 
 [Jesse McCarthy](https://opengameart.org/users/jesse-mccarthy) - Splash
 
-[UbuntuJackson](https://github.com/UbuntuJackson) - UFO, snow tiles redesign
+[UbuntuJackson](https://github.com/UbuntuJackson) - UFO\*, snow tiles redesign\*
 
-[Hugues Ross](https://content.minetest.net/users/Hugues%20Ross/) - RPG16
+[Hugues Ross](https://content.minetest.net/users/Hugues%20Ross/) - RPG16\*
 
-[Crystalized Sun](https://www.deviantart.com/crystalizedsun/) - Mr. and Ms. Snowball, Snow Jumpy, Spiked Snowball, Snowman, Mecha Wheeler, Hamster Wheeler, Katie, Penny Overworld
+[Crystalized Sun](https://www.deviantart.com/crystalizedsun/) - Mr. and Ms. Snowball\*, Snow Jumpy, Spiked Snowball, Snowman, Mecha Wheeler, Hamster Wheeler, Katie\*, Penny Overworld\*, Kiki\*, Cyra, Snow Fish, Gold Bomb, Pepper
 
-[Narehop](https://opengameart.org/users/narehop) - Achievement Frame
+[Narehop](https://opengameart.org/users/narehop) - Achievement Frame\*
+
+[Serano01](https://github.com/serano01) - Switch Palace BG\*
+
+[BitingChaos](https://opengameart.org/users/bitingchaos)
+
+\*: Contains edits from or made in collaboration with Kelvin Shadewing
 
 ## Sounds
 
@@ -81,6 +89,8 @@
 [Little Robot Sound Factory](https://opengameart.org/content/8-bit-sound-effects-library) - Misc sounds
 
 [Subspace Audio](https://opengameart.org/content/512-sound-effects-8-bit-style) - Misc sounds
+
+[Erich Izdepsk](https://opengameart.org/users/digitl) - Electric wave
 
 ## Music
 
@@ -118,9 +128,19 @@ Lukas Nystrand - Chippdisko
 
 [Snabisch](https://opengameart.org/users/snabisch) - In The Forest
 
+[bart](https://opengameart.org/users/bart) - Airship Song
+
+[Spring](https://opengameart.org/users/spring-spring) - Forest Top
+
+[Wansti]() - Forest2\*, Forest3\*
+
 ## Level Contributors
 
 [FrostC](https://www.youtube.com/channel/UCy9RpAf9M8icNBRXf3S6rmw) - Slip and Slide, Tux 'N Trouble, Frost's Sense of Snow, The Ocean Bridge, Arctic Wind, Gaurded steps, part of Branching path
+
+[AntumDeluge](https://content.minetest.net/packages/AntumDeluge/sounds/) - Pig Sounds
+
+[Luis Zuno](https://opengameart.org/users/ansimuz) - Cavern Tile Set\*
 
 ## Translators
 
@@ -148,8 +168,6 @@ Click each mascot to learn more about them and the projects they're associated w
 
 [Konqi](https://community.kde.org/Konqi), [Plasma Breeze](https://www.deviantart.com/sheeppony/art/Plasma-Breeze-814699638), [Rocky Raccoon](https://wiki.minix3.org/doku.php?id=mascot), [Tux](https://en.wikipedia.org/wiki/Tux_(mascot)), [Xue](https://docs.xfce.org/)
 
-## Donors
-
-**Contribute 20 USD or more at [Kelvin Shadewing's Ko-Fi](https://ko-fi.com/kelvinshadewing) to be permanantly added to this list!**
+## Additional Supporters
 
 [Blinkehyo](https://www.youtube.com/c/Blinkehyo), [Cosmo Space Dragon](https://www.youtube.com/channel/UCUWmz_daYiPH0YJ-SzLssAg), Hazel Roo, [Kevin Pandaheart](https://www.youtube.com/fichinga), Keyla Otter, [Luke the Foxen](https://www.deviantart.com/lukethefoxen), Neon Blade, Bazzel, [Admiral Spraker](https://www.twitch.tv/adm_spraker), [Nova the Squirrel](https://novasquirrel.com/), tao_de_king

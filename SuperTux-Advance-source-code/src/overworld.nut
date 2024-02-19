@@ -9,6 +9,7 @@
 	//1 = up
 	//2 = left
 	//3 = down
+	canmove = false
 
 	constructor(_x, _y, _arr = null) {
 		base.constructor(_x, _y)
@@ -23,7 +24,7 @@
 		}
 
 		shape = Rec(x, y, 1, 1, 0)
-		if(!gvPlayer) gvPlayer = this
+		gvPlayer = this
 	}
 
 	function run() {
@@ -33,15 +34,20 @@
 		game.owx = x
 		game.owy = y
 
+		if(!getcon("left", "hold", false, 0)
+		&& !getcon("right", "hold", false, 0)
+		&& !getcon("up", "hold", false, 0)
+		&& !getcon("down", "hold", false, 0))
+			canmove = true
+
 		local level = ""
 		local onstage = false
-		local onrace = false
+		local noclear = false
 
 		if(actor.rawin("StageIcon")) {//Find what level was landed on
 			foreach(i in actor["StageIcon"]) {
 				if(hitTest(shape, i.shape)) {
-					level = i.level
-					onrace = i.raceMode
+					level = i.levelName
 					onstage = true
 					break
 				}
@@ -51,8 +57,9 @@
 		if(actor.rawin("TownIcon")) {//Find what level was landed on
 			foreach(i in actor["TownIcon"]) {
 				if(hitTest(shape, i.shape)) {
-					level = i.level
+					level = i.levelName
 					onstage = true
+					noclear = true
 					break
 				}
 			}
@@ -63,6 +70,7 @@
 				if(hitTest(shape, i.shape)) {
 					level = i.world
 					onstage = true
+					noclear = true
 					break
 				}
 			}
@@ -179,32 +187,32 @@
 			}
 
 			//Move right
-			if(getcon("right", "hold") && !getcon("left", "hold") && (!placeFree(x + 16, y) || debug) && hspeed <= 0 && vspeed == 0) {
-				if(level == "" || game.owd == 0 || game.completed.rawin(level) || onrace) {
+			if(canmove && getcon("right", "hold") && !getcon("left", "hold") && (!placeFree(x + 16, y) || debug) && hspeed <= 0 && vspeed == 0) {
+				if(level == "" || game.owd == 0 || game.completed.rawin(level) || noclear) {
 					hspeed = 2
 					game.owd = 2
 				}
 			}
 
 			//Move up
-			if(getcon("up", "hold") && !getcon("down", "hold") && (!placeFree(x, y - 16) || debug) && hspeed == 0 && vspeed >= 0) {
-				if(level == "" || game.owd == 1 || game.completed.rawin(level) || onrace) {
+			if(canmove && getcon("up", "hold") && !getcon("down", "hold") && (!placeFree(x, y - 16) || debug) && hspeed == 0 && vspeed >= 0) {
+				if(level == "" || game.owd == 1 || game.completed.rawin(level) || noclear) {
 					vspeed = -2
 					game.owd = 3
 				}
 			}
 
 			//Move left
-			if(getcon("left", "hold") && !getcon("right", "hold") && (!placeFree(x - 16, y) || debug) && hspeed >= 0 && vspeed == 0) {
-				if(level == "" || game.owd == 2 || game.completed.rawin(level) || onrace) {
+			if(canmove && getcon("left", "hold") && !getcon("right", "hold") && (!placeFree(x - 16, y) || debug) && hspeed >= 0 && vspeed == 0) {
+				if(level == "" || game.owd == 2 || game.completed.rawin(level) || noclear) {
 					hspeed = -2
 					game.owd = 0
 				}
 			}
 
 			//Move down
-			if(getcon("down", "hold") && !getcon("up", "hold") && (!placeFree(x, y + 16) || debug) && hspeed == 0 && vspeed <= 0) {
-				if(level == "" || game.owd == 3 || game.completed.rawin(level) || onrace) {
+			if(canmove && getcon("down", "hold") && !getcon("up", "hold") && (!placeFree(x, y + 16) || debug) && hspeed == 0 && vspeed <= 0) {
+				if(level == "" || game.owd == 3 || game.completed.rawin(level) || noclear) {
 					vspeed = 2
 					game.owd = 1
 				}
@@ -214,9 +222,17 @@
 		x += hspeed
 		y += vspeed
 
-		if(hspeed == 0 && vspeed == 0) drawSpriteZ(2, getroottable()[game.characters[game.playerChar]["over"]], 0, x - camx, y - camy)
-		else drawSpriteZ(2, getroottable()[game.characters[game.playerChar]["over"]], getFrames() / 8, x - camx, y - camy)
+		if(hspeed == 0 && vspeed == 0) {
+			x -= x % 16
+			x += 8
 
+			y -= y % 16
+			y += 8
+		}
+
+		if(hspeed == 0 && vspeed == 0) drawSpriteZ(2, getroottable()[gvCharacters[game.playerChar]["over"]], 0, x - camx, y - camy)
+		else drawSpriteZ(2, getroottable()[gvCharacters[game.playerChar]["over"]], getFrames() / 8, x - camx, y - camy)
+		
 		gvLevel = level
 	}
 
@@ -229,11 +245,14 @@
 	level = ""
 	visible = true
 	raceMode = false
+	levelName = ""
 
 	constructor(_x, _y, _arr = null) {
 		base.constructor(_x, _y)
 
 		shape = Rec(x, y, 8, 8, 0)
+		level = _arr
+		levelName = level
 	}
 
 	function run() {
@@ -268,11 +287,14 @@
 ::TownIcon <- class extends PhysAct {
 	level = ""
 	visible = true
+	levelName = ""
 
 	constructor(_x, _y, _arr = null) {
 		base.constructor(_x, _y)
 
 		shape = Rec(x, y, 8, 8, 0)
+		level = _arr
+		levelName = level
 	}
 
 	function run() {
@@ -285,8 +307,6 @@
 				startPlay(game.path + level + ".json", true, true)
 			}
 		}
-
-		if(level != "" && !game.completed.rawin(level)) game.completed[level] <- true
 	}
 
 	function _typeof() { return "TownIcon" }
@@ -298,11 +318,14 @@
 	visible = true
 	px = 0
 	py = 0
+	levelName = ""
 
 	constructor(_x, _y, _arr = null) {
 		base.constructor(_x, _y)
 
 		shape = Rec(x, y, 8, 8, 0)
+		level = _arr
+		levelName = level
 	}
 
 	function run() {
@@ -318,7 +341,7 @@
 			if(gvPlayer) if(hitTest(shape, gvPlayer.shape) && gvPlayer.hspeed == 0 && gvPlayer.vspeed == 0) if(world != "") {
 				game.owx = px
 				game.owy = py
-				startOverworld("res/map/" + world + ".json")
+				startOverworld(game.path + world + ".json")
 			}
 		}
 	}
@@ -355,15 +378,16 @@
 	gvFadeInTime = 255
 	setFPS(60)
 	gvPlayer = false
+	gvPlayer2 = false
 	deleteAllActors()
 	gvIGT = 0
-	autocon = {
-		up = false
-		down = false
-		left = false
-		right = false
-	}
+	autocon = clone(defAutocon)
 	gfxReset()
+	gvLightScreen = gvLightScreen1
+	gvSplitScreen = false
+	gvYetFoundItems.clear()
+	gvFoundItems.clear()
+	gvAutoCon = false
 
 	//Load map to play
 	if(gvMap != 0) gvMap.del()
@@ -404,54 +428,69 @@
 	//Start making actors
 	foreach(i in actlayer.objects)
 	{
-		local n = i.gid - tilef
 		local c
 
-		//Get the tile number and make an actor
-		//according to the image used in actors.png
-		switch(n)
-		{
-			case 0:
-				//newActor(Tux, i.x, i.y - 16)
-				if(!gvPlayer) c = newActor(OverPlayer, i.x + 8, i.y - 8)
-				break
+		if("gid" in i) {
+			local n = i.gid - tilef
 
-			case 1:
-				c = actor[newActor(StageIcon, i.x + 8, i.y - 8)]
-				c.level = i.name
-				c.visible = i.visible
-				break
+			//Get the tile number and make an actor
+			//according to the image used in actors.png
+			switch(n)
+			{
+				case 0:
+					if(!gvPlayer) c = newActor(OverPlayer, i.x + 8, i.y - 8)
+					camx = gvPlayer.x - gvScreenW / 2
+					camy = gvPlayer.y - gvScreenH / 2
+					break
 
-			case 2:
-				c = actor[newActor(WorldIcon, i.x + 8, i.y - 8)]
-				c.level = i.name
-				break
+				case 1:
+					c = actor[newActor(StageIcon, i.x + 8, i.y - 8, i.name)]
+					c.visible = i.visible
+					break
 
-			case 3:
-				c = actor[newActor(TownIcon, i.x + 8, i.y - 8)]
-				c.level = i.name
-				break
+				case 2:
+					c = actor[newActor(WorldIcon, i.x + 8, i.y - 8, i.name)]
+					break
 
-			case 4:
-				c = newActor(LockIcon, i.x + 8, i.y - 8, i.name)
-				break
+				case 3:
+					c = actor[newActor(TownIcon, i.x + 8, i.y - 8, i.name)]
+					break
 
-			case 5:
-				if(i.name == "") break
-				local arg = split(i.name, ",")
-				local n = arg[0]
-				arg.remove(0)
-				if(arg.len() == 1) arg = arg[0]
-				else if(arg.len() == 0) arg = null
-				if(getroottable().rawin(n)) if(typeof getroottable()[n] == "class") c = newActor(getroottable()[n], i.x + 8, i.y - 8, arg)
-				break
+				case 4:
+					c = newActor(LockIcon, i.x + 8, i.y - 8, i.name)
+					break
 
-			case 6:
-				c = actor[newActor(StageIcon, i.x + 8, i.y - 8)]
-				c.level = i.name
-				c.visible = i.visible
-				c.raceMode = true
-				break
+				case 5:
+					if(i.name == "") break
+					local arg = split(i.name, ",")
+					local n = arg[0]
+					arg.remove(0)
+					if(arg.len() == 1) arg = arg[0]
+					else if(arg.len() == 0) arg = null
+					if(getroottable().rawin(n)) if(typeof getroottable()[n] == "class") c = newActor(getroottable()[n], i.x + 8, i.y - 8, arg)
+					break
+
+				case 6:
+					c = actor[newActor(StageIcon, i.x + 8, i.y - 8, i.name)]
+					c.visible = i.visible
+					c.raceMode = true
+					break
+			}
+		}
+
+		//Rectangle actors
+		if(!i.rawin("polygon") && !i.rawin("polyline") && !i.rawin("ellipse") && !i.rawin("point") && !i.rawin("gid")) if(i.name != "") {
+			local arg = split(i.name, ",")
+			local n = arg[0]
+			arg.remove(0)
+			if(arg.len() == 1) arg = arg[0]
+			else if(arg.len() == 0) arg = null
+			if(getroottable().rawin(n)) if(typeof getroottable()[n] == "class") {
+				print(i.x + " - " + i.y)
+				c = newActor(getroottable()[n], i.x + (i.width / 2.0), i.y + (i.height / 2.0), arg)
+				actor[c].w = i.width / 2.0
+				actor[c].h = i.height / 2.0
+			}
 		}
 
 		if(typeof c == "integer") mapActor[i.id] <- c
@@ -495,10 +534,7 @@
 	print("End level code")
 
 	//Reset auto/locked controls
-	autocon.up = false
-	autocon.down = false
-	autocon.left = false
-	autocon.right = false
+	autocon = clone(defAutocon)
 
 	update()
 }
@@ -514,9 +550,14 @@
 	//Actor types are explicitly called this way to ensure the player is drawn on top
 	//This was made before Z drawing was implemented, so it's not perfect
 	runActors()
+	foreach(i in actor) if("draw" in i && typeof i.draw == "function") i.draw()
 	drawZList(8)
 
 	runAmbientLight()
+
+	if(gvPlayer)
+		drawLight(sprLightBasic, 0, gvPlayer.x - camx, gvPlayer.y - camy - 8)
+
 	drawAmbientLight()
 
 	if(gvLevel != "") {
@@ -530,6 +571,25 @@
 
 	drawSprite(sprCoin, 0, 16, screenH() - 16)
 	drawText(font2, 24, screenH() - 23, game.coins.tostring())
+
+	if (game.colorswitch.find(true) != null) {
+		if(getcon("spec1", "press")) {
+			game.turnOffBlocks = !game.turnOffBlocks
+			playSound(sndMenuSelect, 0)
+		}
+
+		local blockx = gvScreenW - 21
+		local blocky = gvScreenH - 21
+		local trueCount = 0
+		for(local i = 7; i >= 0; i--) {
+			if(game.colorswitch[i]) {
+				trueCount++
+				drawSprite(sprColorBlock, ((i * 2) + 1) - int(game.turnOffBlocks), blockx, blocky)
+				blockx -= 8
+				blocky -= (trueCount % 2 == 0 ? -8 : 8)
+			}
+		}
+	}
 
 	//Fade from black
 	setDrawColor(gvFadeInTime)

@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="AudioFilesHandler.cs" />
     <Compile Include="FileNameInfo.cs" />
+    <Compile Include="FileNameInfoComparer.cs" />
     <Compile Include="ImageFilesHandler.cs" />
     <Compile Include="ISquirrelTranspiler.cs" />
     <Compile Include="JsonFilesHandler.cs" />
@@ -51,6 +52,8 @@
     <Compile Include="SquirrelTranspilationException.cs" />
     <Compile Include="SquirrelTranspilationUtil.cs" />
     <Compile Include="StringUtil.cs" />
+    <Compile Include="TranspilationTesting.cs" />
+    <Compile Include="TsjFilesHandler.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="WebVersionGeneration.cs" />
   </ItemGroup>

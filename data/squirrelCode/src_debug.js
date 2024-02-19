@@ -13,6 +13,10 @@ debugHistory =  [  ]  ;
 debugCursor = 0 ; 
 debugMouseLeft = 1 ; 
 debugMouseRight = 0 ; 
+debugExt =  {  }  ; 
+gvDebugConsole = false ; 
+gvConIn = "" ; 
+gvConOut = "" ; 
 drawDebug =  function (  ) {  if ( keyPress ( k_tick )  ) devcom =  ! devcom ; 
  
   if (  ! debug )  return ; 
@@ -25,37 +29,39 @@ debugTickIndex ++  ;
  if ( debugTickIndex == 64 ) debugTickIndex = 0 ; 
  
  fps = debugTickSum / 64 ; 
- if ( keyPress ( k_1 )  ) game . weapon = 0 ; 
- 
+ if ( keyPress ( k_1 )  )  { 
+ game . ps . weapon = "fire" ; 
+ } 
+  
   if ( keyPress ( k_2 )  )  { 
- game . weapon = 1 ; 
-game . maxEnergy = 4 - game . difficulty + game . fireBonus ; 
+ game . ps . weapon = "ice" ; 
  } 
   
   if ( keyPress ( k_3 )  )  { 
- game . weapon = 2 ; 
-game . maxEnergy = 4 - game . difficulty + game . iceBonus ; 
+ game . ps . weapon = "air" ; 
  } 
   
   if ( keyPress ( k_4 )  )  { 
- game . weapon = 3 ; 
-game . maxEnergy = 4 - game . difficulty + game . airBonus ; 
+ game . ps . weapon = "earth" ; 
  } 
   
   if ( keyPress ( k_5 )  )  { 
- game . weapon = 4 ; 
-game . maxEnergy = 4 - game . difficulty + game . earthBonus ; 
+ game . ps . weapon = "shock" ; 
  } 
   
   if ( keyPress ( k_6 )  )  { 
- gvPlayer . zoomies += 60 * 16 ; 
+ game . ps . weapon = "water" ; 
  } 
   
-  if ( keyPress ( k_0 )  ) game . maxHealth = 16 ; 
- 
-  if ( keyPress ( k_9 )  ) game . health += 4 ; 
- 
-  if ( keyPress ( k_minus )  ) game . maxHealth = game . maxHealth - 4 ; 
+  if ( keyPress ( k_7 )  )  { 
+ game . ps . weapon = "dark" ; 
+ } 
+  
+  if ( keyPress ( k_8 )  )  { 
+ game . ps . weapon = "light" ; 
+ } 
+  
+  if ( keyPress ( k_minus )  && game . maxHealth > 4 ) game . maxHealth = game . maxHealth - 4 ; 
  
   if ( keyPress ( k_equals )  ) game . maxHealth = game . maxHealth + 4 ; 
  
@@ -69,20 +75,53 @@ gvKeyMythril = true ;
   
   } 
   
-  if ( keyDown ( k_lctrl )  || keyDown ( k_rctrl )  )  { 
-  if ( keyPress ( k_e )  )  { 
- endGoal (  )  ; 
+  if (  ( keyDown ( k_lctrl )  || keyDown ( k_rctrl )  )  && keyPress ( k_e )  ) endGoal (  )  ; 
+ 
+  if ( keyDown ( k_lshift )  )  { 
+  if ( gvPlayer && mouseDown ( 0 )  )  { 
+  if (  ! gvSplitScreen )  { 
+ gvPlayer . x = mouseX (  )  + camx0 ; 
+gvPlayer . y = mouseY (  )  + camy0 ; 
+gvPlayer . hspeed = 0.0 ; 
+gvPlayer . vspeed = 0.0 ; 
+ } 
+  
+  else  if ( gvSwapScreen )  { 
+  if ( mouseX (  )  > screenW (  )  / 2 )  { 
+ gvPlayer . x =  ( mouseX (  )  - screenW (  )  / 2 )  + camx1 ; 
+gvPlayer . y = mouseY (  )  + camy1 ; 
+gvPlayer . hspeed = 0.0 ; 
+gvPlayer . vspeed = 0.0 ; 
+ } 
+  
+  else  { 
+ gvPlayer2 . x = mouseX (  )  + camx2 ; 
+gvPlayer2 . y = mouseY (  )  + camy2 ; 
+gvPlayer2 . hspeed = 0.0 ; 
+gvPlayer2 . vspeed = 0.0 ; 
  } 
   
   } 
   
-  if ( keyDown ( k_lshift )  )  { 
-  if ( gvPlayer && mouseDown ( 0 )  )  { 
- gvPlayer . x = mouseX (  )  + camx ; 
-gvPlayer . y = mouseY (  )  + camy ; 
+  else  { 
+  if ( mouseX (  )  < screenW (  )  / 2 )  { 
+ gvPlayer . x = mouseX (  )  + camx1 ; 
+gvPlayer . y = mouseY (  )  + camy1 ; 
 gvPlayer . hspeed = 0.0 ; 
 gvPlayer . vspeed = 0.0 ; 
- if ( gvGameMode == gmOverworld )  { 
+ } 
+  
+  else  { 
+ gvPlayer2 . x =  ( mouseX (  )  - screenW (  )  / 2 )  + camx2 ; 
+gvPlayer2 . y = mouseY (  )  + camy2 ; 
+gvPlayer2 . hspeed = 0.0 ; 
+gvPlayer2 . vspeed = 0.0 ; 
+ } 
+  
+  } 
+  
+  
+  if ( gvGameMode == gmOverworld )  { 
  gvPlayer . x =  ( gvPlayer . x -  ( gvPlayer . x % 16 )  )  + 8 ; 
 gvPlayer . y =  ( gvPlayer . y -  ( gvPlayer . y % 16 )  )  + 8 ; 
  } 
@@ -92,25 +131,72 @@ gvPlayer . y =  ( gvPlayer . y -  ( gvPlayer . y % 16 )  )  + 8 ;
   } 
   
   else  { 
-  if ( mouseDown ( 0 )  ) tileSetSolid ( mouseX (  )  + camx , mouseY (  )  + camy , debugMouseLeft )  ; 
+  var dox = 0 ;
+  var doy = 0 ;
+  if ( gvGameMode == gmOverworld )  { 
+ dox = mouseX (  )  + camx ; 
+doy = mouseY (  )  + camy ; 
+ } 
+  
+  else  if (  ! gvSplitScreen )  { 
+ dox = mouseX (  )  + camx0 ; 
+doy = mouseY (  )  + camy0 ; 
+ } 
+  
+  else  if ( gvSwapScreen )  { 
+  if ( mouseX (  )  > screenW (  )  / 2 )  { 
+ dox =  ( mouseX (  )  - screenW (  )  / 2 )  + camx1 ; 
+doy = mouseY (  )  + camy1 ; 
+ } 
+  
+  else  { 
+ dox = mouseX (  )  + camx2 ; 
+doy = mouseY (  )  + camy2 ; 
+ } 
+  
+  } 
+  
+  else  { 
+  if ( mouseX (  )  < screenW (  )  / 2 )  { 
+ dox = mouseX (  )  + camx1 ; 
+doy = mouseY (  )  + camy1 ; 
+ } 
+  
+  else  { 
+ dox =  ( mouseX (  )  - screenW (  )  / 2 )  + camx2 ; 
+doy = mouseY (  )  + camy2 ; 
+ } 
+  
+  } 
+  
+  
+  
+  if ( mouseDown ( 0 )  ) tileSetSolid ( dox , doy , debugMouseLeft )  ; 
  
-  if ( mouseDown ( 2 )  ) tileSetSolid ( mouseX (  )  + camx , mouseY (  )  + camy , debugMouseRight )  ; 
+  if ( mouseDown ( 2 )  ) tileSetSolid ( dox , doy , debugMouseRight )  ; 
  
-  if ( mouseDown ( 1 )  ) debugMouseLeft = tileGetSolid ( mouseX (  )  + camx , mouseY (  )  + camy )  ; 
+  if ( mouseDown ( 1 )  ) debugMouseLeft = tileGetSolid ( dox , doy )  ; 
  
   if ( mouseWheelY (  )  < 0 ) debugMouseLeft --  ; 
  
   if ( mouseWheelY (  )  > 0 ) debugMouseLeft ++  ; 
  
- debugMouseLeft = wrap ( debugMouseLeft , 0 ,  ( 5 * 13 )  - 1 )  ; 
- if ( debugMouseLeft == 0 ) drawSprite ( tsSolid ,  ( 5 * 13 )  - 1 , mouseX (  )  , mouseY (  )  )  ; 
- 
+ debugMouseLeft = wrap ( debugMouseLeft , 0 ,  ( 6 * 16 )  - 1 )  ; 
+ if ( debugMouseLeft == 0 )  { 
+ setDrawColor ( 0xff0000ff )  ; 
+drawLineWide ( mouseX (  )  - 8 , mouseY (  )  - 8 , mouseX (  )  + 8 , mouseY (  )  + 8 , 2 )  ; 
+drawLineWide ( mouseX (  )  - 8 , mouseY (  )  + 8 , mouseX (  )  + 8 , mouseY (  )  - 8 , 2 )  ; 
+ } 
+  
   else drawSprite ( tsSolid , debugMouseLeft - 1 , mouseX (  )  , mouseY (  )  )  ; 
  
   } 
   
- game . canres = true ; 
- var message = "" ;
+  if ( gvPlayer &&  ( (gvPlayer[ ( "stats" ) ] !== undefined) )  ) gvPlayer . stats . canres = true ; 
+ 
+  if ( gvPlayer2 &&  ( (gvPlayer2[ ( "stats" ) ] !== undefined) )  ) gvPlayer2 . stats . canres = true ; 
+ 
+  var message = "" ;
   if ( gvPlayer )  { 
  message += "X: " + gvPlayer . x + "\n" ; 
 message += "Y: " + gvPlayer . y + "\n" ; 
@@ -121,13 +207,6 @@ message += "Y: " + gvPlayer . y + "\n" ;
  } 
   
  message += "FPS: " + round ( fps )  + " (" + getFPS (  )  + ")\n\n\n\n" ; 
-drawSprite ( sprDebug , getcon ( "left" , "hold" )  . tointeger (  )  , 4 , 60 )  ; 
-drawSprite ( sprDebug , getcon ( "up" , "hold" )  . tointeger (  )  + 4 , 12 , 56 )  ; 
-drawSprite ( sprDebug , getcon ( "down" , "hold" )  . tointeger (  )  + 6 , 12 , 64 )  ; 
-drawSprite ( sprDebug , getcon ( "right" , "hold" )  . tointeger (  )  + 2 , 20 , 60 )  ; 
-drawSprite ( sprDebug , getcon ( "jump" , "hold" )  . tointeger (  )  + 8 , 4 , 72 )  ; 
-drawSprite ( sprDebug , getcon ( "shoot" , "hold" )  . tointeger (  )  + 10 , 12 , 72 )  ; 
-drawSprite ( sprDebug , getcon ( "run" , "hold" )  . tointeger (  )  + 12 , 20 , 72 )  ; 
 message += "HSPD: " ; 
  if ( gvPlayer ) message += gvPlayer . hspeed . tostring (  )  ; 
  
@@ -146,68 +225,68 @@ drawText ( font , 0 , 32 , message )  ;
 setDrawColor ( 0xff0000ff )  ; 
 drawLine ( mouseX (  )  - 8 , mouseY (  )  , mouseX (  )  + 8 , mouseY (  )  )  ; 
 drawLine ( mouseX (  )  , mouseY (  )  - 8 , mouseX (  )  , mouseY (  )  + 8 )  ; 
- }  ; 
-debugConsole =  function (  ) {  if ( gvGameMode != gmPause )  { 
+ {     var foreachOutput1 = squirrelForEach( debugExt );     while(true)     {        foreachOutput1.next();        if (foreachOutput1.isDone()) break; i = foreachOutput1.getValue();  if (  squirrelTypeOf ( i )  == "function" ) i (  )  ; 
+ 
+     }  }  }  ; 
+gmConsole =  function (  ) {  if (  ! gvDebugConsole )  { 
+  if ( gvGameMode != gmPause )  { 
  setDrawTarget ( bgPause )  ; 
 drawImage ( gvScreen , 0 , 0 )  ; 
  } 
   
  resetDrawTarget (  )  ; 
-update (  )  ; 
- var output = "" ;
-  var input = "" ;
-  while (  ! keyPress ( k_tick )  &&  ! keyPress ( k_escape )  )  { 
-  if ( keyPress ( k_backspace )  && input . len (  )  > 0 ) input = input . slice ( 0 ,  - 1 )  ; 
+gvConOut = "" ; 
+gvConIn = "" ; 
+gvDebugConsole = true ; 
+ } 
+  
+  if ( keyPress ( k_backspace )  && gvConIn . len (  )  > 0 ) gvConIn = gvConIn . slice ( 0 ,  - 1 )  ; 
  
   if ( keyPress ( k_enter )  )  { 
- dostr ( input )  ; 
+ dostr ( gvConIn )  ; 
  if ( debugHistory . len (  )  > 0 ) debugHistory . pop (  )  ; 
  
- debugHistory . push ( input )  ; 
+ debugHistory . push ( gvConIn )  ; 
 debugHistory . push ( "" )  ; 
 debugCursor = debugHistory . len (  )  - 1 ; 
  if ( debugHistory . len (  )  > screenH (  )  / 8 ) debugHistory . remove ( 0 )  ; 
  
- input = "" ; 
+ gvConIn = "" ; 
  } 
   
   var newchar = keyString (  )  ;
-  if ( newchar != "`" ) input += newchar ; 
+  if ( newchar != "`" ) gvConIn += newchar ; 
  
  setDrawTarget ( gvScreen )  ; 
 drawImage ( bgPause , 0 , 0 )  ; 
 setDrawColor ( 0x00000080 )  ; 
 drawRec ( 0 , 0 , screenW (  )  , screenH (  )  , true )  ; 
-output = "" ; 
+gvConOut = "" ; 
  for (  var i = 0 ;
  i < debugHistory . len (  )  - 1 ; i ++  )  { 
- output += debugHistory [ i ]  ; 
-output += "\n" ; 
+ gvConOut += debugHistory [ i ]  ; 
+gvConOut += "\n" ; 
  } 
-  if ( input . len (  )  < floor ( screenW (  )  / 6 )  ) output += input ; 
+  if ( gvConIn . len (  )  < floor ( screenW (  )  / 6 )  ) gvConOut += gvConIn ; 
  
-  else output += input . slice (  - floor ( screenW (  )  / 6 )  )  ; 
+  else gvConOut += gvConIn . slice (  - floor ( screenW (  )  / 6 )  )  ; 
  
-  if ( floor ( getFrames (  )  / 32 )  % 2 == 0 ) output += "|" ; 
+  if ( floor ( getFrames (  )  / 32 )  % 2 == 0 ) gvConOut += "|" ; 
  
- drawText ( font , 0 , 0 , output )  ; 
+ drawText ( font , 0 , 0 , gvConOut )  ; 
 resetDrawTarget (  )  ; 
-drawImage ( gvScreen , 0 , 0 )  ; 
-update (  )  ; 
  if ( keyPress ( k_up )  && debugCursor > 0 )  { 
  debugCursor --  ; 
-input = debugHistory [ debugCursor ]  ; 
+gvConIn = debugHistory [ debugCursor ]  ; 
  } 
   
   if ( keyPress ( k_down )  && debugCursor < debugHistory . len (  )  - 1 )  { 
  debugCursor ++  ; 
-input = debugHistory [ debugCursor ]  ; 
+gvConIn = debugHistory [ debugCursor ]  ; 
  } 
   
-  } 
-  
   }  ; 
-PolyTest =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+PolyTest =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -223,8 +302,33 @@ path = _arr [ 0 ]  ;
  i < path . len (  )  - 1 ; i ++  ) drawLine ( path [ i ]  [ 0 ]  - camx , path [ i ]  [ 1 ]  - camy , path [ i + 1 ]  [ 0 ]  - camx , path [ i + 1 ]  [ 1 ]  - camy )  ; 
  } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . path = null ; 
- return squirrelClassFunction; })()) ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . path = null ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Actor;  return squirrelClassFunction; })()) ; 
+displayKeys =  function (  ) {  var offset =  ( gvNumPlayers == 2 ? 32 : 0 )  ;
+  if (  ! config . showleveligt &&  ! gvTimeAttack ) offset -= 16 ; 
+ 
+ drawSprite ( sprDebug , int ( getcon ( "left" , "hold" , true , 1 )  )  , 4 , 60 + offset )  ; 
+drawSprite ( sprDebug , int ( getcon ( "up" , "hold" , true , 1 )  )  + 4 , 12 , 56 + offset )  ; 
+drawSprite ( sprDebug , int ( getcon ( "down" , "hold" , true , 1 )  )  + 6 , 12 , 64 + offset )  ; 
+drawSprite ( sprDebug , int ( getcon ( "right" , "hold" , true , 1 )  )  + 2 , 20 , 60 + offset )  ; 
+drawSprite ( sprDebug , int ( getcon ( "jump" , "hold" , true , 1 )  )  + 8 , 4 , 72 + offset )  ; 
+drawSprite ( sprDebug , int ( getcon ( "spec2" , "hold" , true , 1 )  )  + 10 , 12 , 72 + offset )  ; 
+drawSprite ( sprDebug , int ( getcon ( "swap" , "hold" , true , 1 )  )  + 12 , 20 , 72 + offset )  ; 
+drawSprite ( sprDebug , int ( getcon ( "shoot" , "hold" , true , 1 )  )  + 14 , 28 , 60 + offset )  ; 
+drawSprite ( sprDebug , int ( getcon ( "spec1" , "hold" , true , 1 )  )  + 16 , 28 , 68 + offset )  ; 
+ if ( gvNumPlayers == 2 )  { 
+ drawSprite ( sprDebug , int ( getcon ( "left" , "hold" , true , 2 )  )  , 4 + 36 , 60 + offset )  ; 
+drawSprite ( sprDebug , int ( getcon ( "up" , "hold" , true , 2 )  )  + 4 , 12 + 36 , 56 + offset )  ; 
+drawSprite ( sprDebug , int ( getcon ( "down" , "hold" , true , 2 )  )  + 6 , 12 + 36 , 64 + offset )  ; 
+drawSprite ( sprDebug , int ( getcon ( "right" , "hold" , true , 2 )  )  + 2 , 20 + 36 , 60 + offset )  ; 
+drawSprite ( sprDebug , int ( getcon ( "jump" , "hold" , true , 2 )  )  + 8 , 4 + 36 , 72 + offset )  ; 
+drawSprite ( sprDebug , int ( getcon ( "spec2" , "hold" , true , 2 )  )  + 10 , 12 + 36 , 72 + offset )  ; 
+drawSprite ( sprDebug , int ( getcon ( "swap" , "hold" , true , 2 )  )  + 12 , 20 + 36 , 72 + offset )  ; 
+drawSprite ( sprDebug , int ( getcon ( "shoot" , "hold" , true , 2 )  )  + 14 , 28 + 36 , 60 + offset )  ; 
+drawSprite ( sprDebug , int ( getcon ( "spec1" , "hold" , true , 2 )  )  + 16 , 28 + 36 , 68 + offset )  ; 
+ } 
+  
+  }  ; 
 
 
 

@@ -261,6 +261,16 @@ public interface ISquirrelListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitCloseParen([NotNull] SquirrelParser.CloseParenContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="SquirrelParser.deleteKeyword"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterDeleteKeyword([NotNull] SquirrelParser.DeleteKeywordContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="SquirrelParser.deleteKeyword"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitDeleteKeyword([NotNull] SquirrelParser.DeleteKeywordContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="SquirrelParser.objectLiteral"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -380,6 +390,26 @@ public interface ISquirrelListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitClassFunctionDeclaration([NotNull] SquirrelParser.ClassFunctionDeclarationContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="SquirrelParser.instanceofOperator"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterInstanceofOperator([NotNull] SquirrelParser.InstanceofOperatorContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="SquirrelParser.instanceofOperator"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitInstanceofOperator([NotNull] SquirrelParser.InstanceofOperatorContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="SquirrelParser.cloneOperator"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterCloneOperator([NotNull] SquirrelParser.CloneOperatorContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="SquirrelParser.cloneOperator"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitCloneOperator([NotNull] SquirrelParser.CloneOperatorContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="SquirrelParser.expNotIncludingObjectLiteral"/>.
 	/// </summary>

@@ -81,25 +81,28 @@
 ::Tilemap <- class {
 	data = null
 	tileset = null
+	image = null
 	tilef = null
 	tilew = 0
 	tileh = 0
 	mapw = 0
 	maph = 0
-	geo = null
+	geo = null //List of solid shapes added after loading
 	w = 0
 	h = 0
 	name = ""
 	file = ""
 	author = ""
 	solidfid = 0 //First tile ID for the solid tileset
-	shape = null
+	shape = null //Movable shape used for collision checking
 	anim = null //List of animated tiles
-	solidLayer = null
+	solidLayer = null //Tile layer used for collision checking
 	plat = null //List of platforms
+	infinite = false
 
 	constructor(filename) {
 		tileset = []
+		image = {}
 		tilef = []
 		geo = []
 		data = {}
@@ -122,8 +125,23 @@
 			print("\nLoading map: " + name)
 
 			for(local i = 0; i < data.tilesets.len(); i++) {
+				//Check if tileset is not embedded
+				if("source" in data.tilesets[i])
+				for(local j = 0; j < tileSearchDir.len(); j++) {
+					local sourcefile = findFileName(data.tilesets[i].source)
+					if(fileExists(tileSearchDir[j] + "/" + sourcefile)) {
+						print("Found external tileset: " + sourcefile)
+						local newgid = data.tilesets[i].firstgid
+						data.tilesets[i] = jsonRead(fileRead(tileSearchDir[j] + "/" + sourcefile))
+						data.tilesets[i].firstgid <- newgid
+						break
+					}
+					else print("Unable to find external tile: " + sourcefile + " in " + tileSearchDir[j])
+				}
+
 				//Extract filename
 				//print("Get filename")
+				if(!("image" in data.tilesets[i])) print(jsonWrite(data.tilesets[i]))
 				local filename = data.tilesets[i].image
 				local shortname = findFileName(filename)
 				//print("Full map name: " + filename + ".")
@@ -162,31 +180,34 @@
 
 			//print("Added " + spriteName(tileset[i]) + ".\n")
 
-
-
-
 			shape = (Rec(0, 0, 8, 8, 0))
 
-			//Add sky protection
-			local l = -1
+			//Assign solid layer
 			for(local i = 0; i < data.layers.len(); i++) {
-				if(data.layers[i].name == "solid") {
-					l = data.layers[i]
+				if(data.layers[i].type == "tilelayer" && data.layers[i].name == "solid") {
+					solidLayer = data.layers[i]
 					break
 				}
 			}
-			if(l != -1) {
-				for(local i = 0; i < l.width; i++) {
-					if(l.data[i] != 0) geo.push(Rec((i * 16) + 8, -1000, 8, 1000, 0))
+
+			//Load image layers
+			for(local i = 0; i < data.layers.len(); i++) {
+				if(data.layers[i].type == "imagelayer") {
+					local imageSource = findTexture(findFileName(data.layers[i].image))
+					if(imageSource <= 0) {
+						for(local j = 0; j < tileSearchDir.len(); j++) {
+							local sourcefile = findFileName(data.layers[i].image)
+							if(fileExists(tileSearchDir[j] + "/" + sourcefile)) {
+								print("Found external image: " + sourcefile)
+								imageSource = loadImage(tileSearchDir[j] + "/" + sourcefile)
+								break
+							}
+							else print("Unable to find external image: " + sourcefile + " in " + tileSearchDir[j])
+						}
+					}
+					image[data.layers[i].name] <- imageSource
 				}
 			}
-
-			for(local i = 0; i < data.layers.len(); i++) {
-			if(data.layers[i].type == "tilelayer" && data.layers[i].name == "solid") {
-				solidLayer = data.layers[i]
-				break
-			}
-		}
 		}
 		else print("Map file " + filename + " does not exist!")
 	}
@@ -231,19 +252,19 @@
 		
 		for(local i = my; i < myPlusMh; i++) {
 			local iTimesDataLayersTWidth = i * dataLayersTWidth;
-			local yPlusITimesDataTileheightTimesSy = y + i * data.tileheight * sy;
+			local yPlusRoundITimesDataTileheightTimesSy = y + round(i * data.tileheight * sy);
 			for(local j = mx; j < mxPlusMw; j++) {
 				if(iTimesDataLayersTWidth + j >= dataLayersTDataLen) return
 				local n = dataLayersTData[iTimesDataLayersTWidth + j]; //Number value of the tile
 				if(n != 0) {
-					local xPlusJTimesDataTilewidthTimesSx = x + j * data.tilewidth * sx;
+					local xPlusRoundJTimesDataTilewidthTimesSx = x + round(j * data.tilewidth * sx);
 					for(local k = dataTilesetsLen - 1; k >= 0; k--) {
 						if(n >= data.tilesets[k].firstgid) {
 							if(anim.rawin(n)) {
-								if(tileset[k] == anim[n].sprite) anim[n].draw(xPlusJTimesDataTilewidthTimesSx, yPlusITimesDataTileheightTimesSy, dataLayersTOpacityTimesA)
-								else drawSpriteEx(tileset[k], n - data.tilesets[k].firstgid, xPlusJTimesDataTilewidthTimesSx, yPlusITimesDataTileheightTimesSy, 0, 0, sx, sy, dataLayersTOpacityTimesA)
+								if(tileset[k] == anim[n].sprite) anim[n].draw(xPlusRoundJTimesDataTilewidthTimesSx, yPlusRoundITimesDataTileheightTimesSy, dataLayersTOpacityTimesA)
+								else drawSpriteEx(tileset[k], n - data.tilesets[k].firstgid, xPlusRoundJTimesDataTilewidthTimesSx, yPlusRoundITimesDataTileheightTimesSy, 0, 0, sx, sy, dataLayersTOpacityTimesA)
 							}
-							else drawSpriteEx(tileset[k], n - data.tilesets[k].firstgid, xPlusJTimesDataTilewidthTimesSx, yPlusITimesDataTileheightTimesSy, 0, 0, sx, sy, dataLayersTOpacityTimesA)
+							else drawSpriteEx(tileset[k], n - data.tilesets[k].firstgid, xPlusRoundJTimesDataTilewidthTimesSx, yPlusRoundITimesDataTileheightTimesSy, 0, 0, sx, sy, dataLayersTOpacityTimesA)
 							k = -1
 							break
 						}
@@ -282,10 +303,10 @@
 					for(local k = data.tilesets.len() - 1; k >= 0; k--) {
 						if(n >= data.tilesets[k].firstgid) {
 							if(anim.rawin(n)) {
-								if(tileset[k] == anim[n].sprite) anim[n].draw(x + (j * data.tilewidth * sx), y + (i * data.tileheight * sy), data.layers[t].opacity * a, c)
-								else drawSpriteExMod(tileset[k], n - data.tilesets[k].firstgid, x + (j * data.tilewidth * sx), y + (i * data.tileheight * sy), 0, 0, 1, 1, data.layers[t].opacity * a, c)
+								if(tileset[k] == anim[n].sprite) anim[n].draw(x + floor(j * data.tilewidth * sx), y + floor(i * data.tileheight * sy), data.layers[t].opacity * a, c)
+								else drawSpriteExMod(tileset[k], n - data.tilesets[k].firstgid, x + floor(j * data.tilewidth * sx), y + floor(i * data.tileheight * sy), 0, 0, sx, sy, data.layers[t].opacity * a, c)
 							}
-							else drawSpriteExMod(tileset[k], n - data.tilesets[k].firstgid, x + (j * data.tilewidth * sx), y + (i * data.tileheight * sy), 0, 0, 1, 1, data.layers[t].opacity * a, c)
+							else drawSpriteExMod(tileset[k], n - data.tilesets[k].firstgid, x + floor(j * data.tilewidth * sx), y + floor(i * data.tileheight * sy), 0, 0, sx, sy, data.layers[t].opacity * a, c)
 							k = -1
 							break
 						}
@@ -295,6 +316,11 @@
 		}
 	}
 
+	function drawImageLayer(l, x, y) {
+		if(l in image)
+			drawImage(image[l], x, y)
+	}
+
 	function del() {
 		return //Needs fix on Brux side
 
@@ -302,7 +328,13 @@
 			deleteSprite(tileset[i])
 		}
 	}
+
+	function _typeof() { return "Tilemap" }
 }
+
+///////////////
+// FUNCTIONS //
+///////////////
 
 ::mapNewSolid <- function(shape) {
 	gvMap.geo.push(shape)
@@ -310,7 +342,7 @@
 }
 
 ::mapDeleteSolid <- function(index) {
-	if(index >= 0 && index < gvMap.geo.len() && gvMap.geo.len() > 0) {
+	if(index in gvMap.geo && index >= 0 && index < gvMap.geo.len() && gvMap.geo.len() > 0) {
 		gvMap.geo[index] = null
 	}
 }
@@ -333,5 +365,18 @@
 	if(tile >= 0 && tile < gvMap.solidLayer.data.len()) {
 		if(gvMap.solidLayer.data[tile] == 0) return 0
 		else return (gvMap.solidLayer.data[tile] - gvMap.solidfid + 1)
+	}
+}
+
+::loadTileMapWorld <- function(filename) {
+	if(!fileExists(filename)) return {}
+
+	local file = jsonRead(fileRead(filename))
+	local nw = {}
+
+	if(!"maps" in file) return {}
+	for(local i = 0; i < file.maps.len(); i++) {
+		local name = findFileName(file.maps[i]["fileName"])
+		nw[name] <- [file.maps[i]["x"], file.maps[i]["y"]]
 	}
 }

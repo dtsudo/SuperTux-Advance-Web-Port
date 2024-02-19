@@ -49,6 +49,8 @@ namespace SquirrelLanguageTranspiler
 
 		public string TranspileSquirrelCode(string squirrelCode)
 		{
+			squirrelCode = SquirrelTranspilerPreprocessor.PreprocessSquirrelCode(squirrelCode: squirrelCode);
+
 			this.hasHitError = false;
 
 			AntlrInputStream inputStream = new AntlrInputStream(squirrelCode);
@@ -61,6 +63,9 @@ namespace SquirrelLanguageTranspiler
 			SquirrelTranspilerVisitor visitor = new SquirrelTranspilerVisitor();
 
 			if (this.hasHitError)
+				throw new SquirrelTranspilationException();
+
+			if (inputStream.Index != inputStream.Size)
 				throw new SquirrelTranspilationException();
 
 			string transpiledOutput;
@@ -82,6 +87,8 @@ namespace SquirrelLanguageTranspiler
 
 		public void PrintTokens(string squirrelCode)
 		{
+			squirrelCode = SquirrelTranspilerPreprocessor.PreprocessSquirrelCode(squirrelCode: squirrelCode);
+
 			AntlrInputStream inputStream = new AntlrInputStream(squirrelCode);
 			SquirrelLexer squirrelLexer = new SquirrelLexer(inputStream);
 			CommonTokenStream commonTokenStream = new CommonTokenStream(squirrelLexer);

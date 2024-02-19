@@ -98,12 +98,12 @@
 					if (folder[i].toLowerCase().endsWith(".json"))
 						listOfLevels.push(folder[i].substring(0, folder[i].length - 5));
 				}
-				folder = window.lsdir("contrib/frostlands");
+				folder = window.lsdir("contrib/bonus");
 				for (let i = 0; i < folder.length; i++) {
 					if (folder[i].toLowerCase().endsWith(".json"))
 						listOfLevels.push(folder[i].substring(0, folder[i].length - 5));
 				}
-				folder = window.lsdir("contrib/azzy");
+				folder = window.lsdir("contrib/frostlands");
 				for (let i = 0; i < folder.length; i++) {
 					if (folder[i].toLowerCase().endsWith(".json"))
 						listOfLevels.push(folder[i].substring(0, folder[i].length - 5));
@@ -138,13 +138,11 @@
 				nextTimeToAct = now - 5.0*(1000.0 / fps);
 			
 			nextTimeToAct = nextTimeToAct + (1000.0 / fps);
-			
-			if (window.keyPress(window.k_escape) && levelEndRunner == 0 && gvGameMode != gmMain)
-				togglePause();
-			
+						
 			window.superTuxAdvanceWebVersion.superTuxAdvanceCanvasContext.fillStyle = "rgba(0, 0, 0, 1)";
 			window.superTuxAdvanceWebVersion.superTuxAdvanceCanvasContext.fillRect(0, 0, window.superTuxAdvanceWebVersion.superTuxAdvanceCanvasWidth, window.superTuxAdvanceWebVersion.superTuxAdvanceCanvasHeight);
-			gvGameMode();
+			gameCycle();
+			gameRender();
 			window.update();
 			
 			debugCommands();
@@ -193,7 +191,11 @@
 			return;
 		}
 		
-		if (window.superTuxAdvanceWebVersion.imageLoadingComplete && window.superTuxAdvanceWebVersion.audioLoadingComplete && squirrelFilesLoadingComplete) {
+		if (window.superTuxAdvanceWebVersion.imageLoadingComplete
+				&& window.superTuxAdvanceWebVersion.audioLoadingComplete
+				&& squirrelFilesLoadingComplete
+				&& window.superTuxAdvanceWebVersion.transpilationTesting
+				&& window.superTuxAdvanceWebVersion.transpilationTesting.allTestsPassed) {
 			window.superTuxAdvanceWebVersion.squirrelFiles["game.brx"]();
 			startGame();
 		} else

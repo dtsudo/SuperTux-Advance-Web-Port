@@ -51,11 +51,33 @@
 			name = name.substring(name.lastIndexOf("\\") + 1);
 		return name;
 	};
+	
+	window.bruxGraphics_getImageObjectFromFileName = function (file) {
+		return imageDictionary[file];
+	};
 
 	window.newSprite = function (file, width, height, margin, padding, pivotX, pivotY) {
+		let img = imageDictionary[file];
+		
+		if (img.width < width || img.height < height) {						
+			let offscreenCanvas = document.createElement("canvas");
+			offscreenCanvas.width = img.width < width ? width : img.width;
+			offscreenCanvas.height = img.height < height ? height : img.height;
+			
+			let offscreenCanvasContext = offscreenCanvas.getContext("2d");
+			offscreenCanvasContext.imageSmoothingEnabled = false;
+			offscreenCanvasContext.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+			offscreenCanvasContext.drawImage(img, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
+			
+			let dataUrl = offscreenCanvas.toDataURL();
+			
+			img = new Image();
+			img.src = dataUrl;
+		}
+		
 		let returnVal = {
 			fileName: normalizeSpriteFileName(file),
-			img: imageDictionary[file],
+			img: img,
 			width: width,
 			height: height,
 			margin: margin,
@@ -75,8 +97,8 @@
 		console.log("Warning: newSpriteFT is not implemented");
 	};
 
-	window.drawSprite = function (sprite, frameNum, x, y) {
-		window.drawSpriteExMod(sprite, frameNum, x, y, 0, 0, 1, 1, 1, 0xffffffff);
+	window.drawSprite = function (sprite, frameNum, x, y, a = 0, l = 0, sx = 1.0, sy = 1.0, p = 1.0, c = 0xffffffff) {
+		window.drawSpriteExMod(sprite, frameNum, x, y, a, l, sx, sy, p, c);
 	};
 
 	window.drawSpriteEx = function (sprite, frameNum, x, y, angle, flip, xscale, yscale, alpha) {
@@ -94,7 +116,7 @@
 		if (alpha <= 0)
 			return;
 		
-		if (sprite === -1)
+		if (sprite === -1 || sprite === 0)
 			return;
 		
 		while (true) {
@@ -156,12 +178,15 @@
 		let sx = 0;
 		let sy = 0;
 			
-		let numTotalFrames = (sprite.img.naturalWidth / sprite.width) * (sprite.img.naturalHeight / sprite.height);
+		let numTotalFrames = Math.floor(sprite.img.naturalWidth / sprite.width) * Math.floor(sprite.img.naturalHeight / sprite.height);
 			
 		frameNum = Math.floor(frameNum);
 			
 		frameNum = frameNum % numTotalFrames;
-			
+		
+		while (frameNum < 0)
+			frameNum += numTotalFrames;
+				
 		let numFramesPerRow = sprite.img.naturalWidth / sprite.width;
 			
 		while (frameNum >= numFramesPerRow) {

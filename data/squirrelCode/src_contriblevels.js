@@ -11,7 +11,7 @@ selectContrib =  function (  ) { meContribLevels =  [  ]  ;
   var contrib = lsdir ( "contrib" )  ;
   var contribFiltered =  [  ]  ;
   {     var foreachOutput1 = squirrelForEach( contrib );     while(true)     {        foreachOutput1.next();        if (foreachOutput1.isDone()) break; item = foreachOutput1.getValue();  { 
-  if ( item != "azzy" && item != "osop-prequel" ) contribFiltered . push ( item )  ; 
+  if ( item != "osop-prequel" ) contribFiltered . push ( item )  ; 
  
   } 
      }  } contrib = contribFiltered ; 
@@ -32,6 +32,14 @@ game . world = contribWorldmap ;
  
   } 
   if (  ! searchDirExists ) tileSearchDir . push ( "contrib/" + contribFolder + "/gfx" )  ; 
+ 
+ searchDirExists = false ; 
+ for (  var i = 0 ;
+ i < tileSearchDir . len (  )  ; i ++  )  { 
+  if ( tileSearchDir [ i ]  == "contrib/" + contribFolder ) searchDirExists = true ; 
+ 
+  } 
+  if (  ! searchDirExists ) tileSearchDir . push ( "contrib/" + contribFolder )  ; 
  
  gvDoIGT = false ; 
  if ( fileExists ( "contrib/" + contribFolder + "/text.json" )  )  { 
@@ -87,17 +95,8 @@ contribDidRun [ contribFolder ] = true ;
      }  }  if ( fileExists ( "save/" + contribFolder + ".json" )  )  { 
   var contribWorldmapSaveData = jsonRead ( fileRead ( "save/" + contribFolder + ".json" )  )  ;
   {     var foreachOutput6 = squirrelForEach( contribWorldmapSaveData [ "completed" ]  );     while(true)     {        foreachOutput6.next();        if (foreachOutput6.isDone()) break; level = foreachOutput6.getKey(); levelCompleted = foreachOutput6.getValue();  { 
-  if ( levelCompleted )  { 
-  var wasFound = false ;
-  for (  var searchIndex = 0 ;
- searchIndex < levels . len (  )  ; searchIndex ++  )  { 
-  if ( levels [ searchIndex ]  == level ) wasFound = true ; 
+  if ( levelCompleted && levels . squirrelFind ( level )  != null ) completedLevelsCount ++  ; 
  
-  } 
-  if ( wasFound ) completedLevelsCount ++  ; 
- 
-  } 
-  
   } 
      }  }  } 
   

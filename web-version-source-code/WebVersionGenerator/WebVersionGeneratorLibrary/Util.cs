@@ -123,7 +123,7 @@ namespace WebVersionGeneratorLibrary
 			}
 		}
 
-		public static List<FileNameInfo> GetAllFilesInSuperTuxAdvanceSourceCodeFolder()
+		public static List<FileNameInfo> GetAllFilesInSuperTuxAdvanceSourceCodeFolderInSortedOrder()
 		{
 			string rootFolder = GetSuperTuxAdvanceSourceCodeFolder();
 			if (rootFolder.EndsWith("/", StringComparison.Ordinal) || rootFolder.EndsWith("\\", StringComparison.Ordinal))
@@ -132,6 +132,8 @@ namespace WebVersionGeneratorLibrary
 			List<FileNameInfo> list = new List<FileNameInfo>();
 
 			GetAllFilesInSuperTuxAdvanceSourceCodeFolderHelper(rootFolder, "", list);
+
+			list.Sort(new FileNameInfoComparer());
 
 			return list;
 		}

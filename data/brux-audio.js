@@ -37,6 +37,10 @@
 		}
 	}
 	
+	setTimeout(function () {
+		window.superTuxAdvanceWebVersion.audioLoadingComplete = true;
+	}, 2000);
+	
 	let hasUserInteractedWithPage = false;
 	document.addEventListener("keydown", function () { hasUserInteractedWithPage = true; }, false);
 	document.addEventListener('mousedown', function () { hasUserInteractedWithPage = true; }, false);
@@ -135,7 +139,7 @@
 		
 		music.loop = true;
 		
-		if (musicFile === "res/mus/retro-2.ogg")
+		if (musicFile === "res/mus/retro-23.ogg")
 			currentlyPlayingMusicVolumeModifier = 0.2;
 		else
 			currentlyPlayingMusicVolumeModifier = 1.0;

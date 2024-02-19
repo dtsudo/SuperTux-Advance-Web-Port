@@ -50,7 +50,7 @@ str
 	;
 	
 Str
-	: '"' ~('"')* '"'
+	: '"' ('\\\\' | '\\"' | .)*? '"'
 	| '\'' ~('\'')* '\''
 	;
 
@@ -149,6 +149,10 @@ closeParen
 	: ')'
 	;
 
+deleteKeyword
+	: 'delete'
+	;
+	
 objectLiteral
 	: '{' '\n'* (propertyAssignment ( (',' | '\n') '\n'* propertyAssignment)* )? '\n'* '}'
 	;
@@ -168,9 +172,11 @@ openSquareBracket
 	;
 
 typeOf
-	: 'typeof' id openSquareBracket exp ']'
+	: 'typeof' id openSquareBracket exp ']' '.' id '(' ')'
+	| 'typeof' id openSquareBracket exp ']'
 	| 'typeof' id openParen closeParen openSquareBracket exp ']'
 	| 'typeof' id openParen closeParen
+	| 'typeof' id '.' id
 	| 'typeof' id
 	;
 
@@ -187,7 +193,7 @@ classVariableDeclaration
 	;
 	
 classConstructorDeclaration
-	: 'constructor' '(' classConstructorArgs ')' '\n'* '{' stats '}'
+	: 'function'? 'constructor' '(' classConstructorArgs ')' '\n'* '{' stats '}'
 	;
 	
 classConstructorArgs
@@ -204,6 +210,14 @@ classFunctionDeclaration
 	: 'function' id '(' functionParameter* ')' '\n'? '{' stats '}' 
 	;
 	
+instanceofOperator
+	: 'instanceof' 
+	;
+	
+cloneOperator
+	: 'clone'
+	;
+	
 expNotIncludingObjectLiteral 
 	: Number 
 	| id
@@ -213,6 +227,8 @@ expNotIncludingObjectLiteral
 	| 'class' ('extends' id)? '{' classStatements '}'
 	| 'base' '.' 'constructor' arguments
 	| 'base' '.' id arguments
+	| deleteKeyword exp
+	| cloneOperator exp
 	| expNotIncludingObjectLiteral equalequal exp
 	| expNotIncludingObjectLiteral notequal exp
 	| negativeSign exp
@@ -221,11 +237,12 @@ expNotIncludingObjectLiteral
 	| expNotIncludingObjectLiteral incrementOperator
 	| expNotIncludingObjectLiteral decrementOperator
 	| expNotIncludingObjectLiteral ternaryOperator exp ':' exp
+	| expNotIncludingObjectLiteral instanceofOperator id
 	| expNotIncludingObjectLiteral '.' id
 	| expNotIncludingObjectLiteral '*' exp
 	| expNotIncludingObjectLiteral '/' exp
 	| expNotIncludingObjectLiteral '%' exp
-	| expNotIncludingObjectLiteral '+' exp
+	| expNotIncludingObjectLiteral '\n'* '+' exp
 	| expNotIncludingObjectLiteral '-' exp
 	| expNotIncludingObjectLiteral '>>' exp
 	| expNotIncludingObjectLiteral '<<' exp
@@ -239,12 +256,13 @@ expNotIncludingObjectLiteral
 	| expNotIncludingObjectLiteral '\n'* '||' exp
 	| expNotIncludingObjectLiteral '|' exp
 	| expNotIncludingObjectLiteral 'in' exp
-	| openParen exp closeParen
+	| openParen '\n'* exp '\n'* closeParen
 	| expNotIncludingObjectLiteral '.' id '=' exp
 	| expNotIncludingObjectLiteral '.' id '<-' exp
 	| expNotIncludingObjectLiteral openSquareBracket exp ']' '=' exp
 	| expNotIncludingObjectLiteral openSquareBracket exp ']' '<-' exp
 	| derefexp assignmentModificationOperator exp
+	| derefexp '.' id assignmentModificationOperator exp
 	| derefexp '=' exp 
 	| derefexp '<-' exp 
 	| expNotIncludingObjectLiteral arguments
@@ -257,6 +275,7 @@ assignmentModificationOperator
 	| '-='
 	| '*='
 	| '/='
+	| '%='
 	;
 	
 arguments

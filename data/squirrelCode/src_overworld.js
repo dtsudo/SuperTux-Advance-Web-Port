@@ -5,10 +5,11 @@ window.superTuxAdvanceWebVersion.squirrelFiles['src/overworld.nut'] = function (
 
 
 gvLevel = "" ; 
-OverPlayer =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+OverPlayer =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
+ returnVal . canmove = false ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
@@ -25,20 +26,20 @@ y = game . owy ;
  } 
   
  shape = Rec ( x , y , 1 , 1 , 0 )  ; 
- if (  ! gvPlayer ) gvPlayer = this ; 
- 
-  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
+gvPlayer = this ; 
+ } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
 shape . setPos ( x , y )  ; 
 game . owx = x ; 
 game . owy = y ; 
- var level = "" ;
+ if (  ! getcon ( "left" , "hold" , false , 0 )  &&  ! getcon ( "right" , "hold" , false , 0 )  &&  ! getcon ( "up" , "hold" , false , 0 )  &&  ! getcon ( "down" , "hold" , false , 0 )  ) canmove = true ; 
+ 
+  var level = "" ;
   var onstage = false ;
-  var onrace = false ;
+  var noclear = false ;
   if ( actor . rawin ( "StageIcon" )  )  { 
   {     var foreachOutput1 = squirrelForEach( actor [ "StageIcon" ]  );     while(true)     {        foreachOutput1.next();        if (foreachOutput1.isDone()) break; i = foreachOutput1.getValue();  { 
   if ( hitTest ( shape , i . shape )  )  { 
- level = i . level ; 
-onrace = i . raceMode ; 
+ level = i . levelName ; 
 onstage = true ; 
  break ;  } 
   
@@ -48,8 +49,9 @@ onstage = true ;
   if ( actor . rawin ( "TownIcon" )  )  { 
   {     var foreachOutput2 = squirrelForEach( actor [ "TownIcon" ]  );     while(true)     {        foreachOutput2.next();        if (foreachOutput2.isDone()) break; i = foreachOutput2.getValue();  { 
   if ( hitTest ( shape , i . shape )  )  { 
- level = i . level ; 
+ level = i . levelName ; 
 onstage = true ; 
+noclear = true ; 
  break ;  } 
   
   } 
@@ -60,6 +62,7 @@ onstage = true ;
   if ( hitTest ( shape , i . shape )  )  { 
  level = i . world ; 
 onstage = true ; 
+noclear = true ; 
  break ;  } 
   
   } 
@@ -170,32 +173,32 @@ game . owd = 1 ;
 vspeed = 0 ; 
  } 
   
-  if ( getcon ( "right" , "hold" )  &&  ! getcon ( "left" , "hold" )  &&  (  ! placeFree ( x + 16 , y )  || debug )  && hspeed <= 0 && vspeed == 0 )  { 
-  if ( level == "" || game . owd == 0 || game . completed . rawin ( level )  || onrace )  { 
+  if ( canmove && getcon ( "right" , "hold" )  &&  ! getcon ( "left" , "hold" )  &&  (  ! placeFree ( x + 16 , y )  || debug )  && hspeed <= 0 && vspeed == 0 )  { 
+  if ( level == "" || game . owd == 0 || game . completed . rawin ( level )  || noclear )  { 
  hspeed = 2 ; 
 game . owd = 2 ; 
  } 
   
   } 
   
-  if ( getcon ( "up" , "hold" )  &&  ! getcon ( "down" , "hold" )  &&  (  ! placeFree ( x , y - 16 )  || debug )  && hspeed == 0 && vspeed >= 0 )  { 
-  if ( level == "" || game . owd == 1 || game . completed . rawin ( level )  || onrace )  { 
+  if ( canmove && getcon ( "up" , "hold" )  &&  ! getcon ( "down" , "hold" )  &&  (  ! placeFree ( x , y - 16 )  || debug )  && hspeed == 0 && vspeed >= 0 )  { 
+  if ( level == "" || game . owd == 1 || game . completed . rawin ( level )  || noclear )  { 
  vspeed =  - 2 ; 
 game . owd = 3 ; 
  } 
   
   } 
   
-  if ( getcon ( "left" , "hold" )  &&  ! getcon ( "right" , "hold" )  &&  (  ! placeFree ( x - 16 , y )  || debug )  && hspeed >= 0 && vspeed == 0 )  { 
-  if ( level == "" || game . owd == 2 || game . completed . rawin ( level )  || onrace )  { 
+  if ( canmove && getcon ( "left" , "hold" )  &&  ! getcon ( "right" , "hold" )  &&  (  ! placeFree ( x - 16 , y )  || debug )  && hspeed >= 0 && vspeed == 0 )  { 
+  if ( level == "" || game . owd == 2 || game . completed . rawin ( level )  || noclear )  { 
  hspeed =  - 2 ; 
 game . owd = 0 ; 
  } 
   
   } 
   
-  if ( getcon ( "down" , "hold" )  &&  ! getcon ( "up" , "hold" )  &&  (  ! placeFree ( x , y + 16 )  || debug )  && hspeed == 0 && vspeed <= 0 )  { 
-  if ( level == "" || game . owd == 3 || game . completed . rawin ( level )  || onrace )  { 
+  if ( canmove && getcon ( "down" , "hold" )  &&  ! getcon ( "up" , "hold" )  &&  (  ! placeFree ( x , y + 16 )  || debug )  && hspeed == 0 && vspeed <= 0 )  { 
+  if ( level == "" || game . owd == 3 || game . completed . rawin ( level )  || noclear )  { 
  vspeed = 2 ; 
 game . owd = 1 ; 
  } 
@@ -206,28 +209,39 @@ game . owd = 1 ;
   
  x += hspeed ; 
 y += vspeed ; 
- if ( hspeed == 0 && vspeed == 0 ) drawSpriteZ ( 2 , getroottable (  )  [ game . characters [ game . playerChar ]  [ "over" ]  ]  , 0 , x - camx , y - camy )  ; 
+ if ( hspeed == 0 && vspeed == 0 )  { 
+ x -= x % 16 ; 
+x += 8 ; 
+y -= y % 16 ; 
+y += 8 ; 
+ } 
+  
+  if ( hspeed == 0 && vspeed == 0 ) drawSpriteZ ( 2 , getroottable (  )  [ gvCharacters [ game . playerChar ]  [ "over" ]  ]  , 0 , x - camx , y - camy )  ; 
  
-  else drawSpriteZ ( 2 , getroottable (  )  [ game . characters [ game . playerChar ]  [ "over" ]  ]  , getFrames (  )  / 8 , x - camx , y - camy )  ; 
+  else drawSpriteZ ( 2 , getroottable (  )  [ gvCharacters [ game . playerChar ]  [ "over" ]  ]  , getFrames (  )  / 8 , x - camx , y - camy )  ; 
  
  gvLevel = level ; 
  } ;  returnVal . physics = function (  ) {  } ;  returnVal . _typeof = function (  ) {  return "OverPlayer" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  return squirrelClassFunction; })()) ; 
-StageIcon =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . canmove = false ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = PhysAct;  return squirrelClassFunction; })()) ; 
+StageIcon =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
  returnVal . level = "" ; 
  returnVal . visible = true ; 
  returnVal . raceMode = false ; 
+ returnVal . levelName = "" ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
 
    (baseConstructor.bind(this))  ( _x , _y )  ; 
 shape = Rec ( x , y , 8 , 8 , 0 )  ; 
+level = _arr ; 
+levelName = level ; 
  } ;  returnVal . run = function (  ) {  if ( visible &&  ! raceMode )  { 
   if ( game . completed . rawin ( level )  ) drawSprite ( sprLevels , 1 , x - camx , y - camy )  ; 
  
@@ -256,26 +270,30 @@ startPlay ( game . path + level + ".json" )  ;
   } ;  returnVal . _typeof = function (  ) {  return "StageIcon" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . level = "" ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . level = "" ; 
  squirrelClassFunction . visible = true ; 
  squirrelClassFunction . raceMode = false ; 
- return squirrelClassFunction; })()) ; 
+ squirrelClassFunction . levelName = "" ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = PhysAct;  return squirrelClassFunction; })()) ; 
 clearAllLevels =  function (  ) {  if (  ! actor . rawin ( "StageIcon" )  )  return ; 
   
   {     var foreachOutput4 = squirrelForEach( actor [ "StageIcon" ]  );     while(true)     {        foreachOutput4.next();        if (foreachOutput4.isDone()) break; i = foreachOutput4.getValue(); game . completed [ i . level ] = true ; 
     }  }  }  ; 
-TownIcon =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+TownIcon =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
  returnVal . level = "" ; 
  returnVal . visible = true ; 
+ returnVal . levelName = "" ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
 
    (baseConstructor.bind(this))  ( _x , _y )  ; 
 shape = Rec ( x , y , 8 , 8 , 0 )  ; 
+level = _arr ; 
+levelName = level ; 
  } ;  returnVal . run = function (  ) {  if ( getcon ( "jump" , "press" )  || getcon ( "accept" , "press" )  || getcon ( "shoot" , "press" )  )  { 
   if ( gvPlayer )  if ( hitTest ( shape , gvPlayer . shape )  && gvPlayer . hspeed == 0 && gvPlayer . vspeed == 0 )  if ( level != "" )  { 
  game . check = false ; 
@@ -288,15 +306,14 @@ startPlay ( game . path + level + ".json" , true , true )  ;
   
   } 
   
-  if ( level != "" &&  ! game . completed . rawin ( level )  ) game . completed [ level ] = true ; 
- 
   } ;  returnVal . _typeof = function (  ) {  return "TownIcon" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . level = "" ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . level = "" ; 
  squirrelClassFunction . visible = true ; 
- return squirrelClassFunction; })()) ; 
-WorldIcon =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction . levelName = "" ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = PhysAct;  return squirrelClassFunction; })()) ; 
+WorldIcon =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -305,12 +322,15 @@ WorldIcon =  ((function(){ let squirrelClassFunction = function ( ) { var return
  returnVal . visible = true ; 
  returnVal . px = 0 ; 
  returnVal . py = 0 ; 
+ returnVal . levelName = "" ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
 
    (baseConstructor.bind(this))  ( _x , _y )  ; 
 shape = Rec ( x , y , 8 , 8 , 0 )  ; 
+level = _arr ; 
+levelName = level ; 
  } ;  returnVal . run = function (  ) {  if ( world == "" && level != "" )  { 
   var arr = split ( level , "," )  ;
  world = arr [ 0 ]  ; 
@@ -322,7 +342,7 @@ py = arr [ 2 ]  . tointeger (  )  ;
   if ( gvPlayer )  if ( hitTest ( shape , gvPlayer . shape )  && gvPlayer . hspeed == 0 && gvPlayer . vspeed == 0 )  if ( world != "" )  { 
  game . owx = px ; 
 game . owy = py ; 
-startOverworld ( "res/map/" + world + ".json" )  ; 
+startOverworld ( game . path + world + ".json" )  ; 
  } 
   
   
@@ -332,13 +352,14 @@ startOverworld ( "res/map/" + world + ".json" )  ;
   } ;  returnVal . _typeof = function (  ) {  return "WorldIcon" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . level = "" ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . level = "" ; 
  squirrelClassFunction . world = "" ; 
  squirrelClassFunction . visible = true ; 
  squirrelClassFunction . px = 0 ; 
  squirrelClassFunction . py = 0 ; 
- return squirrelClassFunction; })()) ; 
-LockIcon =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction . levelName = "" ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = PhysAct;  return squirrelClassFunction; })()) ; 
+LockIcon =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -363,15 +384,21 @@ drawSprite ( sprLevels , 5 , x - camx , y - camy )  ;
   } ;  returnVal . _typeof = function (  ) {  return "LockIcon" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . key = "" ; 
- return squirrelClassFunction; })()) ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . key = "" ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = PhysAct;  return squirrelClassFunction; })()) ; 
 startOverworld =  function ( world ) { gvFadeInTime = 255 ; 
 setFPS ( 60 )  ; 
 gvPlayer = false ; 
+gvPlayer2 = false ; 
 deleteAllActors (  )  ; 
 gvIGT = 0 ; 
-autocon =  { up : false , down : false , left : false , right : false }  ; 
+autocon =  window.clone(  ( defAutocon ) )  ; 
 gfxReset (  )  ; 
+gvLightScreen = gvLightScreen1 ; 
+gvSplitScreen = false ; 
+gvYetFoundItems . clear (  )  ; 
+gvFoundItems . clear (  )  ; 
+gvAutoCon = false ; 
  if ( gvMap != 0 ) gvMap . del (  )  ; 
  
  gvMap = Tilemap ( world )  ; 
@@ -404,17 +431,17 @@ tilef = gvMap . tilef [ i ]  ;
   } 
   
   {     var foreachOutput6 = squirrelForEach( actlayer . objects );     while(true)     {        foreachOutput6.next();        if (foreachOutput6.isDone()) break; i = foreachOutput6.getValue();  { 
-  var n = i . gid - tilef ;
   var c ;
+  if (  ( (i[ ( "gid" ) ] !== undefined) )  )  { 
+  var n = i . gid - tilef ;
   switch ( n )  {  case 0 :  if (  ! gvPlayer ) c = newActor ( OverPlayer , i . x + 8 , i . y - 8 )  ; 
  
-  break ;  case 1 : c = actor [ newActor ( StageIcon , i . x + 8 , i . y - 8 )  ]  ; 
-c . level = i . name ; 
+ camx = gvPlayer . x - gvScreenW / 2 ; 
+camy = gvPlayer . y - gvScreenH / 2 ; 
+ break ;  case 1 : c = actor [ newActor ( StageIcon , i . x + 8 , i . y - 8 , i . name )  ]  ; 
 c . visible = i . visible ; 
- break ;  case 2 : c = actor [ newActor ( WorldIcon , i . x + 8 , i . y - 8 )  ]  ; 
-c . level = i . name ; 
- break ;  case 3 : c = actor [ newActor ( TownIcon , i . x + 8 , i . y - 8 )  ]  ; 
-c . level = i . name ; 
+ break ;  case 2 : c = actor [ newActor ( WorldIcon , i . x + 8 , i . y - 8 , i . name )  ]  ; 
+ break ;  case 3 : c = actor [ newActor ( TownIcon , i . x + 8 , i . y - 8 , i . name )  ]  ; 
  break ;  case 4 : c = newActor ( LockIcon , i . x + 8 , i . y - 8 , i . name )  ; 
  break ;  case 5 :  if ( i . name == "" )  break ;  
   var arg = split ( i . name , "," )  ;
@@ -428,11 +455,32 @@ c . level = i . name ;
   if ( getroottable (  )  . rawin ( n )  )  if (  squirrelTypeOf ( getroottable ( ) [ n ] )  == "class" ) c = newActor ( getroottable (  )  [ n ]  , i . x + 8 , i . y - 8 , arg )  ; 
  
   
-  break ;  case 6 : c = actor [ newActor ( StageIcon , i . x + 8 , i . y - 8 )  ]  ; 
-c . level = i . name ; 
+  break ;  case 6 : c = actor [ newActor ( StageIcon , i . x + 8 , i . y - 8 , i . name )  ]  ; 
 c . visible = i . visible ; 
 c . raceMode = true ; 
- break ;  }  if (  squirrelTypeOf ( c )  == "integer" ) mapActor [ i . id ] = c ; 
+ break ;  }  } 
+  
+  if (  ! i . rawin ( "polygon" )  &&  ! i . rawin ( "polyline" )  &&  ! i . rawin ( "ellipse" )  &&  ! i . rawin ( "point" )  &&  ! i . rawin ( "gid" )  )  if ( i . name != "" )  { 
+  var arg = split ( i . name , "," )  ;
+  var n = arg [ 0 ]  ;
+ arg . remove ( 0 )  ; 
+ if ( arg . len (  )  == 1 ) arg = arg [ 0 ]  ; 
+ 
+  else  if ( arg . len (  )  == 0 ) arg = null ; 
+ 
+  
+  if ( getroottable (  )  . rawin ( n )  )  if (  squirrelTypeOf ( getroottable ( ) [ n ] )  == "class" )  { 
+ print ( i . x + " - " + i . y )  ; 
+c = newActor ( getroottable (  )  [ n ]  , i . x +  ( i . width / 2.0 )  , i . y +  ( i . height / 2.0 )  , arg )  ; 
+actor [ c ]  . w = i . width / 2.0 ; 
+actor [ c ]  . h = i . height / 2.0 ; 
+ } 
+  
+  
+  } 
+  
+  
+  if (  squirrelTypeOf ( c )  == "integer" ) mapActor [ i . id ] = c ; 
  
   else mapActor [ i . id ] = c . id ; 
  
@@ -471,10 +519,7 @@ camy = 0 ;
   } 
      }  }  
  print ( "End level code" )  ; 
-autocon . up = false ; 
-autocon . down = false ; 
-autocon . left = false ; 
-autocon . right = false ; 
+autocon =  window.clone(  ( defAutocon ) )  ; 
 update (  )  ; 
  }  ; 
 gmOverworld =  function (  ) { setDrawTarget ( gvScreen )  ; 
@@ -484,9 +529,13 @@ gvMap . drawTiles (  - camx ,  - camy , floor ( camx / 16 )  , floor ( camy / 16
  if ( debug ) gvMap . drawTiles (  - camx ,  - camy , floor ( camx / 16 )  , floor ( camy / 16 )  ,  ( screenW (  )  / 16 )  + 5 ,  ( screenH (  )  / 16 )  + 2 , "solid" )  ; 
  
  runActors (  )  ; 
-drawZList ( 8 )  ; 
+ {     var foreachOutput8 = squirrelForEach( actor );     while(true)     {        foreachOutput8.next();        if (foreachOutput8.isDone()) break; i = foreachOutput8.getValue();  if (  ( (i[ ( "draw" ) ] !== undefined) )  &&  squirrelTypeOf ( i . draw )  == "function" ) i . draw (  )  ; 
+ 
+     }  } drawZList ( 8 )  ; 
 runAmbientLight (  )  ; 
-drawAmbientLight (  )  ; 
+ if ( gvPlayer ) drawLight ( sprLightBasic , 0 , gvPlayer . x - camx , gvPlayer . y - camy - 8 )  ; 
+ 
+ drawAmbientLight (  )  ; 
  if ( gvLevel != "" )  { 
  drawText ( font2 ,  ( screenW (  )  / 2 )  -  ( gvLangObj [ "level" ]  [ gvLevel ]  . len (  )  * 4 )  , 8 , gvLangObj [ "level" ]  [ gvLevel ]  )  ; 
  if ( game . bestTime . rawin ( gvLevel + "-" + game . playerChar )  )  { 
@@ -499,7 +548,28 @@ drawAmbientLight (  )  ;
   
  drawSprite ( sprCoin , 0 , 16 , screenH (  )  - 16 )  ; 
 drawText ( font2 , 24 , screenH (  )  - 23 , game . coins . tostring (  )  )  ; 
-setDrawColor ( gvFadeInTime )  ; 
+ if ( game . colorswitch . squirrelFind ( true )  != null )  { 
+  if ( getcon ( "spec1" , "press" )  )  { 
+ game . turnOffBlocks =  ! game . turnOffBlocks ; 
+playSound ( sndMenuSelect , 0 )  ; 
+ } 
+  
+  var blockx = gvScreenW - 21 ;
+  var blocky = gvScreenH - 21 ;
+  var trueCount = 0 ;
+  for (  var i = 7 ;
+ i >= 0 ; i --  )  { 
+  if ( game . colorswitch [ i ]  )  { 
+ trueCount ++  ; 
+drawSprite ( sprColorBlock ,  (  ( i * 2 )  + 1 )  - int ( game . turnOffBlocks )  , blockx , blocky )  ; 
+blockx -= 8 ; 
+blocky -=  ( trueCount % 2 == 0 ?  - 8 : 8 )  ; 
+ } 
+  
+  } 
+  } 
+  
+ setDrawColor ( gvFadeInTime )  ; 
 drawRec ( 0 , 0 , screenW (  )  , screenH (  )  , true )  ; 
  if ( gvFadeInTime > 0 ) gvFadeInTime -= 10 ; 
  

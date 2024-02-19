@@ -4,7 +4,7 @@ if (!window.superTuxAdvanceWebVersion.squirrelFiles) window.superTuxAdvanceWebVe
 window.superTuxAdvanceWebVersion.squirrelFiles['src/physactor.nut'] = function () { 
 
 
-PhysAct =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+PhysAct =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -24,6 +24,7 @@ PhysAct =  ((function(){ let squirrelClassFunction = function ( ) { var returnVa
  returnVal . routine = null ; 
  returnVal . gravity = 0.0 ; 
  returnVal . friction = 0.1 ; 
+ returnVal . anim =  [ 0 ]  ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
@@ -35,20 +36,28 @@ ystart = _y ;
 animation (  )  ; 
  if ( routine != null ) routine (  )  ; 
  
-  } ;  returnVal . physics = function (  ) {  if ( placeFree ( x , y +  (  squirrelThreeWaysCompare ( 0 , gravity )  )  )  &&  ! phantom ) vspeed += gravity ; 
+  } ;  returnVal . physics = function (  ) {  if ( placeFree ( x , y + gravity )  &&  ! phantom &&  !  ( onPlatform (  )  && vspeed >= 0 )  ) vspeed += gravity ; 
  
-  if ( placeFree ( x , y + vspeed )  ) y += vspeed ; 
+  if ( placeFree ( x , y + vspeed )  || phantom ) y += vspeed ; 
  
-  else  { 
+  else  if (  !  ( onPlatform (  )  && vspeed >= 0 )  )  { 
+  for (  var i = 2 ;
+ i < 8 ; i ++  )  { 
+  if ( placeFree ( x , y +  ( vspeed / i )  )  )  { 
+ y +=  ( vspeed / i )  ; 
+ break ;  } 
+  
+  } 
  vspeed /= 2 ; 
- if ( fabs ( vspeed )  < 0.01 ) vspeed = 0 ; 
- 
-  if ( placeFree ( x , y + vspeed )  ) y += vspeed ; 
+ if ( fabs ( vspeed )  < 0.1 ) vspeed = 0.0 ; 
  
   } 
   
+  
   if ( hspeed != 0 )  { 
-  if ( placeFree ( x + hspeed , y )  )  { 
+  if ( phantom ) x += hspeed ; 
+ 
+  else  if ( placeFree ( x + hspeed , y )  )  { 
   for (  var i = 0 ;
  i < 4 ; i ++  )  if (  ! placeFree ( x , y + 4 )  && placeFree ( x + hspeed , y + 1 )  &&  ! inWater (  )  && vspeed >= 0 &&  ! placeFree ( x + hspeed , y + 4 )  )  { 
  y += 1 ; 
@@ -60,10 +69,10 @@ animation (  )  ;
   else  { 
   var didstep = false ;
   for (  var i = 1 ;
- i <= min ( 8 , abs ( hspeed )  )  ; i ++  )  { 
-  if ( placeFree ( x + hspeed , y - i )  )  { 
+ i <= max ( 8 , abs ( hspeed )  )  ; i ++  )  { 
+  if ( placeFree ( x + hspeed , y -  ( i )  )  )  { 
  x += hspeed ; 
-y -= i ; 
+y -=  ( i )  ; 
  if ( i > 2 )  { 
   if ( hspeed > 0 ) hspeed -= 0.2 ; 
  
@@ -82,6 +91,7 @@ y -= i ;
   
   } 
   
+  
   } 
   
   if ( fabs ( hspeed )  > friction )  { 
@@ -98,8 +108,39 @@ xprev = x ;
 yprev = y ; 
  } ;  returnVal . setAnim = function ( _anim ) { anim = _anim ; 
 frame = 0.0 ; 
- } ;  returnVal . animation = function (  ) {  } ;  returnVal . routine = function (  ) {  } ;  returnVal . draw = function (  ) { drawSpriteExZ ( z , sprite , anim [ frame % anim . len (  )  ]  , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
- } ;  returnVal . escapeMoPlat = function ( useDown = false , useUp = false , useLeft = false , useRight = false ) {  if (  ! actor . rawin ( "MoPlat" )  )  return 0 ;
+ } ;  returnVal . animation = function (  ) {  } ;  returnVal . routine = function (  ) {  } ;  returnVal . draw = function (  ) {  } ;  returnVal . isOnScreen = function (  ) {  var ns = null ;
+  var ns2 = null ;
+  if ( gvNetPlay )  { 
+ ns = Rec ( camx1 + gvScreenW / 2 , camy1 + gvScreenH / 2 , gvScreenW / 2 , gvScreenH / 2 , 0 )  ; 
+ns2 = Rec ( camx2 + net . scw / 2 , camy2 + net . sch / 2 , net . scw / 2 , net . sch / 2 , 0 )  ; 
+ return hitTest ( shape , ns )  || hitTest ( shape , ns2 )  ;
+  } 
+  
+  if ( gvSplitScreen )  { 
+ ns = Rec ( camx1 + gvScreenW / 4 , camy1 + gvScreenH / 2 , gvScreenW / 4 , gvScreenH / 2 , 0 )  ; 
+ns2 = Rec ( camx2 + gvScreenW / 4 , camy2 + gvScreenH / 2 , gvScreenW / 4 , gvScreenH / 2 , 0 )  ; 
+ return hitTest ( shape , ns )  || hitTest ( shape , ns2 )  ;
+  } 
+  
+  if ( gvGameMode == gmOverworld ) ns = Rec ( camx + gvScreenW / 2 , camy + gvScreenH / 2 , gvScreenW / 2 , gvScreenH / 2 , 0 )  ; 
+ 
+  else ns = Rec ( camx0 + gvScreenW / 2 , camy0 + gvScreenH / 2 , gvScreenW / 2 , gvScreenH / 2 , 0 )  ; 
+ 
+  return hitTest ( shape , ns )  ;
+  } ;  returnVal . findPlayer = function (  ) {  if ( gvPlayer && gvPlayer2 )  { 
+  if ( distance2 ( x , y , gvPlayer . x , gvPlayer . y )  < distance2 ( x , y , gvPlayer2 . x , gvPlayer2 . y )  )  return gvPlayer ;
+  
+  else  return gvPlayer2 ;
+  
+  } 
+  
+  else  if ( gvPlayer )  return gvPlayer ;
+  
+  else  if ( gvPlayer2 )  return gvPlayer2 ;
+  
+  
+  
+  } ;  returnVal . escapeMoPlat = function ( useDown = false , useUp = false , useLeft = false , useRight = false ) {  if (  ! actor . rawin ( "MoPlat" )  )  return 0 ;
   
   var result = 0 ;
   {     var foreachOutput1 = squirrelForEach( actor [ "MoPlat" ]  );     while(true)     {        foreachOutput1.next();        if (foreachOutput1.isDone()) break; i = foreachOutput1.getValue();  { 
@@ -177,11 +218,27 @@ y += i . vspeed ;
   for (  var j =  - ch ;
  j <= ch ; j ++  )  { 
   var tile =  ( cx + i )  +  (  ( cy + j )  * wl . width )  ;
-  if ( tile >= 0 && tile < wl . data . len (  )  )  switch ( wl . data [ tile ]  - gvMap . solidfid )  {  case 0 :  case 39 :  case 40 :  case 42 :  case 43 : gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 8 )  ; 
+  if ( cx + i < 0 || cx + i >= gvMap . w / 16 ) continue ; 
+ 
+  if ( tile >= 0 && tile < wl . data . len (  )  )  switch ( wl . data [ tile ]  - gvMap . solidfid )  {  case 0 :  case 39 :  case 40 :  case 42 :  case 43 :  case 60 :  case 61 :  case 62 :  case 63 : gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 8 )  ; 
 gvMap . shape . kind = 0 ; 
 gvMap . shape . w = 8.0 ; 
 gvMap . shape . h = 8.0 ; 
  if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+  if ( cy <= 0 )  { 
+ gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  - 100 )  ; 
+gvMap . shape . h = 100.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+  } 
+  
+  if ( cy >= gvMap . h / 16 )  { 
+ gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 , gvMap . h + 100 )  ; 
+gvMap . shape . h = 100.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+  } 
   
   break ;  case 1 : gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 12 )  ; 
 gvMap . shape . kind = 0 ; 
@@ -467,7 +524,147 @@ gvMap . shape . h = 8.0 ;
  if ( nps . y > shape . y + shape . oy || vspeed >= 0 )  if ( hitTest ( nps , gvMap . shape )  &&  ! hitTest ( shape , gvMap . shape )  && hitTest ( ns , gvMap . shape )  )  return false ;
   
   
+  break ;  case 64 : gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 8 )  ; 
+gvMap . shape . kind = 0 ; 
+gvMap . shape . w = 1.0 ; 
+gvMap . shape . h = 8.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+  break ;  case 65 : gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 14 )  ; 
+gvMap . shape . kind = 2 ; 
+gvMap . shape . w = 8.0 ; 
+gvMap . shape . h = 2.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+  break ;  case 66 : gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 10 )  ; 
+gvMap . shape . kind = 2 ; 
+gvMap . shape . w = 8.0 ; 
+gvMap . shape . h = 2.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+ gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 14 )  ; 
+gvMap . shape . kind = 0 ; 
+gvMap . shape . w = 8.0 ; 
+gvMap . shape . h = 2.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+  break ;  case 67 : gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 6 )  ; 
+gvMap . shape . kind = 2 ; 
+gvMap . shape . w = 8.0 ; 
+gvMap . shape . h = 2.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+ gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 12 )  ; 
+gvMap . shape . kind = 0 ; 
+gvMap . shape . w = 8.0 ; 
+gvMap . shape . h = 4.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+  break ;  case 68 : gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 2 )  ; 
+gvMap . shape . kind = 2 ; 
+gvMap . shape . w = 8.0 ; 
+gvMap . shape . h = 2.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+ gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 10 )  ; 
+gvMap . shape . kind = 0 ; 
+gvMap . shape . w = 8.0 ; 
+gvMap . shape . h = 6.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+  break ;  case 69 : gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 8 )  ; 
+gvMap . shape . kind = 0 ; 
+gvMap . shape . w = 4.0 ; 
+gvMap . shape . h = 8.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+  break ;  case 70 : gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 2 )  ; 
+gvMap . shape . kind = 1 ; 
+gvMap . shape . w = 8.0 ; 
+gvMap . shape . h = 2.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+ gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 10 )  ; 
+gvMap . shape . kind = 0 ; 
+gvMap . shape . w = 8.0 ; 
+gvMap . shape . h = 6.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+  break ;  case 71 : gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 6 )  ; 
+gvMap . shape . kind = 1 ; 
+gvMap . shape . w = 8.0 ; 
+gvMap . shape . h = 2.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+ gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 12 )  ; 
+gvMap . shape . kind = 0 ; 
+gvMap . shape . w = 8.0 ; 
+gvMap . shape . h = 4.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+  break ;  case 72 : gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 10 )  ; 
+gvMap . shape . kind = 1 ; 
+gvMap . shape . w = 8.0 ; 
+gvMap . shape . h = 2.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+ gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 14 )  ; 
+gvMap . shape . kind = 0 ; 
+gvMap . shape . w = 8.0 ; 
+gvMap . shape . h = 2.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+  break ;  case 73 : gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 14 )  ; 
+gvMap . shape . kind = 1 ; 
+gvMap . shape . w = 8.0 ; 
+gvMap . shape . h = 2.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+  break ;  case 74 : gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 8 )  ; 
+gvMap . shape . kind = 0 ; 
+gvMap . shape . w = 8.0 ; 
+gvMap . shape . h = 4.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+ gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 8 )  ; 
+gvMap . shape . kind = 0 ; 
+gvMap . shape . w = 4.0 ; 
+gvMap . shape . h = 8.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+  break ;  case 75 : gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 4 ,  (  ( cy + j )  * 16 )  + 12 )  ; 
+gvMap . shape . kind = 0 ; 
+gvMap . shape . w = 4.0 ; 
+gvMap . shape . h = 4.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+  break ;  case 76 : gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 12 ,  (  ( cy + j )  * 16 )  + 12 )  ; 
+gvMap . shape . kind = 0 ; 
+gvMap . shape . w = 4.0 ; 
+gvMap . shape . h = 4.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+  break ;  case 77 : gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 4 ,  (  ( cy + j )  * 16 )  + 4 )  ; 
+gvMap . shape . kind = 0 ; 
+gvMap . shape . w = 4.0 ; 
+gvMap . shape . h = 4.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+  break ;  case 78 : gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 12 ,  (  ( cy + j )  * 16 )  + 4 )  ; 
+gvMap . shape . kind = 0 ; 
+gvMap . shape . w = 4.0 ; 
+gvMap . shape . h = 4.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
   break ;  }  
+  else  if ( cx + i >= 0 && cy <= 0 && wl . data [ cx + i ]  - gvMap . solidfid >= 0 )  { 
+ gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  - 100 )  ; 
+gvMap . shape . h = 100.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return false ;
+  
+  } 
+  
+  
   if ( debug )  { 
  gvMap . shape . draw (  )  ; 
  } 
@@ -854,7 +1051,7 @@ gvMap . shape . h = 8.0 ;
  
   if ( actor . rawin ( "Water" )  )  { 
   {     var foreachOutput2 = squirrelForEach( actor [ "Water" ]  );     while(true)     {        foreachOutput2.next();        if (foreachOutput2.isDone()) break; i = foreachOutput2.getValue();  { 
-  if ( hitTest ( ns , i . shape )  )  return true ;
+  if ( hitTest ( ns , i . shape )  )  return i . substance ;
   
   } 
      }  }  } 
@@ -927,6 +1124,46 @@ gvMap . shape . h = 9.0 ;
   } 
   
   
+  if ( tile >= 0 && tile < wl . data . len (  )  )  if ( wl . data [ tile ]  - gvMap . solidfid == 60 )  { 
+ gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 4 )  ; 
+gvMap . shape . kind = 0 ; 
+gvMap . shape . w = 6.0 ; 
+gvMap . shape . h = 6.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return true ;
+  
+  } 
+  
+  
+  if ( tile >= 0 && tile < wl . data . len (  )  )  if ( wl . data [ tile ]  - gvMap . solidfid == 61 )  { 
+ gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 8 ,  (  ( cy + j )  * 16 )  + 12 )  ; 
+gvMap . shape . kind = 0 ; 
+gvMap . shape . w = 6.0 ; 
+gvMap . shape . h = 6.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return true ;
+  
+  } 
+  
+  
+  if ( tile >= 0 && tile < wl . data . len (  )  )  if ( wl . data [ tile ]  - gvMap . solidfid == 62 )  { 
+ gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 4 ,  (  ( cy + j )  * 16 )  + 8 )  ; 
+gvMap . shape . kind = 0 ; 
+gvMap . shape . w = 6.0 ; 
+gvMap . shape . h = 6.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return true ;
+  
+  } 
+  
+  
+  if ( tile >= 0 && tile < wl . data . len (  )  )  if ( wl . data [ tile ]  - gvMap . solidfid == 63 )  { 
+ gvMap . shape . setPos (  (  ( cx + i )  * 16 )  + 12 ,  (  ( cy + j )  * 16 )  + 8 )  ; 
+gvMap . shape . kind = 0 ; 
+gvMap . shape . w = 6.0 ; 
+gvMap . shape . h = 6.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return true ;
+  
+  } 
+  
+  
   if ( debug ) gvMap . shape . draw (  )  ; 
  
   } 
@@ -974,10 +1211,10 @@ gvMap . shape . h = 6.0 ;
   } 
   
   return false ;
-  } ;  returnVal . onPlatform = function (  ) {  var ns ;
-  if (  squirrelTypeOf ( shape )  == "Rec" ) ns = Rec ( x + shape . ox , y + shape . oy + 2 , shape . w , shape . h , shape . kind )  ; 
+  } ;  returnVal . onPlatform = function ( _x = 0 , _y = 0 ) {  var ns ;
+  if (  squirrelTypeOf ( shape )  == "Rec" ) ns = Rec ( x + shape . ox + _x , y + shape . oy + 2 + _y , shape . w , shape . h , shape . kind )  ; 
  
-  if (  squirrelTypeOf ( shape )  == "Cir" ) ns = Cir ( x + shape . ox , y + shape . oy + 2 , shape . r )  ; 
+  if (  squirrelTypeOf ( shape )  == "Cir" ) ns = Cir ( x + shape . ox + _x , y + shape . oy + 2 + _y , shape . r )  ; 
  
   var cx = floor ( x / 16 )  ;
   var cy = floor ( y / 16 )  + 1 ;
@@ -990,10 +1227,16 @@ gvMap . shape . w = 8.0 ;
 gvMap . shape . h = 4.0 ; 
  if ( hitTest ( ns , gvMap . shape )  )  return true ;
   
+ ns . x -= hspeed ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return true ;
+  
   break ;  case 44 : gvMap . shape . setPos ( x , y + 4 )  ; 
 gvMap . shape . kind = 2 ; 
 gvMap . shape . w = 8.0 ; 
 gvMap . shape . h = 4.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return true ;
+  
+ ns . x -= hspeed ; 
  if ( hitTest ( ns , gvMap . shape )  )  return true ;
   
   break ;  case 45 : gvMap . shape . setPos ( x , y + 4 )  ; 
@@ -1002,10 +1245,16 @@ gvMap . shape . w = 8.0 ;
 gvMap . shape . h = 4.0 ; 
  if ( hitTest ( ns , gvMap . shape )  )  return true ;
   
+ ns . x -= hspeed ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return true ;
+  
   break ;  case 46 : gvMap . shape . setPos ( x , y + 4 )  ; 
 gvMap . shape . kind = 1 ; 
 gvMap . shape . w = 8.0 ; 
 gvMap . shape . h = 4.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return true ;
+  
+ ns . x -= hspeed ; 
  if ( hitTest ( ns , gvMap . shape )  )  return true ;
   
   break ;  case 47 : gvMap . shape . setPos ( x , y + 4 )  ; 
@@ -1014,10 +1263,16 @@ gvMap . shape . w = 8.0 ;
 gvMap . shape . h = 4.0 ; 
  if ( hitTest ( ns , gvMap . shape )  )  return true ;
   
+ ns . x -= hspeed ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return true ;
+  
   break ;  case 48 : gvMap . shape . setPos ( x , y + 4 )  ; 
 gvMap . shape . kind = 2 ; 
 gvMap . shape . w = 8.0 ; 
 gvMap . shape . h = 4.0 ; 
+ if ( hitTest ( ns , gvMap . shape )  )  return true ;
+  
+ ns . x -= hspeed ; 
  if ( hitTest ( ns , gvMap . shape )  )  return true ;
   
   break ;  case 49 :  break ;  }  
@@ -1063,7 +1318,7 @@ gvMap . shape . h = 4.0 ;
   return false ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . hspeed = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . hspeed = 0.0 ; 
  squirrelClassFunction . vspeed = 0.0 ; 
  squirrelClassFunction . box =  [ 0 , 0 , 0 , 0 ]  ; 
  squirrelClassFunction . xstart = 0.0 ; 
@@ -1079,8 +1334,9 @@ gvMap . shape . h = 4.0 ;
  squirrelClassFunction . routine = null ; 
  squirrelClassFunction . gravity = 0.0 ; 
  squirrelClassFunction . friction = 0.1 ; 
- return squirrelClassFunction; })()) ; 
-PathCrawler =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction . anim =  [ 0 ]  ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Actor;  return squirrelClassFunction; })()) ; 
+PathCrawler =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -1165,7 +1421,7 @@ ty = path [ step ]  [ 1 ]  ;
   
   } ;  returnVal . pathStart = function (  ) {  } ;  returnVal . pathEnd = function (  ) {  } ;  returnVal . pathZero = function (  ) {  } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . path = null ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . path = null ; 
  squirrelClassFunction . speed = 0.0 ; 
  squirrelClassFunction . tx = 0 ; 
  squirrelClassFunction . ty = 0 ; 
@@ -1175,7 +1431,7 @@ ty = path [ step ]  [ 1 ]  ;
  squirrelClassFunction . dir = 0.0 ; 
  squirrelClassFunction . moving = true ; 
  squirrelClassFunction . started = false ; 
- return squirrelClassFunction; })()) ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = PhysAct;  return squirrelClassFunction; })()) ; 
 
 
 

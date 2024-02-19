@@ -66,19 +66,22 @@ newstr += "\n" ;
      }  } drawText ( _f , _x , _y , newstr )  ; 
  }  ; 
 formatTime =  function ( time ) {  var seconds =  ( time % 3600 )  . tofloat (  )  / 60.0 ;
- seconds *= 100.0 ; 
-seconds = floor ( seconds )  . tofloat (  )  ; 
-seconds /= 100 ; 
- var minutes = floor ( time / 3600 )  ;
-  var val = minutes . tostring (  )  + ":" ;
-  if ( seconds < 10 ) val += "0" ; 
+  var minutes = floor ( time / 3600 )  ;
+  var seconds_p1 = ceil ( seconds )  ;
+  var seconds_p2 =  ( seconds - floor ( seconds )  )  * 1000 ;
+  return format ( "%02d:%02d.%03d" , minutes , seconds_p1 , seconds_p2 )  ;
+  }  ; 
+formatInfo =  function ( info ) {  if (  squirrelTypeOf ( info )  == "string" )  return info ;
+  
+  var newcall =  [ 0 ]  ;
+  for (  var i = 0 ;
+ i < info . len (  )  ; i ++  )  { 
+  if ( i == 0 ) newcall . push ( info [ i ]  )  ; 
  
- val += seconds . tostring (  )  ; 
- if ( seconds == floor ( seconds )  ) val += ".00" ; 
+  else newcall . push ( eval ( info [ i ]  )  )  ; 
  
-  if ( seconds * 10 == floor ( seconds * 10 )  &&  ( seconds * 100 )  % 100 != 0 ) val += "0" ; 
- 
-  return val ;
+  } 
+  return format . acall ( newcall )  ;
   }  ; 
 
 

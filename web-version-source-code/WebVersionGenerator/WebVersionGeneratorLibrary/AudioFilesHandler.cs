@@ -1,17 +1,18 @@
 ﻿
 namespace WebVersionGeneratorLibrary
 {
+	using System;
 	using System.Collections.Generic;
 	using System.IO;
 	using System.Linq;
 
 	public class AudioFilesHandler
 	{
-		public static void CopyAudioFiles()
+		public static void CopyAudioFiles(bool keepPreviouslyGeneratedFiles, bool verbose)
 		{
 			string webVersionSourceCodeFolder = Util.GetWebVersionSourceCodeFolder();
 
-			List<FileNameInfo> files = Util.GetAllFilesInSuperTuxAdvanceSourceCodeFolder()
+			List<FileNameInfo> files = Util.GetAllFilesInSuperTuxAdvanceSourceCodeFolderInSortedOrder()
 				.Where(x => x.FileExtension.ToLowerInvariant() == "ogg")
 				.ToList();
 
@@ -25,9 +26,6 @@ namespace WebVersionGeneratorLibrary
 			{
 				FileNameInfo file = files[i];
 
-				List<byte> fileContents = Util.GetFileContentsAsBytes(file.FullyQualifiedFileName);
-				Util.WriteFileContents(webVersionSourceCodeFolder + "output/data/audioFiles/file" + i.ToStringCultureInvariant() + ".ogg", fileContents);
-
 				int numberOfInstances = (new FileInfo(file.FullyQualifiedFileName)).Length < 30 * 1000 ? 8 : 1;
 
 				audioJsFileContents += "window.superTuxAdvanceWebVersion.audioFileList.push({ \n";
@@ -37,6 +35,22 @@ namespace WebVersionGeneratorLibrary
 				audioJsFileContents += "}); \n\n";
 
 				audioJsFileContents += $"window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile('{file.PartiallyQualifiedFileName}', ''); \n\n";
+
+				string partiallyQualifiedOggOutputFileName = "output/data/audioFiles/file" + i.ToStringCultureInvariant() + ".ogg";
+				string fullyQualifiedOggOutputFileName = webVersionSourceCodeFolder + partiallyQualifiedOggOutputFileName;
+
+				if (keepPreviouslyGeneratedFiles && File.Exists(fullyQualifiedOggOutputFileName))
+				{
+					if (verbose)
+						Console.WriteLine(partiallyQualifiedOggOutputFileName + " already exists");
+					continue;
+				}
+
+				if (verbose)
+					Console.WriteLine("Copying " + file.PartiallyQualifiedFileName);
+
+				List<byte> fileContents = Util.GetFileContentsAsBytes(file.FullyQualifiedFileName);
+				Util.WriteFileContents(fullyQualifiedOggOutputFileName, fileContents);
 			}
 
 			Util.WriteFileContents(

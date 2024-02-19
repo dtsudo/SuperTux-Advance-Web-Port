@@ -23,7 +23,7 @@ gvAchievements =  { saveKonqi :  function (  ) {  if ( game . path != "res/map/"
   }  , snowMoreBaddies :  function (  ) {  if ( game . path != "res/map/" )  return false ;
   
   return  ( game . allEnemies . rawin ( "aurora-learn" )  && game . allEnemies . rawin ( "aurora-slip" )  && game . allEnemies . rawin ( "aurora-crystal" )  && game . allEnemies . rawin ( "aurora-subsea" )  && game . allEnemies . rawin ( "aurora-tnt" )  && game . allEnemies . rawin ( "aurora-sense" )  && game . allEnemies . rawin ( "aurora-frozen" )  && game . allEnemies . rawin ( "aurora-branches" )  && game . allEnemies . rawin ( "aurora-bridge" )  && game . allEnemies . rawin ( "aurora-wind" )  && game . allEnemies . rawin ( "aurora-steps" )  && game . allEnemies . rawin ( "aurora-fort" )  && game . allEnemies . rawin ( "aurora-iceguy" )  && game . allEnemies . rawin ( "aurora-fishy" )  && game . allEnemies . rawin ( "aurora-forest" )  )  ;
-  }  , blastOff :  function (  ) {  return gvPlayer && gvPlayer . y < 0 && gvPlayer . hspeed <=  - 5 ;
+  }  , blastOff :  function (  ) {  return gvPlayer && gvPlayer . y < 0 && gvPlayer . hspeed <=  - 10 ;
   }  }  ; 
 gvUnlockedAchievements =  {  }  ; 
 gvAchievementTimer = 0 ; 
@@ -71,7 +71,7 @@ meAchievements . push (  { name :  function (  ) {  return gvLangObj [ "menu-com
  }  }  )  ; 
 menu = meAchievements ; 
  }  ; 
-AchiNotice =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+AchiNotice =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -108,11 +108,11 @@ drawText ( font2A , x , y , text )  ;
   } ;  returnVal . _typeof = function (  ) {  return "AchiNotice" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . persistent = true ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . persistent = true ; 
  squirrelClassFunction . hspeed = 0.0 ; 
  squirrelClassFunction . timer = 60 ; 
  squirrelClassFunction . name = "" ; 
- return squirrelClassFunction; })()) ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Actor;  return squirrelClassFunction; })()) ; 
 drawAchievements =  function (  ) {  if ( actor . rawin ( "AchiNotice" )  )  {     var foreachOutput3 = squirrelForEach( actor [ "AchiNotice" ]  );     while(true)     {        foreachOutput3.next();        if (foreachOutput3.isDone()) break; i = foreachOutput3.getValue(); i . run ( true )  ; 
     }  }  
   }  ; 

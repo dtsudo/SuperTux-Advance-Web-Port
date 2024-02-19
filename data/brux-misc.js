@@ -5,6 +5,6 @@
 	In this file, we re-implement these functions in javascript.
 */
 
-window.choose = function (array) {
-	console.log("Warning: choose is not implemented");
+window.choose = function (...array) {
+	return array[Math.floor(Math.random() * array.length)];
 };

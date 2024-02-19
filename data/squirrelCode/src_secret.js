@@ -4,7 +4,7 @@ if (!window.superTuxAdvanceWebVersion.squirrelFiles) window.superTuxAdvanceWebVe
 window.superTuxAdvanceWebVersion.squirrelFiles['src/secret.nut'] = function () { 
 
 
-SecretWall =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+SecretWall =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -25,11 +25,26 @@ SecretWall =  ((function(){ let squirrelClassFunction = function ( ) { var retur
  
   } ;  returnVal . run = function (  ) {  if ( shape == null && dw != 0 && dh != 0 ) shape = Rec ( x +  ( dw * 8 )  , y +  ( dh * 8 )  ,  - 4 +  ( dw * 8 )  ,  - 4 +  ( dh * 8 )  , 5 )  ; 
  
-  if ( shape != null && gvPlayer )  if ( hitTest ( shape , gvPlayer . shape )  )  { 
+  if ( shape != null && gvPlayer && hitTest ( shape , gvPlayer . shape )  )  { 
   if (  ! found )  { 
  found = true ; 
- if (  ! rehide ) game . secrets ++  ; 
- 
+ if (  ! rehide )  { 
+ game . secrets ++  ; 
+popSound ( sndSecret )  ; 
+ } 
+  
+  } 
+  
+  } 
+  
+  else  if ( shape != null && gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  )  { 
+  if (  ! found )  { 
+ found = true ; 
+ if (  ! rehide )  { 
+ game . secrets ++  ; 
+popSound ( sndSecret )  ; 
+ } 
+  
   } 
   
   } 
@@ -44,7 +59,12 @@ SecretWall =  ((function(){ let squirrelClassFunction = function ( ) { var retur
  
   if ( alpha <= 0 &&  ! rehide ) deleteActor ( id )  ; 
  
-  } ;  returnVal . draw = function (  ) {  if ( config . light ) gvMap . drawTilesMod ( floor (  - camx )  , floor (  - camy )  , x / 16 , y / 16 , dw , dh , "secret" , alpha , 1 , 1 , gvLight )  ; 
+  } ;  returnVal . draw = function (  ) {  var light = 0 ;
+  if ( gvLightScreen == gvLightScreen1 ) light = gvLight ; 
+ 
+  if ( gvLightScreen == gvLightScreen2 ) light = gvLight2 ; 
+ 
+  if ( config . light ) gvMap . drawTilesMod ( floor (  - camx )  , floor (  - camy )  , x / 16 , y / 16 , dw , dh , "secret" , alpha , 1 , 1 , light )  ; 
  
   else gvMap . drawTiles ( floor (  - camx )  , floor (  - camy )  , x / 16 , y / 16 , dw , dh , "secret" , alpha )  ; 
  
@@ -58,14 +78,14 @@ setDrawColor ( 0xffffffff )  ;
   } ;  returnVal . _typeof = function (  ) {  return "SecretWall" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . found = false ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . found = false ; 
  squirrelClassFunction . alpha = 1.0 ; 
  squirrelClassFunction . dw = 0 ; 
  squirrelClassFunction . dh = 0 ; 
  squirrelClassFunction . shape = null ; 
  squirrelClassFunction . rehide = false ; 
- return squirrelClassFunction; })()) ; 
-SecretJoiner =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Actor;  return squirrelClassFunction; })()) ; 
+SecretJoiner =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -90,7 +110,7 @@ dx =  [  ]  ;
 dy =  [  ]  ; 
 path = _arr ; 
  var idsToDelete =  [  ]  ;
-  if (  ( (actor["SecretWall"] !== undefined) )  && actor [ "SecretWall" ]  . len (  )  > 0 )  for (  var i = 0 ;
+  if (  ( (actor[ ( "SecretWall" ) ] !== undefined) )  && actor [ "SecretWall" ]  . len (  )  > 0 )  for (  var i = 0 ;
  i < path . len (  )  ; i ++  )  { 
   {     var foreachOutput1 = squirrelForEach( actor [ "SecretWall" ]  );     while(true)     {        foreachOutput1.next();        if (foreachOutput1.isDone()) break; j = foreachOutput1.getValue();  { 
   if ( j . shape . pointIn ( path [ i ]  [ 0 ]  , path [ i ]  [ 1 ]  )  )  { 
@@ -126,9 +146,20 @@ dh . push ( j . dh )  ;
   } 
   } 
   
-  if ( scanFound )  { 
-  if (  ! rehide &&  ! found ) game . secrets ++  ; 
+  if ( gvPlayer2 )  { 
+  for (  var i = 0 ;
+ i < shape . len (  )  ; i ++  )  { 
+  if ( hitTest ( shape [ i ]  , gvPlayer2 . shape )  ) scanFound = true ; 
  
+  } 
+  } 
+  
+  if ( scanFound )  { 
+  if (  ! rehide &&  ! found )  { 
+ game . secrets ++  ; 
+popSound ( sndSecret )  ; 
+ } 
+  
  found = true ; 
  } 
   
@@ -164,7 +195,7 @@ shape [ i ]  . draw (  )  ;
   } ;  returnVal . _typeof = function (  ) {  return "SecretJoiner" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . found = false ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . found = false ; 
  squirrelClassFunction . alpha = 1.0 ; 
  squirrelClassFunction . dw = null ; 
  squirrelClassFunction . dh = null ; 
@@ -173,7 +204,7 @@ shape [ i ]  . draw (  )  ;
  squirrelClassFunction . shape = null ; 
  squirrelClassFunction . rehide = false ; 
  squirrelClassFunction . path = false ; 
- return squirrelClassFunction; })()) ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Actor;  return squirrelClassFunction; })()) ; 
 
 
 

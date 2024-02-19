@@ -110,7 +110,6 @@ sprBoxRed = sprTriggerBoxOG ;
 sprCoin = sprCoinOG ; 
 sprCoin5 = sprCoin5OG ; 
 sprCoin10 = sprCoin10OG ; 
-sprHealth = sprHealthFL ; 
 sprEnergy = sprEnergyFl ; 
 sprSubItem = sprSubItemFL ; 
 sprColorSwitch = sprColorSwitchFL ; 
@@ -126,7 +125,8 @@ sprCoin10 = sprCoinN10 ;
  } 
   
   }  ; 
-dbgForestF =  function (  ) {  for (  var i = 0 ;
+dbgForestF =  function (  ) { gvLightBG = true ; 
+ for (  var i = 0 ;
  i < 2 ; i ++  )  { 
  drawSprite ( bgForestday , 0 ,  (  (  - camx / 16 )  % 720 )  +  ( i * 720 )  , screenH (  )  - 240 )  ; 
  } 
@@ -139,7 +139,8 @@ dbgForestF =  function (  ) {  for (  var i = 0 ;
  drawSprite ( bgForesttree1 , 0 ,  (  (  - camx / 4 )  % 720 )  +  ( i * 720 )  , screenH (  )  - 240 )  ; 
  } 
   }  ; 
-dbgAuroraF =  function (  ) {  for (  var i = 0 ;
+dbgAuroraF =  function (  ) { gvLightBG = true ; 
+ for (  var i = 0 ;
  i < 2 ; i ++  )  { 
  drawSprite ( bgSnowday , 0 ,  (  (  - camx / 16 )  % 720 )  +  ( i * 720 )  , screenH (  )  - 240 )  ; 
  } 
@@ -152,17 +153,20 @@ dbgAuroraF =  function (  ) {  for (  var i = 0 ;
  drawSprite ( bgAuroraHill , 0 ,  (  (  - camx / 4 )  % 720 )  +  ( i * 720 )  , screenH (  )  - 240 )  ; 
  } 
   }  ; 
-dbgNever =  function (  ) {  for (  var i = 0 ;
+dbgNever =  function (  ) { gvLightBG = true ; 
+ for (  var i = 0 ;
  i < 2 ; i ++  )  { 
  drawSprite ( bgSnowNever , 0 ,  (  (  - camx / 8 )  % 720 )  +  ( i * 720 )  , screenH (  )  - 240 )  ; 
  } 
   }  ; 
-dbgRedmond =  function (  ) {  for (  var i = 0 ;
+dbgRedmond =  function (  ) { gvLightBG = true ; 
+ for (  var i = 0 ;
  i < 2 ; i ++  )  { 
  drawSprite ( bgRedmond , 0 ,  (  (  - camx / 8 )  % 720 )  +  ( i * 720 )  , screenH (  )  - 240 )  ; 
  } 
   }  ; 
-dbgSnowPlainF =  function (  ) {  for (  var i = 0 ;
+dbgSnowPlainF =  function (  ) { gvLightBG = true ; 
+ for (  var i = 0 ;
  i < 2 ; i ++  )  { 
  drawSprite ( bgSnowDusk , 0 ,  (  (  - camx / 16 )  % 720 )  +  ( i * 720 )  ,  ( screenH (  )  / 2 )  - 120 )  ; 
  } 
@@ -175,7 +179,8 @@ dbgSnowPlainF =  function (  ) {  for (  var i = 0 ;
  drawSprite ( bgPlainHill , 0 ,  (  (  - camx / 6 )  % 720 )  +  ( i * 720 )  ,  ( screenH (  )  / 2 )  - 120 )  ; 
  } 
   }  ; 
-dbgNightalt =  function (  ) { drawSprite ( bgSnowstars2 , 0 , 0 ,  ( screenH (  )  / 2 )  - 120 )  ; 
+dbgNightalt =  function (  ) { gvLightBG = true ; 
+drawSprite ( bgSnowstars2 , 0 , 0 ,  ( screenH (  )  / 2 )  - 120 )  ; 
  for (  var i = 0 ;
  i < 2 ; i ++  )  { 
  drawSprite ( bgStarHill , 0 ,  (  (  - camx / 8 )  % 720 )  +  ( i * 720 )  ,  ( screenH (  )  / 2 )  - 120 )  ; 
@@ -185,11 +190,14 @@ dbgNightalt =  function (  ) { drawSprite ( bgSnowstars2 , 0 , 0 ,  ( screenH ( 
  drawSprite ( bgStarHill2 , 0 ,  (  (  - camx / 6 )  % 720 )  +  ( i * 720 )  ,  ( screenH (  )  / 2 )  - 120 )  ; 
  } 
   }  ; 
-dbgRace =  function (  ) { drawSprite ( bgRace , 0 , 0 ,  ( screenH (  )  / 2 )  - 120 )  ; 
+dbgRace =  function (  ) { gvLightBG = true ; 
+drawSprite ( bgRace , 0 , 0 ,  ( screenH (  )  / 2 )  - 120 )  ; 
  }  ; 
-dbgglitch =  function (  ) { drawSprite ( bgError , 0 , 0 ,  ( screenH (  )  / 2 )  - 120 )  ; 
+dbgglitch =  function (  ) { gvLightBG = true ; 
+drawSprite ( bgError , 0 , 0 ,  ( screenH (  )  / 2 )  - 120 )  ; 
  }  ; 
-dbgtropicf =  function (  ) { drawSprite ( bgFtropic2 , 0 , 0 ,  ( screenH (  )  / 2 )  - 120 )  ; 
+dbgtropicf =  function (  ) { gvLightBG = true ; 
+drawSprite ( bgFtropic2 , 0 , 0 ,  ( screenH (  )  / 2 )  - 120 )  ; 
  for (  var i = 0 ;
  i < 2 ; i ++  )  { 
  drawSprite ( bgFtropic0 , 0 ,  (  (  - camx / 32 )  % 720 )  +  ( i * 720 )  ,  ( screenH (  )  / 2 )  - 120 )  ; 
@@ -203,7 +211,8 @@ dbgtropicf =  function (  ) { drawSprite ( bgFtropic2 , 0 , 0 ,  ( screenH (  ) 
  drawSprite ( bgFtropic3 , 0 ,  (  (  - camx / 10 )  % 720 )  +  ( i * 720 )  ,  ( screenH (  )  / 2 )  - 80 )  ; 
  } 
   }  ; 
-dbgtropicFS =  function (  ) { drawSprite ( bgOceanbg , 0 , 0 ,  ( screenH (  )  / 2 )  - 120 )  ; 
+dbgtropicFS =  function (  ) { gvLightBG = true ; 
+drawSprite ( bgOceanbg , 0 , 0 ,  ( screenH (  )  / 2 )  - 120 )  ; 
  for (  var i = 0 ;
  i < 2 ; i ++  )  { 
  drawSprite ( bgOceancloud , 0 ,  (  (  - camx / 32 )  % 720 )  +  ( i * 720 )  ,  ( screenH (  )  / 2 )  - 120 )  ; 
@@ -217,7 +226,8 @@ dbgtropicFS =  function (  ) { drawSprite ( bgOceanbg , 0 , 0 ,  ( screenH (  ) 
  drawSprite ( bgFtropicSunset2 , 0 ,  (  (  - camx / 10 )  % 720 )  +  ( i * 720 )  ,  ( screenH (  )  / 2 )  - 80 )  ; 
  } 
   }  ; 
-dbgtropicNS =  function (  ) { drawSprite ( bgSnowstars2 , 0 , 0 ,  ( screenH (  )  / 2 )  - 120 )  ; 
+dbgtropicNS =  function (  ) { gvLightBG = true ; 
+drawSprite ( bgSnowstars2 , 0 , 0 ,  ( screenH (  )  / 2 )  - 120 )  ; 
  for (  var i = 0 ;
  i < 2 ; i ++  )  { 
  drawSprite ( bgNightcloud , 0 ,  (  (  - camx / 32 )  % 720 )  +  ( i * 720 )  ,  ( screenH (  )  / 2 )  - 120 )  ; 
@@ -231,13 +241,15 @@ dbgtropicNS =  function (  ) { drawSprite ( bgSnowstars2 , 0 , 0 ,  ( screenH ( 
  drawSprite ( bgFtropicNight2 , 0 ,  (  (  - camx / 10 )  % 720 )  +  ( i * 720 )  ,  ( screenH (  )  / 2 )  - 80 )  ; 
  } 
   }  ; 
-dbgOceanF =  function (  ) { drawSprite ( bgOceanbg , 0 , 0 ,  ( screenH (  )  / 2 )  - 120 )  ; 
+dbgOceanF =  function (  ) { gvLightBG = true ; 
+drawSprite ( bgOceanbg , 0 , 0 ,  ( screenH (  )  / 2 )  - 120 )  ; 
  for (  var i = 0 ;
  i < 2 ; i ++  )  { 
  drawSprite ( bgOceancloud , 0 ,  (  (  - camx / 32 )  % 720 )  +  ( i * 720 )  ,  ( screenH (  )  / 2 )  - 60 )  ; 
  } 
   }  ; 
-dbgtropicS =  function (  ) { drawSprite ( bgFtropic2 , 0 , 0 ,  ( screenH (  )  / 2 )  - 120 )  ; 
+dbgtropicS =  function (  ) { gvLightBG = true ; 
+drawSprite ( bgFtropic2 , 0 , 0 ,  ( screenH (  )  / 2 )  - 120 )  ; 
  for (  var i = 0 ;
  i < 2 ; i ++  )  { 
  drawSprite ( bgFtropic0 , 0 ,  (  (  - camx / 32 )  % 720 )  +  ( i * 720 )  ,  ( screenH (  )  / 2 )  - 120 )  ; 
@@ -247,7 +259,7 @@ dbgtropicS =  function (  ) { drawSprite ( bgFtropic2 , 0 , 0 ,  ( screenH (  ) 
  drawSprite ( bgFtropicM , 0 ,  (  (  - camx / 10 )  % 720 )  +  ( i * 720 )  ,  ( screenH (  )  / 2 )  - 80 )  ; 
  } 
   }  ; 
-Spakle =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+Spakle =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -262,8 +274,8 @@ Spakle =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal
   
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  return squirrelClassFunction; })()) ; 
-c1 =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Actor;  return squirrelClassFunction; })()) ; 
+c1 =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -279,13 +291,12 @@ c1 =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = {
 y -= 0.5 ; 
  if ( frame >= 3 ) deleteActor ( id )  ; 
  
-  else drawSpriteEx ( sprC1 , floor ( frame )  , x - camx , y - camy , 0 , 0 , 1 , 1 , 1 )  ; 
- 
-  } ; 
+  } ;  returnVal . draw = function (  ) { drawSpriteEx ( sprC1 , floor ( frame )  , x - camx , y - camy , 0 , 0 , 1 , 1 , 1 )  ; 
+ } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
- return squirrelClassFunction; })()) ; 
-Towershop =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Actor;  return squirrelClassFunction; })()) ; 
+Towershop =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -294,6 +305,7 @@ Towershop =  ((function(){ let squirrelClassFunction = function ( ) { var return
  returnVal . v = 0.0 ; 
  returnVal . vspeed = 0.0 ; 
  returnVal . soldout = false ; 
+ returnVal . price = 0 ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = "" ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
@@ -301,10 +313,10 @@ Towershop =  ((function(){ let squirrelClassFunction = function ( ) { var return
    (baseConstructor.bind(this))  ( _x , _y )  ; 
 shape = Rec ( x , y + 2 , 8 , 8 , 0 )  ; 
 tileSetSolid ( x , y , 1 )  ; 
- } ;  returnVal . run = function (  ) {  if ( game . maxHealth >= 5 * 4 ) soldout = true ; 
+ } ;  returnVal . run = function (  ) {  if ( game . maxHealth >= 4 * 4 ) soldout = true ; 
  
-  var price =  ( game . maxHealth + 1 )  *  ( 200 )  ;
-  if ( v > 0 )  { 
+ price =  ( game . maxHealth + 1 )  *  ( 200 *  ( game . difficulty + 1 )  )  ; 
+ if ( v > 0 )  { 
  vspeed = 0 ; 
 v = 0 ; 
  } 
@@ -316,9 +328,8 @@ v = 0 ;
   if ( gvPlayer )  { 
   if ( hitTest ( shape , gvPlayer . shape )  )  if ( gvPlayer . vspeed < 0 && v == 0 )  if (  ! soldout && game . coins >= price )  { 
  gvPlayer . vspeed = 0 ; 
-vspeed = 0 ; 
+vspeed =  - 1 ; 
 playSound ( sndHeal , 0 )  ; 
-game . health += 4 ; 
 game . maxHealth += 4 ; 
 game . coins -= price ; 
  } 
@@ -328,7 +339,7 @@ game . coins -= price ;
   } 
   
  v += vspeed ; 
- var pricetag = chint ( 95 )  . tostring (  )  + price . tostring (  )  ;
+ } ;  returnVal . draw = function (  ) {  var pricetag = chint ( 95 )  . tostring (  )  + price . tostring (  )  ;
   if ( soldout ) drawSpriteZ ( 2 , sprBoxEmpty , getFrames (  )  / 8 , x - 8 - camx , y - 8 - camy + v )  ; 
  
   else  { 
@@ -339,13 +350,14 @@ drawText ( font , x - camx -  ( pricetag . len (  )  * 3 )  , y - 16 - camy , pr
   
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . shape = 0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . shape = 0 ; 
  squirrelClassFunction . full = true ; 
  squirrelClassFunction . v = 0.0 ; 
  squirrelClassFunction . vspeed = 0.0 ; 
  squirrelClassFunction . soldout = false ; 
- return squirrelClassFunction; })()) ; 
-Blitz =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction . price = 0 ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Actor;  return squirrelClassFunction; })()) ; 
+Blitz =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -449,19 +461,6 @@ y -= 1.0 ;
   } 
   
   
-  if ( smart ) drawSpriteEx ( sprBlitz , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  else drawSpriteEx ( sprBlitz2 , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  if ( frozen <= 120 )  { 
-  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
- 
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
-  } 
-  
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
   } 
   
   else  { 
@@ -476,10 +475,6 @@ icebox =  - 1 ;
   
   } 
   
-  if ( smart ) drawSpriteEx ( sprBlitz , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  else drawSpriteEx ( sprBlitz2 , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
   } 
   
   } 
@@ -487,10 +482,6 @@ icebox =  - 1 ;
   else  { 
  squishTime += 0.025 ; 
  if ( squishTime >= 1 ) die (  )  ; 
- 
-  if ( smart ) drawSpriteEx ( sprBlitz , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  else drawSpriteEx ( sprBlitz2 , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  
   } 
   
@@ -500,6 +491,27 @@ icebox =  - 1 ;
  if ( debug ) shape . draw (  )  ; 
  
   } 
+  
+  } ;  returnVal . draw = function (  ) {  var myspr = sprBlitz2 ;
+  if ( smart ) myspr = sprBlitz ; 
+ 
+  if ( frozen )  { 
+ drawSpriteEx ( myspr , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ if ( frozen <= 120 )  { 
+  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
+ 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else  if ( squish ) drawSpriteEx ( myspr , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else drawSpriteEx ( myspr , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
   
   } ;  returnVal . hurtPlayer = function ( target ) {  if ( squish )  return ; 
   
@@ -594,15 +606,15 @@ playSound ( sndFlame , 0 )  ;
  } ;  returnVal . _typeof = function (  ) {  return "Deathcap" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . flip = false ; 
  squirrelClassFunction . squish = false ; 
  squirrelClassFunction . squishTime = 0.0 ; 
  squirrelClassFunction . smart = true ; 
  squirrelClassFunction . moving = false ; 
  squirrelClassFunction . touchDamage = 2.0 ; 
- return squirrelClassFunction; })()) ; 
-bsod =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+bsod =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -696,6 +708,38 @@ y -= 1.0 ;
   } 
   
   
+  } 
+  
+  else  { 
+  if ( icebox !=  - 1 )  { 
+ newActor ( IceChunks , x , y )  ; 
+mapDeleteSolid ( icebox )  ; 
+icebox =  - 1 ; 
+ if ( gvPlayer )  if ( x > gvPlayer . x ) flip = true ; 
+ 
+  else flip = false ; 
+ 
+  
+  } 
+  
+  } 
+  
+  } 
+  
+  else  { 
+ squishTime += 0.025 ; 
+ if ( squishTime >= 1 ) die (  )  ; 
+ 
+  } 
+  
+  if (  ! squish ) shape . setPos ( x , y )  ; 
+ 
+ setDrawColor ( 0xff0000ff )  ; 
+ if ( debug ) shape . draw (  )  ; 
+ 
+  } 
+  
+  } ;  returnVal . draw = function (  ) {  if ( frozen )  { 
   if ( smart ) drawSpriteEx ( sprbsod , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  
   else drawSpriteEx ( sprbsod , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
@@ -711,42 +755,10 @@ y -= 1.0 ;
  
   } 
   
-  else  { 
-  if ( icebox !=  - 1 )  { 
- newActor ( IceChunks , x , y )  ; 
-mapDeleteSolid ( icebox )  ; 
-icebox =  - 1 ; 
- if ( gvPlayer )  if ( x > gvPlayer . x ) flip = true ; 
- 
-  else flip = false ; 
- 
-  
-  } 
-  
-  if ( smart ) drawSpriteEx ( sprbsod , wrap ( getFrames (  )  / 12 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+  else  if ( squish ) drawSpriteEx ( sprbsod , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  
   else drawSpriteEx ( sprbsod , wrap ( getFrames (  )  / 12 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  
-  } 
-  
-  } 
-  
-  else  { 
- squishTime += 0.025 ; 
- if ( squishTime >= 1 ) die (  )  ; 
- 
-  if ( smart ) drawSpriteEx ( sprbsod , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  else drawSpriteEx ( sprbsod , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  } 
-  
-  if (  ! squish ) shape . setPos ( x , y )  ; 
- 
- setDrawColor ( 0xff0000ff )  ; 
- if ( debug ) shape . draw (  )  ; 
- 
-  } 
   
   } ;  returnVal . hurtPlayer = function ( target ) {  if ( blinking )  return ; 
   
@@ -837,14 +849,14 @@ popSound ( sndFlame , 0 )  ;
  } ;  returnVal . _typeof = function (  ) {  return "Deathcap" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . flip = false ; 
  squirrelClassFunction . squish = false ; 
  squirrelClassFunction . squishTime = 0.0 ; 
  squirrelClassFunction . smart = false ; 
  squirrelClassFunction . moving = false ; 
  squirrelClassFunction . touchDamage = 2.0 ; 
- return squirrelClassFunction; })()) ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
 print ( "Loaded Frostlands" )  ; 
 
 

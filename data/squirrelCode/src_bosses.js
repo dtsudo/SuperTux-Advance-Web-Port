@@ -4,7 +4,7 @@ if (!window.superTuxAdvanceWebVersion.squirrelFiles) window.superTuxAdvanceWebVe
 window.superTuxAdvanceWebVersion.squirrelFiles['src/bosses.nut'] = function () { 
 
 
-Boss =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+Boss =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -18,7 +18,7 @@ Boss =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal =
  returnVal . gravity = 0.0 ; 
  returnVal . frame = 0.0 ; 
  returnVal . blinking = 0.0 ; 
- returnVal . blinkSpeed = 0.2 ; 
+ returnVal . blinkSpeed = 0.8 ; 
  returnVal . canBeStomped = false ; 
  returnVal . ready = false ; 
  returnVal . damageMult =  { normal : 1.0 , fire : 1.0 , ice : 1.0 , earth : 1.0 , air : 1.0 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 }  ; 
@@ -30,27 +30,33 @@ Boss =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal =
  } ;  returnVal . run = function (  ) {  if ( active )  baseMethods . run  (  )  ; 
  
   } ;  returnVal . physics = function (  ) {  } ;  returnVal . hitPlayer = function ( target ) { target . getHurt ( touchDamage , element )  ; 
- } ;  returnVal . turnToPlayer = function (  ) {  if ( gvPlayer )  { 
-  if ( gvPlayer . x > x ) flip = 0 ; 
+ } ;  returnVal . turnToPlayer = function (  ) {  var target = null ;
+  if ( gvPlayer && gvPlayer2 )  { 
+  if ( distance2 ( x , y , gvPlayer . x , gvPlayer . y )  < distance2 ( x , y , gvPlayer2 . x , gvPlayer2 . y )  ) target = gvPlayer ; 
+ 
+  else target = gvPlayer2 ; 
+ 
+  } 
+  
+  else  if ( gvPlayer ) target = gvPlayer ; 
+ 
+  else  if ( gvPlayer2 ) target = gvPlayer2 ; 
+ 
+  
+  
+  if ( target != null )  { 
+  if ( target . x > x ) flip = 0 ; 
  
   else flip = 1 ; 
  
   } 
-  
-  else  if ( gvPlayer2 )  { 
-  if ( gvPlayer2 . x > x ) flip = 0 ; 
- 
-  else flip = 1 ; 
- 
-  } 
-  
   
   } ;  returnVal . hurtInvinc = function (  ) {  } ;  returnVal . hurtPlayer = function ( target ) {  if ( blinking == 0 )  baseMethods . hurtPlayer  ( target )  ; 
  
   } ;  returnVal . _typeof = function (  ) {  return "Boss" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . health = 40 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . health = 40 ; 
  squirrelClassFunction . phantom = false ; 
  squirrelClassFunction . active = false ; 
  squirrelClassFunction . routine = null ; 
@@ -60,12 +66,12 @@ Boss =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal =
  squirrelClassFunction . gravity = 0.0 ; 
  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . blinking = 0.0 ; 
- squirrelClassFunction . blinkSpeed = 0.2 ; 
+ squirrelClassFunction . blinkSpeed = 0.8 ; 
  squirrelClassFunction . canBeStomped = false ; 
  squirrelClassFunction . ready = false ; 
  squirrelClassFunction . damageMult =  { normal : 1.0 , fire : 1.0 , ice : 1.0 , earth : 1.0 , air : 1.0 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 }  ; 
- return squirrelClassFunction; })()) ; 
-BossManager =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+BossManager =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -109,12 +115,12 @@ deleteActor ( id )  ;
   } 
   
   if ( getFrames (  )  % 4 == 0 )  { 
-  if ( health < healthActual )  { 
+  if ( health < round ( healthActual )  )  { 
  stopSound ( sndMenuMove )  ; 
 playSound ( sndMenuMove , 0 )  ; 
  } 
   
- health +=  squirrelThreeWaysCompare ( healthActual , health )  ; 
+ health +=  squirrelThreeWaysCompare ( round ( healthActual )  , health )  ; 
  } 
   
   if ( health > 0 )  if (  ! gvBoss ) gvBoss = this ; 
@@ -124,14 +130,14 @@ playSound ( sndMenuMove , 0 )  ;
  } ;  returnVal . destructor = function (  ) { gvBoss = false ; 
  } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . bossTotal = 0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . bossTotal = 0 ; 
  squirrelClassFunction . health = 0 ; 
  squirrelClassFunction . healthTotal = 0 ; 
  squirrelClassFunction . healthDrawn = 0 ; 
  squirrelClassFunction . healthActual = 0.0 ; 
  squirrelClassFunction . doorID = 0 ; 
- return squirrelClassFunction; })()) ; 
-Yeti =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Boss ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Actor;  return squirrelClassFunction; })()) ; 
+Yeti =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Boss ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -145,7 +151,7 @@ Yeti =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal =
  returnVal . anShake =  [ 36.0 , 39.0 , "shake" ]  ; 
  returnVal . anThrow =  [ 40.0 , 43.0 , "throw" ]  ; 
  returnVal . anCheer =  [ 44.0 , 47.0 , "cheer" ]  ; 
- returnVal . damageMult =  { normal : 1.0 , fire : 1.0 , ice : 0.0 , earth : 1.0 , air : 1.0 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 }  ; 
+ returnVal . damageMult =  { normal : 1.0 , fire : 2.0 , ice : 0.0 , earth : 1.0 , air : 1.0 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 }  ; 
  returnVal . health = 40 ; 
  returnVal . eventTimer = 0 ; 
  returnVal . eventStage = 0 ; 
@@ -200,6 +206,11 @@ eventTimer = 120 ;
 gvPlayer . invincible = 120 ; 
  } 
   
+  if ( gvPlayer2 )  { 
+ gvPlayer2 . canMove = false ; 
+gvPlayer2 . invincible = 120 ; 
+ } 
+  
  fadeMusic ( 0.25 )  ; 
  } 
   
@@ -229,7 +240,7 @@ frame = anim [ 0 ]  ;
  
   else frame -= 0.5 ; 
  
-  break ;  }  if ( anim != null ) frame = wrap ( frame , anim [ 0 ]  , anim [ 1 ]  )  ; 
+  break ;  }  if ( anim != null &&  ( (anim[ ( 1 ) ] !== undefined) )  ) frame = wrap ( frame , anim [ 0 ]  , anim [ 1 ]  )  ; 
  
   if ( anim != anHurt )  { 
   if ( hspeed > 0 ) flip = 0 ; 
@@ -238,9 +249,13 @@ frame = anim [ 0 ]  ;
  
   } 
   
-  if ( blinking == 0 ) drawSpriteEx ( sprYeti , frame , x - camx , y - camy , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+  if ( routine == ruDizzy ) damageMult . stomp = 4.0 ; 
  
-  else drawSpriteEx ( sprYeti , frame , x - camx , y - camy , 0 , flip . tointeger (  )  , 1 , 1 , max ( wrap ( blinking , 0 , 1 )  ,  ( anim == anHurt )  . tointeger (  )  )  )  ; 
+  else damageMult . stomp = 1.0 ; 
+ 
+  } ;  returnVal . draw = function (  ) {  if ( blinking == 0 ) drawSpriteEx ( sprYeti , frame , x - camx , y - camy , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else drawSpriteEx ( sprYeti , frame , x - camx , y - camy , 0 , flip . tointeger (  )  , 1 , 1 , max ( wrap ( blinking / 5.0 , 0 , 1 )  ,  ( anim == anHurt )  . tointeger (  )  )  )  ; 
  
   if ( debug )  { 
  setDrawColor ( 0x008000ff )  ; 
@@ -248,17 +263,15 @@ shape . draw (  )  ;
 drawText ( font2 , x - camx , y - camy , vspeed . tostring (  )  )  ; 
  } 
   
-  if ( routine == ruDizzy ) damageMult . stomp = 4.0 ; 
- 
-  else damageMult . stomp = 1.0 ; 
- 
   } ;  returnVal . ruWalkIntoFrame = function (  ) { phantom = true ; 
  if ( gvPlayer ) gvPlayer . canMove = false ; 
+ 
+  if ( gvPlayer2 ) gvPlayer2 . canMove = false ; 
  
  anim = anWalk ; 
 flip = 1 ; 
 hspeed =  - 0.5 ; 
- if ( x < camx + screenW (  )  - 96 )  { 
+ if ( x < xstart - 200 )  { 
  routine = ruIntroCheer ; 
 hspeed = 0.0 ; 
 phantom = false ; 
@@ -279,6 +292,8 @@ eventTimer --  ;
  eventTimer = 60 ; 
 routine = ruIdle ; 
  if ( gvPlayer ) gvPlayer . canMove = true ; 
+ 
+  if ( gvPlayer2 ) gvPlayer2 . canMove = true ; 
  
  songPlay ( musBoss )  ; 
  } 
@@ -312,8 +327,22 @@ frame = anim [ 0 ]  ;
   
   if ( floor ( frame )  == anim [ 0 ]  + 1 && anim == anJump )  { 
  vspeed =  - 4.0 ; 
- if ( gvPlayer )  { 
- hspeed =  ( gvPlayer . x - x )  / 64.0 ; 
+ var target = null ;
+  if ( gvPlayer && gvPlayer2 )  { 
+  if ( distance2 ( x , y , gvPlayer . x , gvPlayer . y )  < distance2 ( x , y , gvPlayer2 . x , gvPlayer2 . y )  ) target = gvPlayer ; 
+ 
+  else target = gvPlayer2 ; 
+ 
+  } 
+  
+  else  if ( gvPlayer ) target = gvPlayer ; 
+ 
+  else  if ( gvPlayer2 ) target = gvPlayer2 ; 
+ 
+  
+  
+  if ( target != null )  { 
+ hspeed =  ( target . x - x )  / 64.0 ; 
  } 
   
   } 
@@ -356,7 +385,7 @@ eventTimer = 60 ;
   else hspeed =  - 3.0 ; 
  
   var c = fireWeapon ( MeleeHit , x , y , 1 , id )  ;
- c . shape = clone ( shape )  ; 
+ c . shape =  window.clone(  ( shape ) )  ; 
 c . shape . setPos ( x + hspeed * 2 , y )  ; 
  if (  ! placeFree ( x + hspeed , y )  )  { 
  vspeed =  - 2.0 ; 
@@ -405,6 +434,8 @@ blinking = 0 ;
  setFPS ( 60 )  ; 
  if ( gvPlayer ) gvPlayer . canMove = true ; 
  
+  if ( gvPlayer2 ) gvPlayer2 . canMove = true ; 
+ 
  deleteActor ( id )  ; 
  } 
   
@@ -433,6 +464,10 @@ vspeed =  - 2.0 ;
  
   
   
+  if ( target )  if ( target . rawin ( "anStatue" )  )  if ( target . anim == target . anStatue ) health -= 20 ; 
+ 
+  
+  
   if ( health > 0 ) playSound ( sndBossHit , 0 )  ; 
  
   else playSound ( sndDie , 0 )  ; 
@@ -441,7 +476,7 @@ vspeed =  - 2.0 ;
   
   if ( routine != ruDizzy )  baseMethods . hitPlayer  (  )  ; 
  
-  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( blinking > 0 )  return ; 
+  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( blinking > 0 || _mag == 0 || game . bossHealth <= 0 )  return ; 
   
   var damage = _mag * damageMult [ _element ]  ;
   if ( _cut ) damage *= damageMult [ "cut" ]  ; 
@@ -461,7 +496,7 @@ vspeed =  - 2.0 ;
  } ;  returnVal . die = function (  ) {  } ;  returnVal . _typeof = function (  ) {  return "Boss" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . anIdle =  [ 0.0 , 7.0 , "idle" ]  ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . anIdle =  [ 0.0 , 7.0 , "idle" ]  ; 
  squirrelClassFunction . anWalk =  [ 8.0 , 15.0 , "walk" ]  ; 
  squirrelClassFunction . anRun =  [ 16.0 , 23.0 , "run" ]  ; 
  squirrelClassFunction . anJump =  [ 24.0 , 27.0 , "jump" ]  ; 
@@ -471,14 +506,14 @@ vspeed =  - 2.0 ;
  squirrelClassFunction . anShake =  [ 36.0 , 39.0 , "shake" ]  ; 
  squirrelClassFunction . anThrow =  [ 40.0 , 43.0 , "throw" ]  ; 
  squirrelClassFunction . anCheer =  [ 44.0 , 47.0 , "cheer" ]  ; 
- squirrelClassFunction . damageMult =  { normal : 1.0 , fire : 1.0 , ice : 0.0 , earth : 1.0 , air : 1.0 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 }  ; 
+ squirrelClassFunction . damageMult =  { normal : 1.0 , fire : 2.0 , ice : 0.0 , earth : 1.0 , air : 1.0 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 }  ; 
  squirrelClassFunction . health = 40 ; 
  squirrelClassFunction . eventTimer = 0 ; 
  squirrelClassFunction . eventStage = 0 ; 
  squirrelClassFunction . hasThrown = false ; 
  squirrelClassFunction . touchDamage = 2.0 ; 
- return squirrelClassFunction; })()) ; 
-YetiShock =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Boss;  return squirrelClassFunction; })()) ; 
+YetiShock =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -506,6 +541,15 @@ shape = Rec ( x , y , 8 , 16 , 0 , 0 ,  - 16 )  ;
  
   } 
   
+  if ( gvPlayer2 )  { 
+ shape . setPos ( x +  ( timer * speed )  , y )  ; 
+ if ( hitTest ( shape , gvPlayer2 . shape )  ) gvPlayer2 . hurt = 2 ; 
+ 
+ shape . setPos ( x -  ( timer * speed )  , y )  ; 
+ if ( hitTest ( shape , gvPlayer2 . shape )  ) gvPlayer2 . hurt = 2 ; 
+ 
+  } 
+  
   if ( timer % 10 == 0 )  { 
  newActor ( BigSpark , x +  ( timer * speed )  + speed , y , 0 )  ; 
 newActor ( BigSpark , x -  ( timer * speed )  - speed , y , 1 )  ; 
@@ -513,11 +557,20 @@ newActor ( BigSpark , x -  ( timer * speed )  - speed , y , 1 )  ;
   
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . shape = null ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . shape = null ; 
  squirrelClassFunction . timer = 0 ; 
  squirrelClassFunction . speed = 1.0 ; 
- return squirrelClassFunction; })()) ; 
-Nolok =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Boss ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Actor;  return squirrelClassFunction; })()) ; 
+Beehemoth =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Boss ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+     if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
+         squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
+ } 
+ 
+ with ( returnVal ) { 
+ 
+ } 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Boss;  return squirrelClassFunction; })()) ; 
+Nolok =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Boss ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -531,7 +584,7 @@ shape = Rec ( x , y , 8 , 20 , 0 )  ;
  } ;  returnVal . _typeof = function (  ) {  return "Nolok" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  return squirrelClassFunction; })()) ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Boss;  return squirrelClassFunction; })()) ; 
 
 
 

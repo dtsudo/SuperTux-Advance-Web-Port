@@ -4,7 +4,7 @@ if (!window.superTuxAdvanceWebVersion.squirrelFiles) window.superTuxAdvanceWebVe
 window.superTuxAdvanceWebVersion.squirrelFiles['src/timeline.nut'] = function () { 
 
 
-Timeline =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+Timeline =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -28,10 +28,10 @@ sequence = _arr ;
  } ;  returnVal . _typeof = function (  ) {  return "Timeline" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . sequence = null ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . sequence = null ; 
  squirrelClassFunction . step = 0 ; 
  squirrelClassFunction . done = false ; 
- return squirrelClassFunction; })()) ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Actor;  return squirrelClassFunction; })()) ; 
 runTimeline =  function ( sequence ) {  return newActor ( Timeline , 0 , 0 , sequence )  ;
   }  ; 
 stopTimeline =  function ( tln ) {  if (  squirrelTypeOf ( tln )  == "Timeline" ) deleteActor ( tln . id )  ; 
@@ -43,6 +43,19 @@ tlnTest =  { "0" :  function ( runner ) { print ( "Started test timeline." )  ;
 print ( jsonWrite ( runner . sequence )  )  ; 
 print ( jsonWrite ( actor )  )  ; 
 runner . done = true ; 
+ }  }  ; 
+tlnWalkAndJump =  { "0" :  function ( runner ) { gvAutoCon = true ; 
+autocon . a . right = true ; 
+ }  , "1" :  function ( runner ) {  if ( gvPlayer )  { 
+  if (  ! gvPlayer . placeFree ( gvPlayer . x + 4 , gvPlayer . y )  ) autocon . a . jump = true ; 
+ 
+  if (  ! gvPlayer . placeFree ( gvPlayer . x , gvPlayer . y + 1 )  && gvPlayer . vspeed > 0 ) autocon . a . jump = false ; 
+ 
+  } 
+  
+  if ( autocon . a . jump &&  ! autocon . a . wasJump ) print ( "jumped" )  ; 
+ 
+ runner . step --  ; 
  }  }  ; 
 
 

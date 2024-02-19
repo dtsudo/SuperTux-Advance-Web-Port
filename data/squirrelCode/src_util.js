@@ -14,7 +14,7 @@ mergeTable =  function ( a , b ) {  if (  squirrelTypeOf ( a )  == null &&  squi
   
   if ( b == null )  return a ;
   
-  var nt = clone ( a )  ;
+  var nt =  window.clone(  ( a ) )  ;
   {     var foreachOutput1 = squirrelForEach( b );     while(true)     {        foreachOutput1.next();        if (foreachOutput1.isDone()) break; slot = foreachOutput1.getKey(); i = foreachOutput1.getValue();  { 
   if (  ! nt . rawin ( slot )  ) nt [ slot ] = i ; 
  
@@ -52,29 +52,12 @@ maxNum =  function ( a , b ) {  return  ( a *  ( a > b )  )  +  ( b *  ( b >= a 
 popSound =  function ( sound , repeat = 0 ) { stopSound ( sound )  ; 
 playSound ( sound , repeat )  ; 
  }  ; 
-addTimeAttackWorld =  function ( displayName , folder , level ) {  var tempBack = meTimeAttack . pop (  )  ;
-  var newSlot =  { name :  function (  ) {  return displayName ;
-  }  , func :  function (  ) { gvTAFullGame = false ; 
-game . path = "contrib/" + folder + "/" ; 
-gvTAStart = level ; 
-menu = meDifficulty ; 
- var searchDirExists = false ;
-  for (  var i = 0 ;
- i < tileSearchDir . len (  )  ; i ++  )  { 
-  if ( tileSearchDir [ i ]  == "contrib/" + folder + "/gfx" ) searchDirExists = true ; 
- 
-  } 
-  if (  ! searchDirExists ) tileSearchDir . push ( "contrib/" + folder + "/gfx" )  ; 
- 
-  if ( fileExists ( "contrib/" + folder + "/script.nut" )  &&  ! contribDidRun . rawin ( folder )  )  { 
- donut ( "contrib/" + folder + "/script.nut" )  ; 
-contribDidRun [ folder ] = true ; 
- } 
-  
-  }  }  ;
- meTimeAttack . push ( newSlot )  ; 
-meTimeAttack . push ( tempBack )  ; 
- }  ; 
+even =  function ( x ) {  return x -  ( x % 2 )  ;
+  }  ; 
+torad =  function ( x ) {  return  ( float ( x )  * pi )  / 180.0 ;
+  }  ; 
+inRange =  function ( a , b , c ) {  return  ( a >= b && a <= c )  ;
+  }  ; 
 
 
 

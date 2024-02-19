@@ -9,12 +9,13 @@ Open the `SuperTux-Advance-web-version.html` file in a web browser.
 
 Controls:
 
-* Arrow keys to move
-* Z to jump
-* X to shoot
-* Left shift to run
-* A to item swap
-* Escape to pause
+* Movement: Arrow keys
+* Jump: Z
+* Shoot: X
+* Alt fire: C
+* Special: Left shift
+* Item swap: A
+* Pause: Esc
 
 # Licensing
 

@@ -15,10 +15,22 @@
 	function run() {
 		if(shape == null && dw != 0 && dh != 0) shape = Rec(x + (dw * 8), y + (dh * 8), -4 + (dw * 8), -4 + (dh * 8), 5)
 
-		if(shape != null && gvPlayer) if(hitTest(shape, gvPlayer.shape)) {
+		if(shape != null && gvPlayer && hitTest(shape, gvPlayer.shape)) {
 			if(!found) {
 				found = true
-				if(!rehide) game.secrets++
+				if(!rehide) {
+					game.secrets++
+					popSound(sndSecret)
+				}
+			}
+		}
+		else if(shape != null && gvPlayer2 && hitTest(shape, gvPlayer2.shape)) {
+			if(!found) {
+				found = true
+				if(!rehide) {
+					game.secrets++
+					popSound(sndSecret)
+				}
 			}
 		}
 		else if(rehide) found = false
@@ -28,7 +40,10 @@
 	}
 
 	function draw() {
-		if(config.light) gvMap.drawTilesMod(floor(-camx), floor(-camy), x / 16, y / 16, dw, dh, "secret", alpha, 1, 1, gvLight)
+		local light = 0
+		if(gvLightScreen == gvLightScreen1) light = gvLight
+		if(gvLightScreen == gvLightScreen2) light = gvLight2
+		if(config.light) gvMap.drawTilesMod(floor(-camx), floor(-camy), x / 16, y / 16, dw, dh, "secret", alpha, 1, 1, light)
 		else gvMap.drawTiles(floor(-camx), floor(-camy), x / 16, y / 16, dw, dh, "secret", alpha)
 		if(debug) {
 			drawText(font, x + 2 - camx, y + 2 - camy, "X: " + x + "\nY: " + y + "\nW: " + dw + "\nH: " + dh + "\nA: " + alpha)
@@ -63,8 +78,7 @@
 		local idsToDelete = []
 
 		//Iterate through points in polyline
-		// webBrowserVersionChange: add parentheses to fix order-of-operation issues in the transpiler
-		if(("SecretWall" in actor) && actor["SecretWall"].len() > 0) for(local i = 0; i < path.len(); i++) {
+		if("SecretWall" in actor && actor["SecretWall"].len() > 0) for(local i = 0; i < path.len(); i++) {
 			foreach(j in actor["SecretWall"]) {
 				if(j.shape.pointIn(path[i][0], path[i][1])) {
 					//Add the secret wall to the list
@@ -97,9 +111,17 @@
 				if(hitTest(shape[i], gvPlayer.shape)) scanFound = true
 			}
 		}
+		if(gvPlayer2) {
+			for(local i = 0; i < shape.len(); i++) {
+				if(hitTest(shape[i], gvPlayer2.shape)) scanFound = true
+			}
+		}
 
 		if(scanFound) {
-			if(!rehide && !found) game.secrets++
+			if(!rehide && !found) {
+				game.secrets++
+				popSound(sndSecret)
+			}
 			found = true
 		}
 		else if(rehide) found = false

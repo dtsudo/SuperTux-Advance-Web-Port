@@ -1,4 +1,20 @@
 
+Object.prototype.squirrelFind = function (a, b, c, d, e, f, g) {
+	if (this.substring && this.charAt && this.startsWith)
+		return this.find(a, b);
+	
+	if (this.length || this.length === 0) {
+		for (let i = 0; i < this.length; i++) {
+			if (this[i] === a)
+				return i;
+		}
+		
+		return null;
+	}
+	
+	return this.find(a, b, c, d, e, f, g);
+};
+
 window.squirrelForEach = function (expression) {
 	if (Array.isArray(expression)) {
 		let arrayIndex = -1;
@@ -28,6 +44,28 @@ window.squirrelForEach = function (expression) {
 	};
 };
 
+window.squirrelInstanceOf = function (obj, className) {
+	if (obj === null || obj === undefined)
+		return false;
+	
+	if (!obj.SQUIRREL_CLASS)
+		return false;
+	
+	if (obj.SQUIRREL_CLASS === className)
+		return true;
+	
+	let classFunc = obj.SQUIRREL_CLASS;
+	
+	while (true) {
+		if (!classFunc.SQUIRREL_SUPER_CLASS)
+			return false;
+		if (classFunc.SQUIRREL_SUPER_CLASS === className)
+			return true;
+		
+		classFunc = classFunc.SQUIRREL_SUPER_CLASS;
+	}
+};
+
 window.squirrelThreeWaysCompare = function (x, y) {
 	if (x < y)
 		return -1;
@@ -47,8 +85,11 @@ window.squirrelTypeOf = function (obj) {
 		return "table";
 	if (typeof obj === "string")
 		return "string";
-	if (typeof obj === "function")
-		return "class";
+	if (typeof obj === "function") {
+		if (obj.IS_CLASS_DECLARATION)
+			return "class";
+		return "function";
+	}
 	if ((typeof obj === "number") && Math.round(obj) === obj)
 		return "integer";
 	if (typeof obj === "boolean")

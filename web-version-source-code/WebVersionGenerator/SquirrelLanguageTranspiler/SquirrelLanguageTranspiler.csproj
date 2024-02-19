@@ -52,6 +52,11 @@
     <Compile Include="SquirrelListener.cs" />
     <Compile Include="SquirrelParser.cs" />
     <Compile Include="SquirrelTranspiler.cs" />
+    <Compile Include="SquirrelTranspilerPreprocessor.cs" />
+    <Compile Include="SquirrelTranspilerPreprocessor_FixFindFunction.cs" />
+    <Compile Include="SquirrelTranspilerPreprocessor_FixRemainderOperator.cs" />
+    <Compile Include="SquirrelTranspilerPreprocessor_FixInOperator.cs" />
+    <Compile Include="SquirrelTranspilerPreprocessor_FixSyntaxErrors.cs" />
     <Compile Include="SquirrelTranspilerVisitor.cs" />
     <Compile Include="SquirrelVisitor.cs" />
   </ItemGroup>

@@ -2,31 +2,17 @@ if (!window.superTuxAdvanceWebVersion) window.superTuxAdvanceWebVersion = {};
 
 window.superTuxAdvanceWebVersion.squirrelFileList = []; 
 
-window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/game.js'); 
+window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/contrib_bonus_init.js'); 
 
 window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
-    'game.brx', 
+    'contrib/bonus/init.nut', 
     '' 
 ); 
 
-window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/contrib_azzy_init.js'); 
+window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/contrib_bonus_script.js'); 
 
 window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
-    'contrib/azzy/init.nut', 
-    '' 
-); 
-
-window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/contrib_azzy_script.js'); 
-
-window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
-    'contrib/azzy/script.nut', 
-    '' 
-); 
-
-window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/contrib_extras_script.js'); 
-
-window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
-    'contrib/extras/script.nut', 
+    'contrib/bonus/script.nut', 
     '' 
 ); 
 
@@ -44,6 +30,13 @@ window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile(
     '' 
 ); 
 
+window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/contrib_nevergolf_script.js'); 
+
+window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
+    'contrib/nevergolf/script.nut', 
+    '' 
+); 
+
 window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/contrib_osop-prequel_script.js'); 
 
 window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
@@ -51,10 +44,24 @@ window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile(
     '' 
 ); 
 
+window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/game.js'); 
+
+window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
+    'game.brx', 
+    '' 
+); 
+
 window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/mods_test.js'); 
 
 window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
     'mods/test.nut', 
+    '' 
+); 
+
+window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_accessibility.js'); 
+
+window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
+    'src/accessibility.nut', 
     '' 
 ); 
 
@@ -69,6 +76,13 @@ window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_as
 
 window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
     'src/assets.nut', 
+    '' 
+); 
+
+window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_beam.js'); 
+
+window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
+    'src/beam.nut', 
     '' 
 ); 
 
@@ -90,6 +104,13 @@ window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_bo
 
 window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
     'src/bosses.nut', 
+    '' 
+); 
+
+window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_camera.js'); 
+
+window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
+    'src/camera.nut', 
     '' 
 ); 
 
@@ -118,6 +139,13 @@ window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_cu
 
 window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
     'src/cursor.nut', 
+    '' 
+); 
+
+window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_cyra.js'); 
+
+window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
+    'src/cyra.nut', 
     '' 
 ); 
 
@@ -219,10 +247,45 @@ window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile(
     '' 
 ); 
 
+window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_midi.js'); 
+
+window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
+    'src/midi.nut', 
+    '' 
+); 
+
+window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_mods.js'); 
+
+window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
+    'src/mods.nut', 
+    '' 
+); 
+
+window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_network.js'); 
+
+window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
+    'src/network.nut', 
+    '' 
+); 
+
+window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_neverball.js'); 
+
+window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
+    'src/neverball.nut', 
+    '' 
+); 
+
 window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_npc.js'); 
 
 window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
     'src/npc.nut', 
+    '' 
+); 
+
+window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_npc2.js'); 
+
+window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
+    'src/npc2.nut', 
     '' 
 ); 
 
@@ -303,6 +366,13 @@ window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile(
     '' 
 ); 
 
+window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_surge.js'); 
+
+window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
+    'src/surge.nut', 
+    '' 
+); 
+
 window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_text.js'); 
 
 window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
@@ -314,6 +384,13 @@ window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_ti
 
 window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
     'src/tilemap.nut', 
+    '' 
+); 
+
+window.superTuxAdvanceWebVersion.squirrelFileList.push('data/squirrelCode/src_timeattack.js'); 
+
+window.superTuxAdvanceWebVersion.simulatedFileSystem.addFile( 
+    'src/timeattack.nut', 
     '' 
 ); 
 

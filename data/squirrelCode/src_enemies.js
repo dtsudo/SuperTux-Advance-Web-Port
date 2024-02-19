@@ -4,7 +4,8 @@ if (!window.superTuxAdvanceWebVersion.squirrelFiles) window.superTuxAdvanceWebVe
 window.superTuxAdvanceWebVersion.squirrelFiles['src/enemies.nut'] = function () { 
 
 
-Enemy =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+gvEnemies =  {  }  ; 
+Enemy =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -13,19 +14,25 @@ Enemy =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal 
  returnVal . frozen = 0 ; 
  returnVal . freezeTime = 600 ; 
  returnVal . minFreezeTime = 0 ; 
- returnVal . freezeSprite =  - 1 ; 
+ returnVal . freezeSprite = 0 ; 
  returnVal . icebox =  - 1 ; 
  returnVal . nocount = false ; 
+ returnVal . nodrop = false ; 
  returnVal . damageMult =  { normal : 1.0 , fire : 1.0 , ice : 1.0 , earth : 1.0 , air : 1.0 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 , star : 10.0 }  ; 
  returnVal . blinking = 0.0 ; 
  returnVal . blinkSpeed = 1.0 ; 
- returnVal . blinkMax = 10.0 ; 
+ returnVal . blinkMax = 30.0 ; 
  returnVal . touchDamage = 0.0 ; 
  returnVal . element = "normal" ; 
  returnVal . sharpTop = false ; 
  returnVal . sharpSide = false ; 
  returnVal . held = false ; 
  returnVal . squish = false ; 
+ returnVal . blast = false ; 
+ returnVal . cut = false ; 
+ returnVal . dead = false ; 
+ returnVal . hitBy = null ; 
+ returnVal . notarget = false ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
@@ -35,10 +42,11 @@ Enemy =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal 
   baseMethods . run  (  )  ; 
  if ( frozen > 0 )  { 
  frozen --  ; 
- if ( floor ( frozen / 4 )  % 2 == 0 && frozen < 60 ) drawSpriteZ ( 4 , freezeSprite , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
- 
-  else drawSpriteZ ( 4 , freezeSprite , 0 , x - camx , y - camy - 1 )  ; 
- 
+ if ( frozen == 0 )  { 
+ mapDeleteSolid ( icebox )  ; 
+newActor ( IceChunks , x , y )  ; 
+ } 
+  
   } 
   
   if ( actor . rawin ( "WeaponEffect" )  &&  ! blinking )  {     var foreachOutput1 = squirrelForEach( actor [ "WeaponEffect" ]  );     while(true)     {        foreachOutput1.next();        if (foreachOutput1.isDone()) break; i = foreachOutput1.getValue();  { 
@@ -47,7 +55,8 @@ Enemy =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal 
   if ( i . owner == id ) continue ; 
  
   if ( hitTest ( shape , i . shape )  )  { 
-  if ( checkActor ( i . owner )  ) getHurt ( actor [ i . owner ]  , i . power , i . element , i . cut , i . blast )  ; 
+ hitBy = i ; 
+ if ( checkActor ( i . owner )  ) getHurt ( actor [ i . owner ]  , i . power , i . element , i . cut , i . blast )  ; 
  
   else getHurt ( 0 , i . power , i . element , i . cut , i . blast )  ; 
  
@@ -55,27 +64,37 @@ Enemy =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal 
  
   else i . piercing --  ; 
  
-  } 
+ i . didHit = true ; 
+ } 
   
   } 
      }  }  
-  if ( gvPlayer )  { 
-  if ( hitTest ( shape , gvPlayer . shape )  &&  ! frozen )  { 
-  if ( gvPlayer . invincible > 0 ) hurtInvinc (  )  ; 
+  var waterType = inWater ( x , y )  ;
+  switch ( waterType )  {  case "lava" : frozen = 0 ; 
+health -= 0.2 * damageMult . fire ; 
+ if (  ( (this[ ( "hurtFire" ) ] !== undefined) )  && health <= 0 ) hurtFire (  )  ; 
  
-  else  if ( y > gvPlayer . y && vspeed < gvPlayer . vspeed && gvPlayer . canStomp && gvPlayer . placeFree ( gvPlayer . x , gvPlayer . y + 2 )  && blinking == 0 &&  ! sharpTop &&  ! gvPlayer . swimming )  { 
+  break ;  case "acid" : frozen = 0 ; 
+health -= 0.1 * damageMult . toxic ; 
+ if (  ( (this[ ( "hurtBlast" ) ] !== undefined) )  && health <= 0 ) hurtBlast (  )  ; 
+ 
+  break ;  }  if ( gvPlayer && health > 0 )  { 
+  if ( hitTest ( shape , gvPlayer . shape )  &&  ! frozen )  { 
+  if (  ( (gvPlayer[ ( "invincible" ) ] !== undefined) )  && gvPlayer . invincible > 0 ) hurtInvinc (  )  ; 
+ 
+  else  if ( y > gvPlayer . y && vspeed < gvPlayer . vspeed && gvPlayer . canStomp && gvPlayer . placeFree ( gvPlayer . x , gvPlayer . y + 2 )  && blinking == 0 &&  ! sharpTop &&  ! gvPlayer . swimming && gvPlayer . holding != id )  { 
   if (  ! squish )  { 
-  if ( getcon ( "jump" , "hold" )  ) gvPlayer . vspeed =  - 8.0 ; 
+  if ( getcon ( "jump" , "hold" , false , 1 )  ) gvPlayer . vspeed =  - 8.0 ; 
  
   else gvPlayer . vspeed =  - 4.0 ; 
  
   } 
   
- getHurt ( gvPlayer , 1 , "normal" , false , false , true )  ; 
+ getHurt ( gvPlayer , gvPlayer . stompDamage , "normal" , false , false , true )  ; 
  } 
   
-  else  if ( gvPlayer . rawin ( "anSlide" )  && blinking == 0 &&  ! sharpSide )  { 
-  if ( gvPlayer . anim == gvPlayer . anSlide ) getHurt ( gvPlayer , 1 , "normal" , false , false , false )  ; 
+  else  if (  (  ( (gvPlayer[ ( "anim" ) ] !== undefined) )  )  && blinking == 0 &&  ! sharpSide )  { 
+  if ( gvPlayer . inMelee ) getHurt ( gvPlayer , 1 , "normal" , false , false , false )  ; 
  
   else hurtPlayer ( gvPlayer )  ; 
  
@@ -89,23 +108,23 @@ Enemy =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal 
   
   } 
   
-  if ( gvPlayer2 )  { 
+  if ( gvPlayer2 && health > 0 )  { 
   if ( hitTest ( shape , gvPlayer2 . shape )  &&  ! frozen )  { 
-  if ( gvPlayer2 . invincible > 0 ) hurtInvinc (  )  ; 
+  if (  ( (gvPlayer2[ ( "invincible" ) ] !== undefined) )  && gvPlayer2 . invincible > 0 ) hurtInvinc (  )  ; 
  
-  else  if ( y > gvPlayer2 . y && vspeed < gvPlayer2 . vspeed && gvPlayer2 . canStomp && gvPlayer2 . placeFree ( gvPlayer2 . x , gvPlayer2 . y + 2 )  && blinking == 0 &&  ! sharpTop &&  ! gvPlayer2 . swimming )  { 
+  else  if ( y > gvPlayer2 . y && vspeed < gvPlayer2 . vspeed && gvPlayer2 . canStomp && gvPlayer2 . placeFree ( gvPlayer2 . x , gvPlayer2 . y + 2 )  && blinking == 0 &&  ! sharpTop &&  ! gvPlayer2 . swimming && gvPlayer2 . holding != id )  { 
   if (  ! squish )  { 
-  if ( getcon ( "jump" , "hold" )  ) gvPlayer2 . vspeed =  - 8.0 ; 
+  if ( getcon ( "jump" , "hold" , false , 1 )  ) gvPlayer2 . vspeed =  - 8.0 ; 
  
   else gvPlayer2 . vspeed =  - 4.0 ; 
  
   } 
   
- getHurt ( gvPlayer2 , 1 , "normal" , false , false , true )  ; 
+ getHurt ( gvPlayer2 , gvPlayer2 . stompDamage , "normal" , false , false , true )  ; 
  } 
   
-  else  if ( gvPlayer2 . rawin ( "anSlide" )  && blinking == 0 &&  ! sharpSide )  { 
-  if ( gvPlayer2 . anim == gvPlayer2 . anSlide ) getHurt ( gvPlayer2 , 1 , "normal" , false , false , false )  ; 
+  else  if (  (  ( (gvPlayer2[ ( "anim" ) ] !== undefined) )  )  && blinking == 0 &&  ! sharpSide )  { 
+  if ( gvPlayer2 . inMelee ) getHurt ( gvPlayer2 , 1 , "normal" , false , false , false )  ; 
  
   else hurtPlayer ( gvPlayer2 )  ; 
  
@@ -125,22 +144,39 @@ Enemy =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal 
  
   } 
   
-  else  { 
-  if ( inDistance2 ( x , y , camx +  ( screenW (  )  / 2 )  , camy +  ( screenH (  )  / 2 )  , 240 )  ) active = true ; 
+  else  if ( isOnScreen (  )  ) active = true ; 
  
+  
+  if ( health <= 0 )  { 
+ frozen = 0 ; 
+mapDeleteSolid ( icebox )  ; 
+die (  )  ; 
+ return ; 
   } 
   
+  if (  !  (  ( (gvEnemies[ ( id ) ] !== undefined) )  )  ) gvEnemies [ id ] = true ; 
+ 
   } ;  returnVal . hurtInvinc = function (  ) { mapDeleteSolid ( icebox )  ; 
 newActor ( Poof , x , y )  ; 
 die (  )  ; 
 popSound ( sndFlame , 0 )  ; 
- } ;  returnVal . die = function (  ) { mapDeleteSolid ( icebox )  ; 
+ } ;  returnVal . die = function (  ) {  if ( dead )  return ; 
+  
+ dead = true ; 
+mapDeleteSolid ( icebox )  ; 
  if ( frozen ) newActor ( IceChunks , x , y )  ; 
  
  frozen = 0 ; 
 deleteActor ( id )  ; 
  if (  ! nocount ) game . enemies ++  ; 
  
+  if (  ! nodrop )  { 
+  if ( randInt ( 4 + game . difficulty )  == 0 ) newActor ( Berry , x , y , true )  ; 
+ 
+  if ( randInt ( 4 + game . difficulty )  == 0 ) newActor ( CoinSmall , x , y , true )  ; 
+ 
+  } 
+  
   } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( blinking > 0 )  return ; 
   
   var damage = _mag * damageMult [ _element ]  ;
@@ -150,48 +186,168 @@ deleteActor ( id )  ;
  
   if ( _stomp ) damage *= damageMult [ "stomp" ]  ; 
  
+  if ( frozen && _element == "ice" ) damage = 0.0 ; 
+ 
  health -= damage ; 
  if ( damage > 0 ) blinking = blinkMax ; 
  
-  if ( health <= 0 )  { 
- frozen = 0 ; 
-mapDeleteSolid ( icebox )  ; 
-die (  )  ; 
- return ; 
-  } 
+  if ( _element == "ice" && icebox ==  - 1 && freezeTime > 0 )  { 
+ frozen = minFreezeTime +  ( freezeTime * damageMult [ "ice" ]  )  ; 
+icebox = mapNewSolid ( shape )  ; 
+ } 
   
-  if ( _element == "ice" ) frozen = minFreezeTime +  ( freezeTime * damageMult [ "ice" ]  )  ; 
- 
   if ( _element == "fire" )  { 
  newActor ( Flame , x , y )  ; 
 popSound ( sndFlame , 0 )  ; 
+frozen = 0 ; 
+mapDeleteSolid ( icebox )  ; 
  } 
   
- blinking = blinkMax ; 
- } ;  returnVal . hurtPlayer = function ( target ) { target . hurt = touchDamage * target . damageMult [ element ]  ; 
- } ;  returnVal . destructor = function (  ) { mapDeleteSolid ( icebox )  ; 
- } ; 
+  } ;  returnVal . hurtPlayer = function ( target ) {  if ( blinking || squish )  return ; 
+  
+ target . hurt = touchDamage * target . damageMult [ element ]  *  ( cut ? target . damageMult [ "cut" ]  : 1 )  *  ( blast ? target . damageMult [ "blast" ]  : 1 )  ; 
+ } ;  returnVal . holdMe = function ( throwF = 2.0 ) {  if ( frozen )  return ; 
+  
+  var target = findPlayer (  )  ;
+  if ( target == null )  { 
+ held = false ; 
+ return ; 
+  } 
+  
+  if ( target . anim == "slide" || target . anim == "ball" || target . inMelee )  { 
+ target . holding = 0 ; 
+held = false ; 
+ return ; 
+  } 
+  
+  if ( target != null )  { 
+  if (  ( target . inMelee )  ) held = false ; 
+ 
+  else  if ( hitTest ( shape , target . shape )  &&  ( getcon ( "shoot" , "hold" , false , target . playerNum )  || getcon ( "spec1" , "hold" , false , target . playerNum )  )  &&  ( target . holding == 0 || target . holding == id )  )  { 
+ y = target . y ; 
+flip = target . flip ; 
+ if ( flip == 0 ) x = target . x + 10 ; 
+ 
+  else x = target . x - 10 ; 
+ 
+ x += target . hspeed ; 
+y += target . vspeed ; 
+held = true ; 
+target . holding = id ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . health = 1.0 ; 
+  
+  
+  if ( target . rawin ( "anClimb" )  && target . anim == target . anClimb && held )  { 
+ target . holding = 0 ; 
+ var escapedir =  squirrelThreeWaysCompare ( x , target . x )  ;
+ y = target . y ; 
+x = target . x ; 
+ for (  var i = 0 ;
+ i < shape . w ; i ++  )  { 
+  if ( placeFree ( x +  ( i * escapedir )  , y )  ) x += escapedir ; 
+ 
+  } 
+ shape . setPos ( x , y )  ; 
+held = false ; 
+ } 
+  
+  if (  ! placeFree ( x , y )  && held )  { 
+  var escapedir =  squirrelThreeWaysCompare ( x , target . x )  ;
+ y = target . y ; 
+x = target . x ; 
+ for (  var i = 0 ;
+ i < shape . w ; i ++  )  { 
+  if ( placeFree ( x +  ( i * escapedir )  , y )  ) x += escapedir ; 
+ 
+  } 
+  } 
+  
+  } 
+  
+  if (  ( (target[ ( "playerNum" ) ] !== undefined) )  &&  ! getcon ( "shoot" , "hold" , false , target . playerNum )  &&  ! getcon ( "spec1" , "hold" , false , target . playerNum )  )  { 
+  if ( held && target )  { 
+ target . holding = 0 ; 
+x += target . hspeed * 2 ; 
+ if (  ! placeFree ( x , y )  )  { 
+  var escapedir =  squirrelThreeWaysCompare ( x , target . x )  ;
+ y = target . y ; 
+x = target . x ; 
+ for (  var i = 0 ;
+ i < shape . w ; i ++  )  { 
+  if ( placeFree ( x +  ( i * escapedir )  , y )  ) x += escapedir ; 
+ 
+  } 
+  } 
+  
+  var throwH =  squirrelThreeWaysCompare ( x , target . x )  ;
+  var throwV = 0 ;
+  if ( getcon ( "up" , "hold" , false , target . playerNum )  && held )  { 
+ throwV =  - 1 ; 
+ if (  ! getcon ( "left" , "hold" , false , target . playerNum )  &&  ! getcon ( "right" , "hold" , true , target . playerNum )  ) throwH = 0 ; 
+ 
+  } 
+  
+  if ( getcon ( "down" , "hold" , false , target . playerNum )  && held )  { 
+ throwV = 1 ; 
+ if (  ! getcon ( "left" , "hold" , false , target . playerNum )  &&  ! getcon ( "right" , "hold" , true , target . playerNum )  ) throwH = 0 ; 
+ 
+  } 
+  
+  if ( getcon ( "left" , "hold" , false , target . playerNum )  && held ) throwH =  - 1 ; 
+ 
+  if ( getcon ( "right" , "hold" , false , target . playerNum )  && held ) throwH = 1 ; 
+ 
+  var throwD = pointAngle ( 0 , 0 , throwH , throwV )  ;
+ hspeed = lendirX ( throwF , throwD )  +  ( target . hspeed / 2.0 )  ; 
+vspeed = lendirY ( throwF , throwD )  +  ( target . vspeed / 4.0 )  ; 
+ } 
+  
+ held = false ; 
+ } 
+  
+  } ;  returnVal . draw = function (  ) {  if ( frozen )  { 
+  if ( frozen <= 120 )  { 
+  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSpriteZ ( 6 , freezeSprite , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
+ 
+  else drawSpriteZ ( 6 , freezeSprite , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else drawSpriteZ ( 6 , freezeSprite , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  } ;  returnVal . destructor = function (  ) { mapDeleteSolid ( icebox )  ; 
+ if (  ( (gvEnemies[ ( id ) ] !== undefined) )  )  delete gvEnemies [ id ]  ; 
+ 
+  } ; 
+ } 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . health = 1.0 ; 
  squirrelClassFunction . active = false ; 
  squirrelClassFunction . frozen = 0 ; 
  squirrelClassFunction . freezeTime = 600 ; 
  squirrelClassFunction . minFreezeTime = 0 ; 
- squirrelClassFunction . freezeSprite =  - 1 ; 
+ squirrelClassFunction . freezeSprite = 0 ; 
  squirrelClassFunction . icebox =  - 1 ; 
  squirrelClassFunction . nocount = false ; 
+ squirrelClassFunction . nodrop = false ; 
  squirrelClassFunction . damageMult =  { normal : 1.0 , fire : 1.0 , ice : 1.0 , earth : 1.0 , air : 1.0 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 , star : 10.0 }  ; 
  squirrelClassFunction . blinking = 0.0 ; 
  squirrelClassFunction . blinkSpeed = 1.0 ; 
- squirrelClassFunction . blinkMax = 10.0 ; 
+ squirrelClassFunction . blinkMax = 30.0 ; 
  squirrelClassFunction . touchDamage = 0.0 ; 
  squirrelClassFunction . element = "normal" ; 
  squirrelClassFunction . sharpTop = false ; 
  squirrelClassFunction . sharpSide = false ; 
  squirrelClassFunction . held = false ; 
  squirrelClassFunction . squish = false ; 
- return squirrelClassFunction; })()) ; 
-DeadNME =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction . blast = false ; 
+ squirrelClassFunction . cut = false ; 
+ squirrelClassFunction . dead = false ; 
+ squirrelClassFunction . hitBy = null ; 
+ squirrelClassFunction . notarget = false ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = PhysAct;  return squirrelClassFunction; })()) ; 
+DeadNME =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -209,16 +365,28 @@ DeadNME =  ((function(){ let squirrelClassFunction = function ( ) { var returnVa
 
    (baseConstructor.bind(this))  ( _x , _y )  ; 
 vspeed =  - 3.0 ; 
+shape = Rec ( x , y , 8 , 8 , 0 )  ; 
  } ;  returnVal . run = function (  ) { vspeed += gravity ; 
-x += hspeed ; 
+ if ( inWater ( x , y )  )  { 
+ x += hspeed / 4.0 ; 
+y += vspeed / 4.0 ; 
+ if ( vspeed > 4 ) vspeed -= gravity * 2.0 ; 
+ 
+  } 
+  
+  else  { 
+ x += hspeed ; 
 y += vspeed ; 
-angle += spin ; 
+ } 
+  
+ angle += spin ; 
  if ( y > gvMap . h + 32 ) deleteActor ( id )  ; 
  
- drawSpriteEx ( sprite , frame , floor ( x - camx )  , floor ( y - camy )  , angle , flip , 1 , 1 , 1 )  ; 
- } ; 
+  } ;  returnVal . draw = function (  ) { drawSprite ( sprite , frame , floor ( x - camx )  , floor ( y - camy )  , angle , flip , 1 , 1 , 1 )  ; 
+ } ;  returnVal . _typeof = function (  ) {  return "DeadNME" ;
+  } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . sprite = 0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . sprite = 0 ; 
  squirrelClassFunction . frame = 0 ; 
  squirrelClassFunction . hspeed = 0.0 ; 
  squirrelClassFunction . vspeed = 0.0 ; 
@@ -226,8 +394,8 @@ angle += spin ;
  squirrelClassFunction . spin = 0 ; 
  squirrelClassFunction . flip = 0 ; 
  squirrelClassFunction . gravity = 0.2 ; 
- return squirrelClassFunction; })()) ; 
-Deathcap =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = PhysAct;  return squirrelClassFunction; })()) ; 
+Deathcap =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -244,11 +412,12 @@ Deathcap =  ((function(){ let squirrelClassFunction = function ( ) { var returnV
 
    (baseConstructor.bind(this))  ( _x . tofloat (  )  , _y . tofloat (  )  )  ; 
 shape = Rec ( x , y , 6 , 6 , 0 )  ; 
-smart = _arr ; 
+smart = bool ( _arr )  ; 
  } ;  returnVal . routine = function (  ) {  } ;  returnVal . animation = function (  ) {  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
  if ( active )  { 
+  var target = findPlayer (  )  ;
   if (  ! moving )  { 
-  if ( gvPlayer && x > gvPlayer . x ) flip = true ; 
+  if ( target != null && target && x > target . x ) flip = true ; 
  
  moving = true ; 
  } 
@@ -314,25 +483,16 @@ y -= 1.0 ;
   } 
   
   if ( frozen )  { 
-  if ( gvPlayer )  if ( icebox ==  - 1 &&  ! hitTest ( shape , gvPlayer . shape )  )  { 
+  var canice = true ;
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
+ 
+  if ( icebox ==  - 1 && canice )  { 
   if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
  
   } 
   
-  
-  if ( smart ) drawSpriteEx ( sprGradcap , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  else drawSpriteEx ( sprDeathcap , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  if ( frozen <= 120 )  { 
-  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
- 
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
-  } 
-  
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
   } 
   
   else  { 
@@ -347,10 +507,6 @@ icebox =  - 1 ;
   
   } 
   
-  if ( smart ) drawSpriteEx ( sprGradcap , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  else drawSpriteEx ( sprDeathcap , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
   } 
   
   } 
@@ -358,10 +514,6 @@ icebox =  - 1 ;
   else  { 
  squishTime += 0.025 ; 
  if ( squishTime >= 1 ) die (  )  ; 
- 
-  if ( smart ) drawSpriteEx ( sprGradcap , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  else drawSpriteEx ( sprDeathcap , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  
   } 
   
@@ -372,12 +524,49 @@ icebox =  - 1 ;
  
   } 
   
-  } ;  returnVal . hurtPlayer = function ( target ) {  if ( blinking )  return ; 
+  } ;  returnVal . draw = function (  ) {  if (  ! active )  return ; 
   
-  if ( squish )  return ; 
+  if (  ! squish )  { 
+  if ( frozen )  { 
+  if ( smart ) drawSprite ( sprGradcap , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else drawSprite ( sprDeathcap , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  if ( frozen <= 120 )  { 
+  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
+ 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
   
-  baseMethods . hurtPlayer  ( target )  ; 
- } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( squish )  return ; 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else  { 
+  if ( smart ) drawSprite ( sprGradcap , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else drawSprite ( sprDeathcap , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  } 
+  
+  } 
+  
+  else  { 
+  if ( smart ) drawSprite ( sprGradcap , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else drawSprite ( sprDeathcap , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  } 
+  
+  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( squish )  return ; 
+  
+  if ( _element == "ice" )  { 
+ frozen = 600 ; 
+ return ; 
+  } 
+  
+  if ( _mag <= 0 )  return ; 
   
   if ( _blast )  { 
  hurtblast (  )  ; 
@@ -396,21 +585,16 @@ popSound ( sndFlame , 0 )  ;
   return ; 
   } 
   
-  if ( _element == "ice" )  { 
- frozen = 600 ; 
- return ; 
-  } 
-  
-  if ( gvPlayer . rawin ( "anSlide" )  )  { 
-  if ( gvPlayer . anim == gvPlayer . anSlide && hitTest ( shape , gvPlayer . shape )  )  { 
+  if (  ( (_by[ ( "inMelee" ) ] !== undefined) )  )  { 
+  if ( _by . inMelee && hitTest ( shape , _by . shape )  )  { 
   var c = newActor ( DeadNME , x , y )  ;
   if ( smart ) actor [ c ]  . sprite = sprGradcap ; 
  
   else actor [ c ]  . sprite = sprDeathcap ; 
  
- actor [ c ]  . vspeed = min (  - fabs ( gvPlayer . hspeed )  ,  - 4 )  ; 
-actor [ c ]  . hspeed =  ( gvPlayer . hspeed / 16 )  ; 
-actor [ c ]  . spin =  ( gvPlayer . hspeed * 7 )  ; 
+ actor [ c ]  . vspeed = min (  - fabs ( _by . hspeed )  ,  - 4 )  ; 
+actor [ c ]  . hspeed =  ( _by . hspeed / 16 )  ; 
+actor [ c ]  . spin =  ( _by . hspeed * 7 )  ; 
 actor [ c ]  . angle = 180 ; 
 die (  )  ; 
 popSound ( sndKick , 0 )  ; 
@@ -439,9 +623,11 @@ popSound ( sndKick , 0 )  ;
   
   else popSound ( sndSquish , 0 )  ; 
  
- squish = true ; 
-blinking = 120 ; 
- } ;  returnVal . hurtblast = function (  ) {  var c = newActor ( DeadNME , x , y )  ;
+  if ( _mag > 0 ) squish = true ; 
+ 
+  if ( _mag > 0 ) blinking = 120 ; 
+ 
+  } ;  returnVal . hurtblast = function (  ) {  var c = newActor ( DeadNME , x , y )  ;
   if ( smart ) actor [ c ]  . sprite = sprGradcap ; 
  
   else actor [ c ]  . sprite = sprDeathcap ; 
@@ -466,15 +652,15 @@ popSound ( sndFlame , 0 )  ;
  } ;  returnVal . _typeof = function (  ) {  return "Deathcap" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . flip = false ; 
  squirrelClassFunction . squish = false ; 
  squirrelClassFunction . squishTime = 0.0 ; 
  squirrelClassFunction . smart = false ; 
  squirrelClassFunction . moving = false ; 
  squirrelClassFunction . touchDamage = 2.0 ; 
- return squirrelClassFunction; })()) ; 
-PipeSnake =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+PipeSnake =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -499,27 +685,44 @@ flip = _arr ;
  
   if (  ! up && y < ystart &&  ! frozen ) y += 2 ; 
  
- timer --  ; 
- if ( timer <= 0 )  { 
+  if (  ! frozen ) timer --  ; 
+ 
+  if ( timer <= 0 )  { 
  up =  ! up ; 
 timer = 60 ; 
  } 
   
  shape . setPos ( x , y + 16 )  ; 
  if ( frozen )  { 
-  if ( gvPlayer )  if ( icebox ==  - 1 &&  ! hitTest ( shape , gvPlayer . shape )  )  { 
+  var canice = true ;
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
+ 
+  if ( icebox ==  - 1 && canice )  { 
   if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
  
   } 
   
+  } 
   
-  if ( flip == 1 ) drawSpriteEx ( sprSnake , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , 0 , 1 , 1 , 1 )  ; 
+  else  { 
+  if ( icebox !=  - 1 )  { 
+ newActor ( IceChunks , x , y )  ; 
+mapDeleteSolid ( icebox )  ; 
+icebox =  - 1 ; 
+ } 
+  
+  } 
+  
+  } ;  returnVal . draw = function (  ) {  if ( flip == 1 ) drawSprite ( sprSnake ,  ( frozen ? 1 : getFrames (  )  / 8 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , 0 , 1 , 1 , 1 )  ; 
  
-  if ( flip ==  - 1 ) drawSpriteEx ( sprSnake , 0 , floor ( x - camx )  , floor ( y - camy )  + 32 , 0 , 2 , 1 , 1 , 1 )  ; 
+  if ( flip ==  - 1 ) drawSprite ( sprSnake ,  ( frozen ? 1 : getFrames (  )  / 8 )  , floor ( x - camx )  , floor ( y - camy )  + 32 , 0 , 2 , 1 , 1 , 1 )  ; 
  
-  if ( flip == 1 ) drawSpriteEx ( sprSnake , 1 , floor ( x - camx )  , floor ( y - camy )  , 0 , 0 , 1 , 1 , 1 )  ; 
+  if ( frozen > 0 )  { 
+  if ( flip == 1 ) drawSprite ( sprSnake , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , 0 , 1 , 1 , 1 )  ; 
  
-  if ( flip ==  - 1 ) drawSpriteEx ( sprSnake , 1 , floor ( x - camx )  , floor ( y - camy )  - 8 , 0 , 2 , 1 , 1 , 1 )  ; 
+  if ( flip ==  - 1 ) drawSprite ( sprSnake , 0 , floor ( x - camx )  , floor ( y - camy )  + 32 , 0 , 2 , 1 , 1 , 1 )  ; 
  
   if ( frozen <= 120 )  { 
   if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapTall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy + 16 )  ; 
@@ -532,51 +735,21 @@ timer = 60 ;
  
   } 
   
-  else  { 
-  if ( icebox !=  - 1 )  { 
- mapDeleteSolid ( icebox )  ; 
-newActor ( IceChunks , x , y )  ; 
-icebox =  - 1 ; 
- } 
-  
-  if ( flip == 1 ) drawSpriteEx ( sprSnake , getFrames (  )  / 8 , floor ( x - camx )  , floor ( y - camy )  , 0 , 0 , 1 , 1 , 1 )  ; 
- 
-  if ( flip ==  - 1 ) drawSpriteEx ( sprSnake , getFrames (  )  / 8 , floor ( x - camx )  , floor ( y - camy )  + 32 , 0 , 2 , 1 , 1 , 1 )  ; 
- 
-  } 
-  
   if ( debug )  { 
  setDrawColor ( 0x008000ff )  ; 
 shape . draw (  )  ; 
+drawText ( font , x - camx , y - camy , frozen . tostring (  )  )  ; 
  } 
   
-  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if (  ! gvPlayer )  return ; 
-  
-  if ( _mag == 0 )  return ; 
+  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _mag == 0 )  return ; 
   
   if ( _stomp )  return ; 
   
-  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  )  { 
+  if ( _by != 0 && hitTest ( shape , _by . shape )  )  { 
   var didhurt = false ;
-  if ( gvPlayer . rawin ( "anSlide" )  )  if ( gvPlayer . anim == gvPlayer . anSlide ) didhurt = true ; 
+  if (  ( (_by[ ( "inMelee" ) ] !== undefined) )  && _by . inMelee ) didhurt = true ; 
  
-  
-  if ( gvPlayer . rawin ( "anStomp" )  )  if ( gvPlayer . anim == gvPlayer . anStomp ) didhurt = true ; 
- 
-  
-  if (  ! didhurt ) hurtPlayer ( gvPlayer )  ; 
- 
-  } 
-  
-  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  )  { 
-  var didhurt = false ;
-  if ( gvPlayer2 . rawin ( "anSlide" )  )  if ( gvPlayer2 . anim == gvPlayer2 . anSlide ) didhurt = true ; 
- 
-  
-  if ( gvPlayer2 . rawin ( "anStomp" )  )  if ( gvPlayer2 . anim == gvPlayer2 . anStomp ) didhurt = true ; 
- 
-  
-  if (  ! didhurt ) hurtPlayer ( gvPlayer2 )  ; 
+  if (  ! didhurt ) hurtPlayer ( _by )  ; 
  
   } 
   
@@ -623,15 +796,15 @@ newActor ( IceChunks , x , y )  ;
  } ;  returnVal . _typeof = function (  ) {  return "Snake" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . ystart = 0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . ystart = 0 ; 
  squirrelClassFunction . timer = 30 ; 
  squirrelClassFunction . up = false ; 
  squirrelClassFunction . flip = 1 ; 
  squirrelClassFunction . touchDamage = 2.0 ; 
  squirrelClassFunction . sharpTop = true ; 
  squirrelClassFunction . damageMult =  { normal : 1.0 , fire : 1.0 , ice : 1.0 , earth : 1.0 , air : 1.0 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 0.0 }  ; 
- return squirrelClassFunction; })()) ; 
-OrangeBounce =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+OrangeBounce =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -650,8 +823,9 @@ shape = Rec ( x , y , 6 , 6 , 0 )  ;
 vspeed =  - 3.0 ; 
  } ;  returnVal . physics = function (  ) {  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
  if ( active )  { 
-  if ( gvPlayer && hspeed == 0 )  { 
-  if ( x > gvPlayer . x ) hspeed =  - 0.5 ; 
+  var target = findPlayer (  )  ;
+  if ( target && hspeed == 0 )  { 
+  if ( x > target . x ) hspeed =  - 0.5 ; 
  
   else hspeed = 0.5 ; 
  
@@ -678,30 +852,23 @@ vspeed =  - 3.0 ;
   } 
   
  shape . setPos ( x , y )  ; 
-drawSpriteEx ( sprOrangeBounce , getFrames (  )  / 8 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  if ( frozen )  { 
-  if ( gvPlayer )  if ( icebox ==  - 1 &&  ! hitTest ( shape , gvPlayer . shape )  )  { 
+  var canice = true ;
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
+ 
+  if ( icebox ==  - 1 && canice )  { 
   if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
  
   } 
   
-  
- drawSpriteEx ( sprOrangeBounce , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- if ( frozen <= 120 )  { 
-  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
- 
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
-  } 
-  
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
   } 
   
   else  { 
   if ( icebox !=  - 1 )  { 
- mapDeleteSolid ( icebox )  ; 
-newActor ( IceChunks , x , y )  ; 
+ newActor ( IceChunks , x , y )  ; 
+mapDeleteSolid ( icebox )  ; 
 icebox =  - 1 ; 
  if ( gvPlayer )  if ( x > gvPlayer . x ) flip = true ; 
  
@@ -718,7 +885,43 @@ icebox =  - 1 ;
  
   if ( x > gvMap . w ) hspeed =  - fabs ( hspeed )  ; 
  
-  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _stomp || _element == "normal" )  { 
+  } ;  returnVal . draw = function (  ) { drawSprite ( sprOrangeBounce , getFrames (  )  / 8 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ if ( frozen )  { 
+ drawSprite ( sprOrangeBounce , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ if ( frozen <= 120 )  { 
+  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
+ 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  && _stomp )  { 
+  if ( _mag > 0 ) die (  )  ; 
+ 
+ popSound ( sndSquish , 0 )  ; 
+ if ( getcon ( "jump" , "hold" , true , 1 )  ) gvPlayer . vspeed =  - 8 ; 
+ 
+  else gvPlayer . vspeed =  - 4 ; 
+ 
+  return ; 
+  } 
+  
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  && _stomp )  { 
+  if ( _mag > 0 ) die (  )  ; 
+ 
+ popSound ( sndSquish , 0 )  ; 
+ if ( getcon ( "jump" , "hold" , true , 2 )  ) gvPlayer2 . vspeed =  - 8 ; 
+ 
+  else gvPlayer2 . vspeed =  - 4 ; 
+ 
+  return ; 
+  } 
+  
+  if (  ( _stomp || _element == "normal" )  && _mag > 0 )  { 
  newActor ( Poof , x , y )  ; 
 die (  )  ; 
 popSound ( sndSquish , 0 )  ; 
@@ -735,23 +938,13 @@ newActor ( IceChunks , x , y )  ;
  return ; 
   } 
   
-  if ( gvPlayer )  if ( hitTest ( shape , gvPlayer . shape )  )  { 
- newActor ( Poof , x , y )  ; 
-die (  )  ; 
-popSound ( sndSquish , 0 )  ; 
- if ( keyDown ( config . key . jump )  ) gvPlayer . vspeed =  - 8 ; 
- 
-  else gvPlayer . vspeed =  - 4 ; 
- 
-  } 
-  
-  
   if ( _element == "fire" ) hurtFire (  )  ; 
  
-  if ( _element == "ice" ) hurtIce (  )  ; 
+  else  if ( _element == "ice" ) hurtIce (  )  ; 
  
-  if ( _blast ) hurtBlast (  )  ; 
+  else hurtBlast (  )  ; 
  
+  
   if ( icebox !=  - 1 )  { 
  mapDeleteSolid ( icebox )  ; 
 newActor ( IceChunks , x , y )  ; 
@@ -776,17 +969,19 @@ popSound ( sndFlame , 0 )  ;
 newActor ( IceChunks , x , y )  ; 
  } 
   
-  } ;  returnVal . _typeof = function (  ) {  return "OrangeBounce" ;
+  } ;  returnVal . die = function (  ) {  baseMethods . die  (  )  ; 
+newActor ( Poof , x , y )  ; 
+ } ;  returnVal . _typeof = function (  ) {  return "OrangeBounce" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . flip = false ; 
  squirrelClassFunction . squish = false ; 
  squirrelClassFunction . squishTime = 0.0 ; 
  squirrelClassFunction . smart = false ; 
  squirrelClassFunction . touchDamage = 2.0 ; 
- return squirrelClassFunction; })()) ; 
-CarlBoom =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+CarlBoom =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -835,7 +1030,7 @@ y -= 1.0 ;
  
   
   
-  if ( placeFree ( x - 6 , y + 14 )  ) flip = false ; 
+  if ( placeFree ( x - 6 , y + 14 )  &&  ! placeFree ( x , y + 2 )  ) flip = false ; 
  
   if ( x <= 0 ) flip = false ; 
  
@@ -858,7 +1053,7 @@ y -= 1.0 ;
  
   
   
-  if ( placeFree ( x + 6 , y + 14 )  ) flip = true ; 
+  if ( placeFree ( x + 6 , y + 14 )  &&  ! placeFree ( x , y + 2 )  ) flip = true ; 
  
   if ( x >= gvMap . w ) flip = true ; 
  
@@ -867,28 +1062,22 @@ y -= 1.0 ;
   } 
   
   if ( frozen )  { 
-  if ( gvPlayer )  if ( icebox ==  - 1 &&  ! hitTest ( shape , gvPlayer . shape )  )  { 
+  var canice = true ;
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
+ 
+  if ( icebox ==  - 1 && canice )  { 
   if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
  
   } 
   
-  
- drawSpriteEx ( sprCarlBoom , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- if ( frozen <= 120 )  { 
-  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
- 
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
-  } 
-  
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
   } 
   
   else  { 
   if ( icebox !=  - 1 )  { 
- mapDeleteSolid ( icebox )  ; 
-newActor ( IceChunks , x , y )  ; 
+ newActor ( IceChunks , x , y )  ; 
+mapDeleteSolid ( icebox )  ; 
 icebox =  - 1 ; 
  if ( gvPlayer )  if ( x > gvPlayer . x ) flip = true ; 
  
@@ -897,8 +1086,7 @@ icebox =  - 1 ;
   
   } 
   
- drawSpriteEx ( sprCarlBoom , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- } 
+  } 
   
   } 
   
@@ -908,7 +1096,6 @@ icebox =  - 1 ;
   else squishTime += 1.5 ; 
  
  frame += 0.002 * squishTime ; 
-drawSpriteEx ( sprCarlBoom , wrap ( frame , 4 , 7 )  , x - camx , y - camy , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  if ( getFrames (  )  % 20 == 0 )  { 
   var c ;
   if (  ! flip ) c = actor [ newActor ( FlameTiny , x - 6 , y - 8 )  ]  ; 
@@ -924,78 +1111,8 @@ c . hspeed = randFloat ( 0.2 )  - 0.1 ;
 squishTime = 0 ; 
  } 
   
-  if ( gvPlayer )  { 
-  if ( hitTest ( shape , gvPlayer . shape )  && getcon ( "shoot" , "hold" )  &&  ( gvPlayer . holding == 0 || gvPlayer . holding == id )  && hspeed == 0 )  { 
- held = true ; 
-gvPlayer . holding = id ; 
- } 
-  
-  else  if (  ! inDistance2 ( x , y , gvPlayer . x , gvPlayer . y , 16 )  )  { 
- held = false ; 
-gvPlayer . holding = 0 ; 
- } 
-  
-  
-  if ( gvPlayer . rawin ( "anSlide" )  && gvPlayer . anim == gvPlayer . anSlide )  { 
- held = false ; 
-gvPlayer . holding = 0 ; 
- } 
-  
-  if ( held )  { 
- y = gvPlayer . y ; 
-flip = gvPlayer . flip ; 
- if ( gvPlayer . flip == 0 ) x = gvPlayer . x + 10 + gvPlayer . hspeed ; 
- 
-  else  if ( gvPlayer . flip == 1 ) x = gvPlayer . x - 10 + gvPlayer . hspeed ; 
- 
-  
- y = gvPlayer . y + gvPlayer . vspeed ; 
- } 
-  
-  if ( gvPlayer . rawin ( "anSlide" )  && gvPlayer . anim == gvPlayer . anSlide && held )  { 
- gvPlayer . holding = 0 ; 
- if (  ! placeFree ( x , y )  )  { 
-  var escapedir =  squirrelThreeWaysCompare ( gvPlayer . x , x )  ;
-  while (  ! placeFree ( x , y )  ) x += escapedir ; 
- 
-  } 
-  
- held = false ; 
- } 
-  
-  if ( gvPlayer . rawin ( "anClimb" )  && gvPlayer . anim == gvPlayer . anClimb && held )  { 
- gvPlayer . holding = 0 ; 
- if (  ! placeFree ( x , y )  )  { 
-  var escapedir =  squirrelThreeWaysCompare ( gvPlayer . x , x )  ;
-  while (  ! placeFree ( x , y )  ) x += escapedir ; 
- 
-  } 
-  
- held = false ; 
- } 
-  
-  } 
-  
-  if (  ! getcon ( "shoot" , "hold" )  )  { 
-  if ( getcon ( "shoot" , "release" )  && getcon ( "up" , "hold" )  && held ) vspeed =  - 2.0 ; 
- 
-  if ( held && gvPlayer )  { 
- gvPlayer . holding = 0 ; 
-x += gvPlayer . hspeed * 2 ; 
- if (  ! getcon ( "down" , "hold" )  ) hspeed =  - 2.0 *  (  squirrelThreeWaysCompare ( gvPlayer . x , x )  )  ; 
- 
-  if (  ! placeFree ( x , y )  )  { 
-  var escapedir =  squirrelThreeWaysCompare ( gvPlayer . x , x )  ;
-  while (  ! placeFree ( x , y )  ) x += escapedir ; 
- 
-  } 
-  
-  } 
-  
- held = false ; 
- } 
-  
-  if ( placeFree ( x + hspeed , y )  ) x += hspeed ; 
+ holdMe (  )  ; 
+ if ( placeFree ( x + hspeed , y )  ) x += hspeed ; 
  
   else  if ( placeFree ( x + hspeed , y - 2 )  )  { 
  x += hspeed ; 
@@ -1011,7 +1128,7 @@ y -= 1.0 ;
  
   if ( squishTime >= 150 )  { 
  die (  )  ; 
-fireWeapon ( ExplodeF , x , y , 0 , id )  ; 
+fireWeapon ( ExplodeF2 , x , y , 0 , id )  ; 
  if ( gvPlayer )  if ( gvPlayer . holding == id ) gvPlayer . holding = 0 ; 
  
   
@@ -1025,15 +1142,29 @@ setDrawColor ( 0xff0000ff )  ;
  
   } 
   
-  } ;  returnVal . hurtPlayer = function ( target ) {  if ( squish )  return ; 
+  } ;  returnVal . draw = function (  ) {  if ( squish ) drawSprite ( sprCarlBoom , wrap ( frame , 4 , 7 )  , x - camx , y - camy , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else  if ( frozen )  { 
+ drawSprite ( sprCarlBoom , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ if ( frozen <= 120 )  { 
+  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
+ 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
   
-  baseMethods . hurtPlayer  ( target )  ; 
- } ;  returnVal . hurtBlast = function (  ) {  if ( squish )  return ; 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else drawSprite ( sprCarlBoom , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  
+  } ;  returnVal . hurtBlast = function (  ) {  if ( squish )  return ; 
   
   if ( frozen ) frozen = 0 ; 
  
- popSound ( sndFizz , 0 )  ; 
- if ( icebox !=  - 1 )  { 
+  if ( icebox !=  - 1 )  { 
  mapDeleteSolid ( icebox )  ; 
 newActor ( IceChunks , x , y )  ; 
  } 
@@ -1043,12 +1174,18 @@ newActor ( IceChunks , x , y )  ;
   
   if ( held )  return ; 
   
+  if ( _element == "water" )  { 
+ squish = false ; 
+squishTime = 0 ; 
+ return ; 
+  } 
+  
   if ( _element == "ice" )  { 
  hurtIce (  )  ; 
  return ; 
   } 
   
-  else  if ( _element == "fire" || _blast )  { 
+  else  if ( _element == "fire" || _blast || _element == "shock" )  { 
  hurtFire (  )  ; 
  return ; 
   } 
@@ -1057,22 +1194,19 @@ newActor ( IceChunks , x , y )  ;
   
   
   
- popSound ( sndFizz , 0 )  ; 
- if ( _stomp )  { 
-  if ( getcon ( "jump" , "hold" )  ) gvPlayer . vspeed =  - 8 ; 
+  if ( _element != "fire" && _blast == false ) popSound ( sndFizz , 0 )  ; 
  
-  else gvPlayer . vspeed =  - 4 ; 
- 
-  if ( gvPlayer . anim == gvPlayer . anJumpT || gvPlayer . anim == gvPlayer . anFall )  { 
- gvPlayer . anim = gvPlayer . anJumpU ; 
-gvPlayer . frame = gvPlayer . anJumpU [ 0 ]  ; 
+  if ( _stomp )  { 
+  if ( _by . anim == "jumpT" || _by . anim == "fall" )  { 
+ _by . anim = "jumpU" ; 
+_by . frame = _by . an [ "jumpU" ]  [ 0 ]  ; 
  } 
   
   } 
   
-  if ( gvPlayer &&  ( (gvPlayer["anSlide"] !== undefined) )  && gvPlayer . anim == gvPlayer . anSlide )  { 
- vspeed =  - abs ( gvPlayer . hspeed )  / 2.0 ; 
-hspeed =  squirrelThreeWaysCompare ( gvPlayer . hspeed , 0 )  ; 
+  if ( _by != 0 &&  (  ( (_by[ ( "anim" ) ] !== undefined) )  )  && _by . anim == "slide" )  { 
+ vspeed =  - abs ( _by . hspeed )  / 2.0 ; 
+hspeed =  squirrelThreeWaysCompare ( _by . hspeed , 0 )  ; 
  } 
   
  squish = true ; 
@@ -1082,7 +1216,7 @@ newActor ( IceChunks , x , y )  ;
  } 
   
   if (  ! burnt )  { 
- fireWeapon ( ExplodeF , x , y - 1 , 2 , id )  ; 
+ fireWeapon ( ExplodeF2 , x , y - 1 , 2 , id )  ; 
 die (  )  ; 
 popSound ( sndFlame , 0 )  ; 
 burnt = true ; 
@@ -1092,15 +1226,224 @@ burnt = true ;
  } ;  returnVal . _typeof = function (  ) {  return "CarlBoom" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . burnt = false ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . burnt = false ; 
  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . flip = false ; 
  squirrelClassFunction . squish = false ; 
  squirrelClassFunction . squishTime = 0.0 ; 
  squirrelClassFunction . hspeed = 0.0 ; 
  squirrelClassFunction . touchDamage = 2.0 ; 
- return squirrelClassFunction; })()) ; 
-BlueFish =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Shortfuse =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+     if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
+         squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
+ } 
+ returnVal . burnt = false ; 
+ returnVal . frame = 0.0 ; 
+ returnVal . flip = false ; 
+ returnVal . squish = false ; 
+ returnVal . squishTime = 0.0 ; 
+ returnVal . hspeed = 0.0 ; 
+ returnVal . touchDamage = 2.0 ; 
+ returnVal . nocount = true ; 
+ returnVal . explodeX = 0 ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   (baseConstructor.bind(this))  ( _x . tofloat (  )  , _y . tofloat (  )  )  ; 
+shape = Rec ( x , y , 2 , 2 , 0 , 0 , 1 )  ; 
+ if ( gvPlayer )  if ( x > gvPlayer . x ) flip = true ; 
+ 
+  
+  } ;  returnVal . run = function (  ) {  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) explodeX = gvPlayer . hspeed ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) explodeX = gvPlayer2 . hspeed ; 
+ 
+  baseMethods . run  (  )  ; 
+ if ( active )  { 
+  if ( placeFree ( x , y + 1 )  &&  ! held ) vspeed += 0.1 ; 
+ 
+  if ( placeFree ( x , y + vspeed )  ) y += vspeed ; 
+ 
+  else vspeed /= 2 ; 
+ 
+  if (  ! squish )  { 
+  if ( y > gvMap . h + 8 ) die (  )  ; 
+ 
+  if (  ! frozen )  { 
+  if ( flip )  { 
+  if ( placeFree ( x - 1 , y )  ) x -= 1.0 ; 
+ 
+  else  if ( placeFree ( x - 2 , y - 2 )  )  { 
+ x -= 1.0 ; 
+y -= 1.0 ; 
+ } 
+  
+  else  if ( placeFree ( x - 1 , y - 2 )  )  { 
+ x -= 1.0 ; 
+y -= 1.0 ; 
+ } 
+  
+  else flip = false ; 
+ 
+  
+  
+  if ( placeFree ( x - 6 , y + 14 )  &&  ! placeFree ( x , y + 2 )  ) flip = false ; 
+ 
+  if ( x <= 0 ) flip = false ; 
+ 
+  } 
+  
+  else  { 
+  if ( placeFree ( x + 1 , y )  ) x += 1.0 ; 
+ 
+  else  if ( placeFree ( x + 1 , y - 1 )  )  { 
+ x += 1.0 ; 
+y -= 1.0 ; 
+ } 
+  
+  else  if ( placeFree ( x + 2 , y - 2 )  )  { 
+ x += 1.0 ; 
+y -= 1.0 ; 
+ } 
+  
+  else flip = true ; 
+ 
+  
+  
+  if ( placeFree ( x + 6 , y + 14 )  &&  ! placeFree ( x , y + 2 )  ) flip = true ; 
+ 
+  if ( x >= gvMap . w ) flip = true ; 
+ 
+  } 
+  
+  } 
+  
+  if ( frozen )  { 
+  var canice = true ;
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
+ 
+  if ( icebox ==  - 1 && canice )  { 
+  if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
+ 
+  } 
+  
+  } 
+  
+  else  { 
+  if ( icebox !=  - 1 )  { 
+ newActor ( IceChunks , x , y )  ; 
+mapDeleteSolid ( icebox )  ; 
+icebox =  - 1 ; 
+ if ( gvPlayer )  if ( x > gvPlayer . x ) flip = true ; 
+ 
+  else flip = false ; 
+ 
+  
+  } 
+  
+  } 
+  
+  } 
+  
+  else  { 
+  if ( held ) squishTime += 0.1 ; 
+ 
+  else squishTime += 1.5 ; 
+ 
+ frame += 0.002 * squishTime ; 
+ if ( getFrames (  )  % 20 == 0 )  { 
+  var c ;
+  if (  ! flip ) c = actor [ newActor ( FlameTiny , x - 6 , y - 8 )  ]  ; 
+ 
+  else c = actor [ newActor ( FlameTiny , x + 6 , y - 8 )  ]  ; 
+ 
+ c . vspeed =  - 0.1 ; 
+c . hspeed = randFloat ( 0.2 )  - 0.1 ; 
+ } 
+  
+  if ( frozen )  { 
+ squish = false ; 
+squishTime = 0 ; 
+ } 
+  
+ holdMe (  )  ; 
+ if ( placeFree ( x + hspeed , y )  ) x += hspeed ; 
+ 
+  else  if ( placeFree ( x + hspeed , y - 2 )  )  { 
+ x += hspeed ; 
+y -= 1.0 ; 
+ } 
+  
+  
+  if ( placeFree ( x , y + 1 )  ) friction = 0.0 ; 
+ 
+  else friction = 0.1 ; 
+ 
+  if ( fabs ( hspeed )  < 0.1 ) hspeed = 0.0 ; 
+ 
+  if ( squishTime >= 150 )  { 
+ die (  )  ; 
+fireWeapon ( ExplodeF2 , x , y , 0 , id )  ; 
+ if ( gvPlayer )  if ( gvPlayer . holding == id ) gvPlayer . holding = 0 ; 
+ 
+  
+  } 
+  
+  } 
+  
+ shape . setPos ( x , y )  ; 
+setDrawColor ( 0xff0000ff )  ; 
+ if ( debug ) shape . draw (  )  ; 
+ 
+  } 
+  
+  } ;  returnVal . draw = function (  ) {  if ( squish ) drawSprite ( sprShortfuse , wrap ( frame , 4 , 7 )  , x - camx , y - camy , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else  if ( frozen )  { 
+ drawSprite ( sprShortfuse , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ if ( frozen <= 120 )  { 
+  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
+ 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else drawSprite ( sprShortfuse , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  
+  } ;  returnVal . hurtBlast = function (  ) { die (  )  ; 
+ } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) { die (  )  ; 
+ } ;  returnVal . hurtFire = function (  ) { die (  )  ; 
+ } ;  returnVal . hurtPlayer = function ( blah = null ) { die (  )  ; 
+ } ;  returnVal . die = function (  ) {  baseMethods . die  (  )  ; 
+fireWeapon ( ExplodeTiny , x + explodeX , y , 0 , 0 )  ; 
+ if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) gvPlayer . hspeed =  - explodeX ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) gvPlayer2 . hspeed =  - explodeX ; 
+ 
+  } ;  returnVal . hurtIce = function (  ) { frozen = 600 ; 
+ } ;  returnVal . _typeof = function (  ) {  return "Shortfuse" ;
+  } ; 
+ } 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . burnt = false ; 
+ squirrelClassFunction . frame = 0.0 ; 
+ squirrelClassFunction . flip = false ; 
+ squirrelClassFunction . squish = false ; 
+ squirrelClassFunction . squishTime = 0.0 ; 
+ squirrelClassFunction . hspeed = 0.0 ; 
+ squirrelClassFunction . touchDamage = 2.0 ; 
+ squirrelClassFunction . nocount = true ; 
+ squirrelClassFunction . explodeX = 0 ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+BlueFish =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -1132,21 +1475,27 @@ vspeed =  - 0.5 + randFloat ( 1 )  ;
   if (  ! inWater ( x , y )  ) vspeed += 0.1 ; 
  
  vspeed *= 0.99 ; 
- if ( gvPlayer )  if ( hitTest ( shape , gvPlayer . shape )  ) biting = true ; 
+ var target = null ;
+  if ( gvPlayer && gvPlayer2 )  { 
+  if ( distance2 ( x , y , gvPlayer . x , gvPlayer . y )  < distance2 ( x , y , gvPlayer2 . x , gvPlayer2 . y )  ) target = gvPlayer ; 
+ 
+  else target = gvPlayer2 ; 
+ 
+  } 
+  
+  else  if ( gvPlayer ) target = gvPlayer ; 
+ 
+  else  if ( gvPlayer2 ) target = gvPlayer2 ; 
  
   
+  
+  if ( target != null && hitTest ( shape , target . shape )  ) biting = true ; 
+ 
   if ( frame >= 4 )  { 
  biting = false ; 
 frame = 0.0 ; 
  } 
   
-  if ( biting )  { 
- drawSpriteEx ( sprBlueFish , 4 + frame , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
-frame += 0.125 ; 
- } 
-  
-  else drawSpriteEx ( sprBlueFish , wrap ( getFrames (  )  / 16 , 0 , 3 )  , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
- 
   if ( y > gvMap . h )  { 
   if ( vspeed > 0 ) vspeed = 0 ; 
  
@@ -1164,24 +1513,28 @@ frame += 0.125 ;
  shape . setPos ( x , y )  ; 
  } 
   
-  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( gvPlayer . rawin ( "anSlide" )  )  if ( gvPlayer . anim == gvPlayer . anSlide && game . weapon == 4 ) hurtFire (  )  ; 
- 
+  } ;  returnVal . draw = function (  ) {  if ( biting )  { 
+ drawSprite ( sprBlueFish , 4 + frame , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
+frame += 0.125 ; 
+ } 
   
-  if (  ! _stomp ||  ! _by . swimming ) hurtFire (  )  ; 
+  else drawSprite ( sprBlueFish , wrap ( getFrames (  )  / 16 , 0 , 3 )  , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
+ 
+  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _element == "water" || _mag == 0 )  return ; 
+  
+  if (  (  ( (_by[ ( "anim" ) ] !== undefined) )  && _by . anim == "slide" && _by . stats . weapon == "earth" )  ||  (  ! _stomp ||  ! _by . swimming )  ) hurtFire (  )  ; 
  
   } ;  returnVal . hurtFire = function (  ) {  var c = newActor ( DeadNME , x , y )  ;
  actor [ c ]  . sprite = sprDeadFish ; 
-actor [ c ]  . vspeed =  - 0.5 ; 
+actor [ c ]  . vspeed =  - 4.0 ; 
 actor [ c ]  . flip = flip ; 
 actor [ c ]  . hspeed = hspeed ; 
  if ( flip == 1 ) actor [ c ]  . spin =  - 1 ; 
  
   else actor [ c ]  . spin = 1 ; 
  
- actor [ c ]  . gravity = 0.02 ; 
-die (  )  ; 
+ die (  )  ; 
 popSound ( sndKick , 0 )  ; 
-game . enemies ++  ; 
 newActor ( Poof , x + 8 , y )  ; 
 newActor ( Poof , x - 8 , y )  ; 
  if ( randInt ( 20 )  == 0 )  { 
@@ -1192,13 +1545,13 @@ newActor ( Poof , x - 8 , y )  ;
   } ;  returnVal . _typeof = function (  ) {  return "BlueFish" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . timer = 0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . timer = 0 ; 
  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . biting = false ; 
  squirrelClassFunction . flip = 0 ; 
  squirrelClassFunction . touchDamage = 2.0 ; 
- return squirrelClassFunction; })()) ; 
-RedFish =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+RedFish =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -1234,28 +1587,42 @@ vspeed =  - 0.5 + randFloat ( 1 )  ;
   if (  ! inWater ( x , y )  ) vspeed += 0.1 ; 
  
  vspeed *= 0.99 ; 
- if ( gvPlayer )  { 
-  if ( hitTest ( shape , gvPlayer . shape )  ) biting = true ; 
+ var target = null ;
+  if ( gvPlayer && gvPlayer2 )  { 
+  if ( distance2 ( x , y , gvPlayer . x , gvPlayer . y )  < distance2 ( x , y , gvPlayer2 . x , gvPlayer2 . y )  ) target = gvPlayer ; 
  
-  if ( inDistance2 ( x , y , gvPlayer . x , gvPlayer . y , 128 )  && inWater ( x , y )  )  { 
+  else target = gvPlayer2 ; 
+ 
+  } 
+  
+  else  if ( gvPlayer ) target = gvPlayer ; 
+ 
+  else  if ( gvPlayer2 ) target = gvPlayer2 ; 
+ 
+  
+  
+  if ( target != null )  { 
+  if ( hitTest ( shape , target . shape )  ) biting = true ; 
+ 
+  if ( inDistance2 ( x , y , target . x , target . y , 128 )  && inWater ( x , y )  )  { 
  biting = true ; 
 timer = 240 ; 
- if ( x < gvPlayer . x && hspeed < 2 ) hspeed += 0.02 ; 
+ if ( x < target . x && hspeed < 2 ) hspeed += 0.02 ; 
  
-  if ( x > gvPlayer . x && hspeed >  - 2 ) hspeed -= 0.02 ; 
+  if ( x > target . x && hspeed >  - 2 ) hspeed -= 0.02 ; 
  
-  if ( y < gvPlayer . y && vspeed < 2 ) vspeed += 0.02 ; 
+  if ( y < target . y && vspeed < 2 ) vspeed += 0.02 ; 
  
-  if ( y > gvPlayer . y && vspeed >  - 2 ) vspeed -= 0.02 ; 
+  if ( y > target . y && vspeed >  - 2 ) vspeed -= 0.02 ; 
  
-  if ( inDistance2 ( x , y , gvPlayer . x , gvPlayer . y , 32 )  )  { 
-  if ( x < gvPlayer . x && hspeed < 2 ) hspeed += 0.02 ; 
+  if ( inDistance2 ( x , y , target . x , target . y , 32 )  )  { 
+  if ( x < target . x && hspeed < 2 ) hspeed += 0.02 ; 
  
-  if ( x > gvPlayer . x && hspeed >  - 2 ) hspeed -= 0.02 ; 
+  if ( x > target . x && hspeed >  - 2 ) hspeed -= 0.02 ; 
  
-  if ( y < gvPlayer . y && vspeed < 2 ) vspeed += 0.02 ; 
+  if ( y < target . y && vspeed < 2 ) vspeed += 0.02 ; 
  
-  if ( y > gvPlayer . y && vspeed >  - 2 ) vspeed -= 0.02 ; 
+  if ( y > target . y && vspeed >  - 2 ) vspeed -= 0.02 ; 
  
   } 
   
@@ -1268,13 +1635,6 @@ timer = 240 ;
 frame = 0.0 ; 
  } 
   
-  if ( biting )  { 
- drawSpriteEx ( sprRedFish , 4 + frame , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
-frame += 0.125 ; 
- } 
-  
-  else drawSpriteEx ( sprRedFish , wrap ( getFrames (  )  / 16 , 0 , 3 )  , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
- 
   if ( y > gvMap . h )  { 
   if ( vspeed > 0 ) vspeed = 0 ; 
  
@@ -1292,24 +1652,28 @@ frame += 0.125 ;
  shape . setPos ( x , y )  ; 
  } 
   
-  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( gvPlayer . rawin ( "anSlide" )  )  if ( gvPlayer . anim == gvPlayer . anSlide && game . weapon == 4 ) hurtFire (  )  ; 
- 
+  } ;  returnVal . draw = function (  ) {  if ( biting )  { 
+ drawSprite ( sprRedFish , 4 + frame , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
+frame += 0.125 ; 
+ } 
   
-  if (  ! _stomp ||  ! _by . swimming ) hurtFire (  )  ; 
+  else drawSprite ( sprRedFish , wrap ( getFrames (  )  / 16 , 0 , 3 )  , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
+ 
+  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _element == "water" || _mag == 0 )  return ; 
+  
+  if (  (  ( (_by[ ( "anim" ) ] !== undefined) )  && _by . anim == "slide" && _by . stats . weapon == "earth" )  ||  (  ! _stomp ||  ! _by . swimming )  ) hurtFire (  )  ; 
  
   } ;  returnVal . hurtFire = function (  ) {  var c = newActor ( DeadNME , x , y )  ;
  actor [ c ]  . sprite = sprDeadFish ; 
-actor [ c ]  . vspeed =  - 0.5 ; 
+actor [ c ]  . vspeed =  - 4.0 ; 
 actor [ c ]  . flip = flip ; 
 actor [ c ]  . hspeed = hspeed ; 
  if ( flip == 1 ) actor [ c ]  . spin =  - 1 ; 
  
   else actor [ c ]  . spin = 1 ; 
  
- actor [ c ]  . gravity = 0.02 ; 
-die (  )  ; 
+ die (  )  ; 
 popSound ( sndKick , 0 )  ; 
-game . enemies ++  ; 
 newActor ( Poof , x + 8 , y )  ; 
 newActor ( Poof , x - 8 , y )  ; 
  if ( randInt ( 20 )  == 0 )  { 
@@ -1320,13 +1684,13 @@ newActor ( Poof , x - 8 , y )  ;
   } ;  returnVal . _typeof = function (  ) {  return "RedFish" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . timer = 0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . timer = 0 ; 
  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . biting = false ; 
  squirrelClassFunction . flip = 0 ; 
  squirrelClassFunction . touchDamage = 2.0 ; 
- return squirrelClassFunction; })()) ; 
-JellyFish =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+JellyFish =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -1402,8 +1766,6 @@ pump = false ;
  
  vspeed *= 0.99 ; 
 hspeed *= 0.99 ; 
-drawSpriteEx ( sprJellyFish , frame , x - camx , y - camy , 0 , fliph +  ( flipv * 2 )  , 1 , 1 , 1 )  ; 
-drawLightEx ( sprLightIce , 0 , x - camx , y - camy , 0 , 0 , 0.25 , 0.25 )  ; 
  if ( placeFree ( x + hspeed , y )  ) x += hspeed ; 
  
   if ( placeFree ( x , y + vspeed )  ) y += vspeed ; 
@@ -1411,10 +1773,11 @@ drawLightEx ( sprLightIce , 0 , x - camx , y - camy , 0 , 0 , 0.25 , 0.25 )  ;
  shape . setPos ( x , y )  ; 
  } 
   
-  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( gvPlayer . rawin ( "anSlide" )  )  if ( gvPlayer . anim == gvPlayer . anSlide && game . weapon == 4 ) hurtFire (  )  ; 
- 
+  } ;  returnVal . draw = function (  ) { drawSprite ( sprJellyFish , frame , x - camx , y - camy , 0 , fliph +  ( flipv * 2 )  , 1 , 1 , 1 )  ; 
+drawLight ( sprLightIce , 0 , x - camx , y - camy , 0 , 0 , 0.25 , 0.25 )  ; 
+ } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _element == "water" || _mag == 0 )  return ; 
   
-  if (  ! _stomp ||  ! _by . swimming ) hurtFire (  )  ; 
+  if (  (  ( (_by[ ( "anim" ) ] !== undefined) )  && _by . anim == "slide" && _by . stats . weapon == "earth" )  ||  (  ! _stomp ||  ! _by . swimming )  ) hurtFire (  )  ; 
  
   } ;  returnVal . hurtFire = function (  ) {  if ( randInt ( 20 )  == 0 )  { 
   var a = actor [ newActor ( MuffinBlue , x , y )  ]  ;
@@ -1423,30 +1786,28 @@ drawLightEx ( sprLightIce , 0 , x - camx , y - camy , 0 , 0 , 0.25 , 0.25 )  ;
   
   var c = newActor ( DeadNME , x , y )  ;
  actor [ c ]  . sprite = sprJellyFish ; 
-actor [ c ]  . vspeed =  - 0.2 ; 
+actor [ c ]  . vspeed =  - 3.0 ; 
 actor [ c ]  . flip = fliph +  ( flipv * 2 )  ; 
 actor [ c ]  . hspeed = hspeed / 2 ; 
  if ( fliph == 1 ) actor [ c ]  . spin =  - 1 ; 
  
   else actor [ c ]  . spin = 1 ; 
  
- actor [ c ]  . gravity = 0.01 ; 
-die (  )  ; 
+ die (  )  ; 
 popSound ( sndKick , 0 )  ; 
-game . enemies ++  ; 
 newActor ( Poof , x , y )  ; 
  } ;  returnVal . _typeof = function (  ) {  return "Jellyfish" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . timer = 0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . timer = 0 ; 
  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . pump = false ; 
  squirrelClassFunction . fliph = 0 ; 
  squirrelClassFunction . flipv = 0 ; 
  squirrelClassFunction . touchDamage = 2.0 ; 
  squirrelClassFunction . element = "shock" ; 
- return squirrelClassFunction; })()) ; 
-Clamor =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Clamor =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -1466,8 +1827,22 @@ shape = Rec ( x , y , 6 , 6 , 0 )  ;
   else huntdir =  - 1 ; 
  
   } ;  returnVal . physics = function (  ) {  } ;  returnVal . animation = function (  ) {  } ;  returnVal . routine = function (  ) {  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
- if ( gvPlayer )  { 
-  if ( inDistance2 ( x +  ( huntdir * 48 )  , y - 32 , gvPlayer . x , gvPlayer . y , 64 )  && timer == 0 )  { 
+ var target = null ;
+  if ( gvPlayer && gvPlayer2 )  { 
+  if ( distance2 ( x , y , gvPlayer . x , gvPlayer . y )  < distance2 ( x , y , gvPlayer2 . x , gvPlayer2 . y )  ) target = gvPlayer ; 
+ 
+  else target = gvPlayer2 ; 
+ 
+  } 
+  
+  else  if ( gvPlayer ) target = gvPlayer ; 
+ 
+  else  if ( gvPlayer2 ) target = gvPlayer2 ; 
+ 
+  
+  
+  if ( target != null )  { 
+  if ( inDistance2 ( x +  ( huntdir * 48 )  , y - 32 , target . x , target . y , 64 )  && timer == 0 )  { 
  timer = 240 ; 
 newActor ( ClamorPearl , x , y , null )  ; 
  } 
@@ -1476,15 +1851,15 @@ newActor ( ClamorPearl , x , y , null )  ;
   
   if ( timer > 0 ) timer --  ; 
  
- drawSpriteEx ( sprClamor ,  ( timer < 30 )  . tointeger (  )  , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
- } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( gvPlayer . rawin ( "anSlide" )  )  if ( gvPlayer . anim == gvPlayer . anSlide && game . weapon == 4 ) hurtFire (  )  ; 
+  } ;  returnVal . draw = function (  ) { drawSprite ( sprClamor ,  ( timer < 30 )  . tointeger (  )  , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
+ } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if (  ( (_by[ ( "anim" ) ] !== undefined) )  )  if ( _by . anim == "slide" && _by . stats . weapon == "earth" ) hurtFire (  )  ; 
  
   
   if ( _stomp && timer > 30 )  return ; 
   
   if ( _element == "fire" ) hurtFire (  )  ; 
  
-  if ( _element == "normal" || _blast ) hurtBlast (  )  ; 
+  if ( _element != "water" && _element != "ice" ) hurtBlast (  )  ; 
  
   } ;  returnVal . hurtFire = function (  ) {  if ( timer < 30 )  { 
   if ( randInt ( 20 )  == 0 )  { 
@@ -1502,11 +1877,11 @@ die (  )  ;
  } ;  returnVal . _typeof = function (  ) {  return "Clamor" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . huntdir = 0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . huntdir = 0 ; 
  squirrelClassFunction . timer = 0 ; 
  squirrelClassFunction . flip = 0 ; 
- return squirrelClassFunction; })()) ; 
-ClamorPearl =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+ClamorPearl =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -1519,7 +1894,7 @@ ClamorPearl =  ((function(){ let squirrelClassFunction = function ( ) { var retu
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
 
    (baseConstructor.bind(this))  ( _x , _y )  ; 
- if (  ! gvPlayer )  { 
+ if (  ! gvPlayer &&  ! gvPlayer2 )  { 
  die (  )  ; 
  return ; 
   } 
@@ -1534,20 +1909,21 @@ shape . setPos ( x , y )  ;
 timer --  ; 
  if ( timer == 0 ||  ! placeFree ( x , y )  ) deleteActor ( id )  ; 
  
-  if ( gvPlayer )  if ( hitTest ( shape , gvPlayer . shape )  ) gvPlayer . hurt = 2 ; 
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) gvPlayer . hurt = 2 ; 
  
-  
- drawSprite ( sprIceball , 0 , x - camx , y - camy )  ; 
- if (  ! inWater ( x , y )  ) vspeed += 0.2 ; 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) gvPlayer2 . hurt = 2 ; 
  
-  } ; 
+  if (  ! inWater ( x , y )  ) vspeed += 0.2 ; 
+ 
+  } ;  returnVal . draw = function (  ) { drawSprite ( sprIceball , 0 , x - camx , y - camy )  ; 
+ } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . hspeed = 0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . hspeed = 0 ; 
  squirrelClassFunction . vspeed = 0 ; 
  squirrelClassFunction . timer = 1200 ; 
  squirrelClassFunction . shape = null ; 
- return squirrelClassFunction; })()) ; 
-GreenFish =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = PhysAct;  return squirrelClassFunction; })()) ; 
+GreenFish =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -1564,9 +1940,8 @@ GreenFish =  ((function(){ let squirrelClassFunction = function ( ) { var return
    (baseConstructor.bind(this))  ( _x , _y )  ; 
 shape = Rec ( x , y , 8 , 6 , 0 )  ; 
 hspeed = 1.0 ; 
- if ( gvPlayer )  if ( x > gvPlayer . x ) hspeed =  - 1.0 ; 
+ if ( gvPlayer && x > gvPlayer . x ) hspeed =  - 1.0 ; 
  
-  
   } ;  returnVal . physics = function (  ) {  } ;  returnVal . animation = function (  ) {  } ;  returnVal . routine = function (  ) {  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
  if ( active )  { 
  flip =  ( hspeed < 0 )  . tointeger (  )  ; 
@@ -1585,19 +1960,33 @@ timer --  ;
   if (  ! inWater ( x , y )  ) vspeed += 0.1 ; 
  
  vspeed *= 0.99 ; 
- if ( gvPlayer )  { 
-  if ( hitTest ( shape , gvPlayer . shape )  ) biting = true ; 
+ var target = null ;
+  if ( gvPlayer && gvPlayer2 )  { 
+  if ( distance2 ( x , y , gvPlayer . x , gvPlayer . y )  < distance2 ( x , y , gvPlayer2 . x , gvPlayer2 . y )  ) target = gvPlayer ; 
  
-  if ( inDistance2 ( x , y , gvPlayer . x , gvPlayer . y , 256 )  && inWater ( x , y )  )  { 
+  else target = gvPlayer2 ; 
+ 
+  } 
+  
+  else  if ( gvPlayer ) target = gvPlayer ; 
+ 
+  else  if ( gvPlayer2 ) target = gvPlayer2 ; 
+ 
+  
+  
+  if ( target != null )  { 
+  if ( hitTest ( shape , target . shape )  ) biting = true ; 
+ 
+  if ( inDistance2 ( x , y , target . x , target . y , 256 )  && inWater ( x , y )  )  { 
  biting = true ; 
- if ( x < gvPlayer . x && hspeed < 2 ) hspeed += 0.02 ; 
+ if ( x < target . x && hspeed < 2 ) hspeed += 0.02 ; 
  
-  if ( x > gvPlayer . x && hspeed >  - 2 ) hspeed -= 0.02 ; 
+  if ( x > target . x && hspeed >  - 2 ) hspeed -= 0.02 ; 
  
-  if ( y < gvPlayer . y && vspeed < 2 ) vspeed += 0.1 ; 
+  if ( y < target . y && vspeed < 2 ) vspeed += 0.1 ; 
  
-  if ( y > gvPlayer . y && vspeed >  - 4 )  { 
-  if ( canjump &&  ! gvPlayer . inWater ( gvPlayer . x , gvPlayer . y )  &&  (  ( hspeed > 0 && gvPlayer . x > x )  ||  ( hspeed < 0 && gvPlayer . x < x )  )  )  { 
+  if ( y > target . y && vspeed >  - 4 )  { 
+  if ( canjump &&  ! target . inWater ( target . x , target . y )  &&  (  ( hspeed > 0 && target . x > x )  ||  ( hspeed < 0 && target . x < x )  )  )  { 
  vspeed =  - 6 ; 
 canjump = false ; 
  } 
@@ -1605,14 +1994,14 @@ canjump = false ;
  vspeed -= 0.2 ; 
  } 
   
-  if (  ! inDistance2 ( x , y , gvPlayer . x , gvPlayer . y , 64 )  )  { 
-  if ( x < gvPlayer . x && hspeed < 2 ) hspeed += 0.02 ; 
+  if (  ! inDistance2 ( x , y , target . x , target . y , 64 )  )  { 
+  if ( x < target . x && hspeed < 2 ) hspeed += 0.02 ; 
  
-  if ( x > gvPlayer . x && hspeed >  - 2 ) hspeed -= 0.02 ; 
+  if ( x > target . x && hspeed >  - 2 ) hspeed -= 0.02 ; 
  
-  if ( y < gvPlayer . y && vspeed < 2 ) vspeed += 0.02 ; 
+  if ( y < target . y && vspeed < 2 ) vspeed += 0.02 ; 
  
-  if ( y > gvPlayer . y && vspeed >  - 2 ) vspeed -= 0.02 ; 
+  if ( y > target . y && vspeed >  - 2 ) vspeed -= 0.02 ; 
  
   } 
   
@@ -1625,13 +2014,6 @@ canjump = false ;
 frame = 0.0 ; 
  } 
   
-  if ( biting )  { 
- drawSpriteEx ( sprGreenFish , 4 + frame , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
-frame += 0.125 ; 
- } 
-  
-  else drawSpriteEx ( sprGreenFish , wrap ( getFrames (  )  / 16 , 0 , 3 )  , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
- 
   if ( y > gvMap . h )  { 
   if ( vspeed > 0 ) vspeed = 0 ; 
  
@@ -1642,29 +2024,49 @@ frame += 0.125 ;
  
   if ( x < 0 ) hspeed = 1.0 ; 
  
+  if ( vspeed >= 0 &&  ! placeFree ( x , y )  )  { 
+  if ( x < xstart ) hspeed = 1.0 ; 
+ 
+  if ( x > xstart ) hspeed =  - 1.0 ; 
+ 
+  if ( y < ystart && vspeed < 1.0 ) vspeed = 1.0 ; 
+ 
+  if ( y > ystart && vspeed >  - 1.0 ) vspeed =  - 1.0 ; 
+ 
+  if (  ! inWater (  )  )  { 
+ vspeed =  - vspeed ; 
+hspeed *= 2.0 ; 
+ } 
+  
+  } 
+  
  x += hspeed ; 
 y += vspeed ; 
 shape . setPos ( x , y )  ; 
  } 
   
-  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( gvPlayer . rawin ( "anSlide" )  )  if ( gvPlayer . anim == gvPlayer . anSlide && game . weapon == 4 ) hurtFire (  )  ; 
- 
+  } ;  returnVal . draw = function (  ) {  if ( biting )  { 
+ drawSprite ( sprGreenFish , 4 + frame , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
+frame += 0.125 ; 
+ } 
   
-  if (  ! _stomp ||  ! _by . swimming ) hurtFire (  )  ; 
+  else drawSprite ( sprGreenFish , wrap ( getFrames (  )  / 16 , 0 , 3 )  , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
+ 
+  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _element == "water" || _mag == 0 )  return ; 
+  
+  if (  (  ( (_by[ ( "anim" ) ] !== undefined) )  && _by . anim == "slide" && _by . stats . weapon == "earth" )  ||  (  ! _stomp ||  ! _by . swimming )  ) hurtFire (  )  ; 
  
   } ;  returnVal . hurtFire = function (  ) {  var c = newActor ( DeadNME , x , y )  ;
  actor [ c ]  . sprite = sprDeadFish ; 
-actor [ c ]  . vspeed =  - 0.5 ; 
+actor [ c ]  . vspeed =  - 4.0 ; 
 actor [ c ]  . flip = flip ; 
 actor [ c ]  . hspeed = hspeed ; 
  if ( flip == 1 ) actor [ c ]  . spin =  - 1 ; 
  
   else actor [ c ]  . spin = 1 ; 
  
- actor [ c ]  . gravity = 0.02 ; 
-die (  )  ; 
+ die (  )  ; 
 popSound ( sndKick , 0 )  ; 
-game . enemies ++  ; 
 newActor ( Poof , x + 8 , y )  ; 
 newActor ( Poof , x - 8 , y )  ; 
  if ( randInt ( 20 )  == 0 )  { 
@@ -1675,30 +2077,33 @@ newActor ( Poof , x - 8 , y )  ;
   } ;  returnVal . _typeof = function (  ) {  return "GreenFish" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . timer = 120 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . timer = 120 ; 
  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . biting = false ; 
  squirrelClassFunction . flip = 0 ; 
  squirrelClassFunction . canjump = false ; 
  squirrelClassFunction . touchDamage = 2.0 ; 
- return squirrelClassFunction; })()) ; 
-Ouchin =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Ouchin =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
  returnVal . sf = 0.0 ; 
  returnVal . sharpTop = true ; 
  returnVal . sharpSide = true ; 
+ returnVal . touchDamage = 2 ; 
+ returnVal . rev = 0 ; 
+ returnVal . notarget = true ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
 
    (baseConstructor.bind(this))  ( _x , _y )  ; 
-shape = Rec ( x , y , 8 , 8 , 0 )  ; 
+shape = Rec ( x , y , 6 , 6 , 0 )  ; 
 sf = randInt ( 8 )  ; 
+rev = choose ( 1 ,  - 1 )  ; 
  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
-drawSprite ( sprOuchin , sf +  ( getFrames (  )  / 16 )  , x - camx , y - camy )  ; 
- if ( gvPlayer )  if ( hitTest ( shape , gvPlayer . shape )  )  { 
+ if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  )  { 
   if ( x > gvPlayer . x )  { 
   if ( gvPlayer . placeFree ( gvPlayer . x - 1 , gvPlayer . y )  ) gvPlayer . x --  ; 
  
@@ -1725,14 +2130,58 @@ drawSprite ( sprOuchin , sf +  ( getFrames (  )  / 16 )  , x - camx , y - camy )
   
   } 
   
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  )  { 
+  if ( x > gvPlayer2 . x )  { 
+  if ( gvPlayer2 . placeFree ( gvPlayer2 . x - 1 , gvPlayer2 . y )  ) gvPlayer2 . x --  ; 
+ 
+ gvPlayer2 . hspeed -= 0.1 ; 
+ } 
+  
+  if ( x < gvPlayer2 . x )  { 
+  if ( gvPlayer2 . placeFree ( gvPlayer2 . x + 1 , gvPlayer2 . y )  ) gvPlayer2 . x ++  ; 
+ 
+ gvPlayer2 . hspeed += 0.1 ; 
+ } 
+  
+  if ( y > gvPlayer2 . y )  { 
+  if ( gvPlayer2 . placeFree ( gvPlayer2 . x , gvPlayer2 . y - 1 )  ) gvPlayer2 . y --  ; 
+ 
+ gvPlayer2 . vspeed -= 0.1 ; 
+ } 
+  
+  if ( y < gvPlayer2 . y )  { 
+  if ( gvPlayer2 . placeFree ( gvPlayer2 . x , gvPlayer2 . y + 1 )  ) gvPlayer2 . y ++  ; 
+ 
+ gvPlayer2 . vspeed += 0.1 ; 
+ } 
+  
+  } 
   
   if ( frozen )  { 
-  if ( gvPlayer )  if ( icebox ==  - 1 &&  ! hitTest ( shape , gvPlayer . shape )  )  { 
+  var canice = true ;
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
+ 
+  if ( icebox ==  - 1 && canice )  { 
   if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
  
   } 
   
+  } 
   
+  else  { 
+  if ( icebox !=  - 1 )  { 
+ newActor ( IceChunks , x , y )  ; 
+mapDeleteSolid ( icebox )  ; 
+icebox =  - 1 ; 
+ } 
+  
+  } 
+  
+ shape . setPos ( x , y )  ; 
+ } ;  returnVal . draw = function (  ) { drawSprite ( sprOuchin , sf +  ( getFrames (  )  / 16 )  * rev , x - camx , y - camy )  ; 
+ if ( frozen )  { 
   if ( frozen <= 120 )  { 
   if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
  
@@ -1744,19 +2193,6 @@ drawSprite ( sprOuchin , sf +  ( getFrames (  )  / 16 )  , x - camx , y - camy )
  
   } 
   
-  else  { 
-  if ( icebox !=  - 1 )  { 
- mapDeleteSolid ( icebox )  ; 
-newActor ( IceChunks , x , y )  ; 
-icebox =  - 1 ; 
- } 
-  
-  } 
-  
- shape . setPos ( x , y )  ; 
- } ;  returnVal . hurtPlayer = function ( target ) {  baseMethods . hurtPlayer  ( target )  ; 
- if ( gvPlayer ) gvPlayer . hurt = 2 ; 
- 
   } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _element == "fire" ) hurtFire (  )  ; 
  
   if ( _element == "ice" ) hurtIce (  )  ; 
@@ -1764,11 +2200,14 @@ icebox =  - 1 ;
   } ;  returnVal . hurtFire = function (  ) {  } ;  returnVal . hurtIce = function (  ) { frozen = 600 ; 
  } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . sf = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . sf = 0.0 ; 
  squirrelClassFunction . sharpTop = true ; 
  squirrelClassFunction . sharpSide = true ; 
- return squirrelClassFunction; })()) ; 
-BadCannon =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction . touchDamage = 2 ; 
+ squirrelClassFunction . rev = 0 ; 
+ squirrelClassFunction . notarget = true ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+BadCannon =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -1781,41 +2220,55 @@ BadCannon =  ((function(){ let squirrelClassFunction = function ( ) { var return
    (baseConstructor.bind(this))  ( _x , _y )  ; 
 mapNewSolid ( Rec ( x , y , 8 , 8 , 0 )  )  ; 
  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
- if ( gvPlayer )  { 
-  if ( x > gvPlayer . x + 8 && frame > 0.5 ) frame -= 0.1 ; 
+ var target = null ;
+  if ( gvPlayer && gvPlayer2 )  { 
+  if ( distance2 ( x , y , gvPlayer . x , gvPlayer . y )  < distance2 ( x , y , gvPlayer2 . x , gvPlayer2 . y )  ) target = gvPlayer ; 
  
-  if ( x < gvPlayer . x - 8 && frame < 4.5 ) frame += 0.1 ; 
+  else target = gvPlayer2 ; 
  
-  if ( inDistance2 ( x , y , gvPlayer . x , gvPlayer . y , 160 )  && timer == 0 &&  ( frame < 1 || frame > 4 )  )  { 
+  } 
+  
+  else  if ( gvPlayer ) target = gvPlayer ; 
+ 
+  else  if ( gvPlayer2 ) target = gvPlayer2 ; 
+ 
+  
+  
+  if ( target != null )  { 
+  if ( x > target . x + 8 && frame > 0.5 ) frame -= 0.1 ; 
+ 
+  if ( x < target . x - 8 && frame < 4.5 ) frame += 0.1 ; 
+ 
+  if ( inDistance2 ( x , y , target . x , target . y , 160 )  && timer == 0 &&  ( frame < 1 || frame > 4 )  )  { 
   if ( frame < 1 )  { 
   var c = actor [ newActor ( CannonBob , x - 4 , y - 4 )  ]  ;
- c . hspeed =  (  ( gvPlayer . x - x )  / 48 )  ; 
- var d =  ( y - gvPlayer . y )  / 64 ;
+ c . hspeed =  (  ( target . x - x )  / 48 )  ; 
+ var d =  ( y - target . y )  / 64 ;
   if ( d > 2 ) d = 2 ; 
  
-  if ( y > gvPlayer . y ) c . vspeed -= d ; 
+  if ( y > target . y ) c . vspeed -= d ; 
  
  newActor ( Poof , x - 4 , y - 4 )  ; 
  } 
   
   if ( frame >= 4 )  { 
   var c = actor [ newActor ( CannonBob , x + 4 , y - 4 )  ]  ;
- c . hspeed =  (  ( gvPlayer . x - x )  / 48 )  ; 
- var d =  ( y - gvPlayer . y )  / 64 ;
+ c . hspeed =  (  ( target . x - x )  / 48 )  ; 
+ var d =  ( y - target . y )  / 64 ;
   if ( d > 2 ) d = 2 ; 
  
-  if ( y > gvPlayer . y ) c . vspeed -= d ; 
+  if ( y > target . y ) c . vspeed -= d ; 
  
  newActor ( Poof , x + 4 , y - 4 )  ; 
  } 
   
   if ( frame >= 1 && frame <= 4 )  { 
   var c = actor [ newActor ( CannonBob , x , y - 4 )  ]  ;
- c . hspeed =  (  ( gvPlayer . x - x )  / 48 )  ; 
- var d =  ( y - gvPlayer . y )  / 64 ;
+ c . hspeed =  (  ( target . x - x )  / 48 )  ; 
+ var d =  ( y - target . y )  / 64 ;
   if ( d > 2 ) d = 2 ; 
  
-  if ( y > gvPlayer . y ) c . vspeed -= d ; 
+  if ( y > target . y ) c . vspeed -= d ; 
  
  newActor ( Poof , x , y - 4 )  ; 
  } 
@@ -1827,14 +2280,14 @@ mapNewSolid ( Rec ( x , y , 8 , 8 , 0 )  )  ;
  
   } 
   
- drawSprite ( sprCannon , frame , x - camx , y - camy )  ; 
+  } ;  returnVal . draw = function (  ) { drawSprite ( sprCannon , frame , x - camx , y - camy )  ; 
  } ;  returnVal . _typeof = function (  ) {  return "BadCannon" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . frame = 3.5 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 3.5 ; 
  squirrelClassFunction . timer = 240 ; 
- return squirrelClassFunction; })()) ; 
-CannonBob =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Actor;  return squirrelClassFunction; })()) ; 
+CannonBob =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -1853,10 +2306,6 @@ shape = Rec ( x , y , 6 , 6 , 0 )  ;
  
   } ;  returnVal . physics = function (  ) {  } ;  returnVal . animation = function (  ) {  } ;  returnVal . routine = function (  ) {  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
  if (  ! frozen )  { 
-  if ( hspeed < 0 ) drawSpriteEx ( sprite , getFrames (  )  / 4 , x - camx , y - camy , 0 , 0 , 1 , 1 , 1 )  ; 
- 
-  else drawSpriteEx ( sprite , getFrames (  )  / 4 , x - camx , y - camy , 0 , 1 , 1 , 1 , 1 )  ; 
- 
  vspeed += 0.2 ; 
 x += hspeed ; 
 y += vspeed ; 
@@ -1874,17 +2323,19 @@ vspeed =  - 1.0 ;
   } 
   
   else  { 
-  if ( hspeed < 0 ) drawSpriteEx ( sprite , 4 , x - camx , y - camy , 0 , 1 , 1 , 1 , 1 )  ; 
+  var canice = true ;
+  if ( gvPlayer && icebox ==  - 1 && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
  
-  else drawSpriteEx ( sprite , 4 , x - camx , y - camy , 0 , 0 , 1 , 1 , 1 )  ; 
+  if ( gvPlayer2 && icebox ==  - 1 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
  
-  if ( gvPlayer )  if ( icebox ==  - 1 &&  ! hitTest ( shape , gvPlayer . shape )  )  { 
-  if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
+  if ( canice )  if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
  
+  
   } 
   
-  
-  if ( frozen <= 120 )  { 
+  } ;  returnVal . draw = function (  ) {  if ( frozen )  { 
+ drawSprite ( sprite , 4 , x - camx , y - camy , 0 , int ( hspeed < 0 )  , 1 , 1 , 1 )  ; 
+ if ( frozen <= 120 )  { 
   if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
  
   else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
@@ -1895,6 +2346,8 @@ vspeed =  - 1.0 ;
  
   } 
   
+  else drawSprite ( sprite , getFrames (  )  / 4 , x - camx , y - camy , 0 , int ( hspeed < 0 )  , 1 , 1 , 1 )  ; 
+ 
   } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _blast || _element == "fire" )  { 
  hurtBlast (  )  ; 
  return ; 
@@ -1906,6 +2359,7 @@ vspeed =  - 1.0 ;
   } 
   
   
+  if ( _stomp )  { 
   var c = newActor ( DeadNME , x , y )  ;
  actor [ c ]  . sprite = sprite ; 
  if ( gvPlayer )  { 
@@ -1913,8 +2367,14 @@ vspeed =  - 1.0 ;
 actor [ c ]  . hspeed =  ( gvPlayer . hspeed / 16 )  ; 
  } 
   
+  else  if ( gvPlayer2 )  { 
+ actor [ c ]  . vspeed =  - abs ( gvPlayer2 . hspeed * 1.1 )  ; 
+actor [ c ]  . hspeed =  ( gvPlayer2 . hspeed / 16 )  ; 
+ } 
+  
   else actor [ c ]  . vspeed =  - 4.0 ; 
  
+  
  popSound ( sndKick )  ; 
  if ( icebox !=  - 1 )  { 
  mapDeleteSolid ( icebox )  ; 
@@ -1922,10 +2382,12 @@ newActor ( IceChunks , x , y )  ;
  } 
   
  die (  )  ; 
- } ;  returnVal . hurtBlast = function (  ) {  var c = newActor ( DeadNME , x , y )  ;
+ } 
+  
+  } ;  returnVal . hurtBlast = function (  ) {  var c = newActor ( DeadNME , x , y )  ;
  actor [ c ]  . sprite = sprite ; 
-actor [ c ]  . vspeed =  - abs ( gvPlayer . hspeed * 1.1 )  ; 
-actor [ c ]  . hspeed =  ( gvPlayer . hspeed / 16 )  ; 
+actor [ c ]  . vspeed =  - 2 ; 
+actor [ c ]  . hspeed =  - hspeed ; 
 die (  )  ; 
 popSound ( sndKick , 0 )  ; 
  if ( icebox !=  - 1 )  { 
@@ -1937,11 +2399,11 @@ newActor ( IceChunks , x , y )  ;
  } ;  returnVal . _typeof = function (  ) {  return "CannonBob" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . vspeed =  - 4 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . vspeed =  - 4 ; 
  squirrelClassFunction . sprite = 0 ; 
  squirrelClassFunction . touchDamage = 2.0 ; 
- return squirrelClassFunction; })()) ; 
-Icicle =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Icicle =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -1951,6 +2413,7 @@ Icicle =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal
  returnVal . element = "ice" ; 
  returnVal . dy =  - 16 ; 
  returnVal . nocount = true ; 
+ returnVal . nodrop = true ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
@@ -1960,11 +2423,12 @@ shape = Rec ( x , y , 4 , 6 , 0 )  ;
  } ;  returnVal . physics = function (  ) {  } ;  returnVal . animation = function (  ) {  } ;  returnVal . routine = function (  ) {  } ;  returnVal . run = function (  ) {  if ( dy < 0 ) dy ++  ; 
  
   baseMethods . run  (  )  ; 
- if ( gvPlayer )  if ( abs ( y - gvPlayer . y )  < 128 && y < gvPlayer . y && abs ( x - gvPlayer . x )  < 8 &&  ! counting )  { 
+ if ( sprIcicle != defIcicle ) element = "normal" ; 
+ 
+  if ( gvPlayer && abs ( y - gvPlayer . y )  < 128 && y < gvPlayer . y && abs ( x - gvPlayer . x )  < 8 &&  ! counting || gvPlayer2 && abs ( y - gvPlayer2 . y )  < 128 && y < gvPlayer2 . y && abs ( x - gvPlayer2 . x )  < 8 &&  ! counting )  { 
  counting = true ; 
 popSound ( sndIcicle , 0 )  ; 
  } 
-  
   
   if ( counting && timer > 0 ) timer --  ; 
  
@@ -1981,13 +2445,40 @@ popSound ( sndIcicle , 0 )  ;
 shape . setPos ( x , y )  ; 
  if (  ! placeFree ( x , y )  )  { 
  die (  )  ; 
-newActor ( IceChunks , x , y )  ; 
+ if ( game . difficulty < 2 )  { 
+  if ( sprIcicle == defIcicle ) newActor ( IceChunks , x , y )  ; 
+ 
+  else  { 
+ popSound ( sndBump )  ; 
+newActor ( Poof , x , y )  ; 
  } 
   
- drawSprite ( sprIcicle , 0 , x +  ( timer % 2 )  - camx , y - 8 - camy + dy )  ; 
- if ( vspeed > 0 ) fireWeapon ( AfterIce , x , y , 1 , id )  ; 
+  } 
+  
+  else  if ( game . difficulty == 2 )  { 
+  if ( sprIcicle == defIcicle ) fireWeapon ( ExplodeI , x , y , 0 , 0 )  ; 
  
-  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _element == "fire" )  { 
+  else fireWeapon ( ExplodeN , x , y , 0 , 0 )  ; 
+ 
+  } 
+  
+  else  if ( sprIcicle == defIcicle ) fireWeapon ( ExplodeI2 , x , y , 0 , 0 )  ; 
+ 
+  else fireWeapon ( ExplodeN3 , x , y , 0 , 0 )  ; 
+ 
+  
+  
+  } 
+  
+  if ( vspeed > 0 )  { 
+  if ( sprIcicle == defIcicle ) fireWeapon ( AfterIce , x , y , 1 , id )  ; 
+ 
+  else fireWeapon ( MeleeHit , x , y , 1 , id )  ; 
+ 
+  } 
+  
+  } ;  returnVal . draw = function (  ) { drawSprite ( sprIcicle , 0 , x +  ( timer % 2 )  - camx , y - 8 - camy + dy )  ; 
+ } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _element == "fire" )  { 
  die (  )  ; 
 newActor ( Poof , x , y )  ; 
  return ; 
@@ -1995,20 +2486,27 @@ newActor ( Poof , x , y )  ;
   
   else  if ( _element != "ice" )  { 
   baseMethods . getHurt  (  )  ; 
-newActor ( IceChunks , x , y )  ; 
+ if ( sprIcicle == defIcicle ) newActor ( IceChunks , x , y )  ; 
+ 
+  else  { 
+ popSound ( sndBump )  ; 
+newActor ( Poof , x , y )  ; 
  } 
+  
+  } 
   
   
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . timer = 30 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . timer = 30 ; 
  squirrelClassFunction . counting = false ; 
  squirrelClassFunction . touchDamage = 2.0 ; 
  squirrelClassFunction . element = "ice" ; 
  squirrelClassFunction . dy =  - 16 ; 
  squirrelClassFunction . nocount = true ; 
- return squirrelClassFunction; })()) ; 
-FlyAmanita =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction . nodrop = true ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+FlyAmanita =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -2064,17 +2562,26 @@ icebox =  - 1 ;
  } 
   
  y += vspeed ; 
-drawSpriteEx ( sprFlyAmanita , getFrames (  )  / 4 , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
  } 
   
   else  { 
-  if ( gvPlayer )  if ( icebox ==  - 1 &&  ! hitTest ( shape , gvPlayer . shape )  )  { 
+  var canice = true ;
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
+ 
+  if ( icebox ==  - 1 && canice )  { 
   if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
  
   } 
   
+  } 
   
- drawSpriteEx ( sprFlyAmanita , 0 , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
+ shape . setPos ( x , y )  ; 
+ if ( health <= 0 ) die (  )  ; 
+ 
+  } ;  returnVal . draw = function (  ) {  if ( frozen )  { 
+ drawSprite ( sprFlyAmanita , 0 , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
  if ( frozen <= 120 )  { 
   if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
  
@@ -2086,9 +2593,35 @@ drawSpriteEx ( sprFlyAmanita , getFrames (  )  / 4 , x - camx , y - camy , 0 , f
  
   } 
   
- shape . setPos ( x , y )  ; 
- } ;  returnVal . hurtPlayer = function ( target ) {  baseMethods . hurtPlayer  ( target )  ; 
- } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _element == "fire" )  { 
+  else drawSprite ( sprFlyAmanita , getFrames (  )  / 4 , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
+ 
+  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _mag <= 0 )  return ; 
+  
+  if ( _by != 0 && hitTest ( shape , _by . shape )  )  { 
+  if ( _mag > 0 )  { 
+  var c = newActor ( DeadNME , x , y )  ;
+ actor [ c ]  . sprite = sprFlyAmanita ; 
+actor [ c ]  . vspeed =  - abs ( _by . hspeed * 1.1 )  ; 
+actor [ c ]  . hspeed =  ( _by . hspeed / 16 )  ; 
+actor [ c ]  . spin =  ( _by . hspeed * 6 )  ; 
+actor [ c ]  . angle = 180 ; 
+die (  )  ; 
+popSound ( sndSquish , 0 )  ; 
+ return ; 
+  } 
+  
+  if (  ( (_by[ ( "playerNum" ) ] !== undefined) )  && getcon ( "jump" , "hold" , false , _by . playerNum )  ) _by . vspeed =  - 8 ; 
+ 
+  else _by . vspeed =  - 4 ; 
+ 
+  if ( _by . anim == "jumpT" || _by . anim == "fall" )  { 
+ _by . anim = "jumpU" ; 
+_by . frame = _by . an [ "jumpU" ]  [ 0 ]  ; 
+ } 
+  
+  } 
+  
+  if ( _element == "fire" )  { 
  hurtFire (  )  ; 
  return ; 
   } 
@@ -2104,8 +2637,8 @@ drawSpriteEx ( sprFlyAmanita , getFrames (  )  / 4 , x - camx , y - camy , 0 , f
 newActor ( IceChunks , x , y )  ; 
  } 
   
-  var c = newActor ( DeadNME , x , y )  ;
   if (  ! _stomp )  { 
+  var c = newActor ( DeadNME , x , y )  ;
  actor [ c ]  . sprite = sprFlyAmanita ; 
 actor [ c ]  . vspeed =  - 4.0 ; 
 actor [ c ]  . spin = 6 ; 
@@ -2113,42 +2646,6 @@ actor [ c ]  . angle = 180 ;
 die (  )  ; 
 popSound ( sndKick )  ; 
  } 
-  
-  if ( gvPlayer )  if ( hitTest ( shape , gvPlayer . shape )  )  { 
- actor [ c ]  . sprite = sprFlyAmanita ; 
-actor [ c ]  . vspeed =  - abs ( gvPlayer . hspeed * 1.1 )  ; 
-actor [ c ]  . hspeed =  ( gvPlayer . hspeed / 16 )  ; 
-actor [ c ]  . spin =  ( gvPlayer . hspeed * 6 )  ; 
-actor [ c ]  . angle = 180 ; 
-die (  )  ; 
-popSound ( sndKick )  ; 
- if ( getcon ( "jump" , "hold" )  )  { 
- gvPlayer . vspeed =  - 8 ; 
-popSound ( sndSquish , 0 )  ; 
- } 
-  
-  else  { 
- gvPlayer . vspeed =  - 4 ; 
-popSound ( sndSquish , 0 )  ; 
- } 
-  
-  if ( gvPlayer . anim == gvPlayer . anJumpT || gvPlayer . anim == gvPlayer . anFall )  { 
- gvPlayer . anim = gvPlayer . anJumpU ; 
-gvPlayer . frame = gvPlayer . anJumpU [ 0 ]  ; 
- } 
-  
-  else  if ( keyDown ( config . key . jump )  ) gvPlayer . vspeed =  - 5 ; 
- 
-  else gvPlayer . vspeed =  - 2 ; 
- 
-  
-  if ( gvPlayer . anim == gvPlayer . anJumpT || gvPlayer . anim == gvPlayer . anFall )  { 
- gvPlayer . anim = gvPlayer . anJumpU ; 
-gvPlayer . frame = gvPlayer . anJumpU [ 0 ]  ; 
- } 
-  
-  } 
-  
   
   } ;  returnVal . hurtFire = function (  ) { newActor ( Flame , x , y - 1 )  ; 
 die (  )  ; 
@@ -2161,12 +2658,12 @@ popSound ( sndFlame , 0 )  ;
   } ;  returnVal . hurtIce = function (  ) { frozen = 600 ; 
  } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . range = 0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . range = 0 ; 
  squirrelClassFunction . dir = 0.5 ; 
  squirrelClassFunction . flip = 0 ; 
  squirrelClassFunction . touchDamage = 2.0 ; 
- return squirrelClassFunction; })()) ; 
-Jumpy =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Jumpy =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -2213,30 +2710,23 @@ shape = Rec ( x , y , 6 , 6 , 0 , 0 , 2 )  ;
   } 
   
  shape . setPos ( x , y )  ; 
-drawSpriteEx ( sprJumpy ,  (  squirrelThreeWaysCompare ( 0 , round ( vspeed / 2.0 )  )  )  + 1 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  if ( frozen )  { 
-  if ( gvPlayer )  if ( icebox ==  - 1 &&  ! hitTest ( shape , gvPlayer . shape )  )  { 
+  var canice = true ;
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
+ 
+  if ( icebox ==  - 1 && canice )  { 
   if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
  
   } 
   
-  
- drawSpriteEx ( sprJumpy , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- if ( frozen <= 120 )  { 
-  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
- 
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
-  } 
-  
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
   } 
   
   else  { 
   if ( icebox !=  - 1 )  { 
- mapDeleteSolid ( icebox )  ; 
-newActor ( IceChunks , x , y )  ; 
+ newActor ( IceChunks , x , y )  ; 
+mapDeleteSolid ( icebox )  ; 
 icebox =  - 1 ; 
  if ( gvPlayer )  if ( x > gvPlayer . x ) flip = true ; 
  
@@ -2252,6 +2742,21 @@ icebox =  - 1 ;
   if ( x < 0 ) hspeed = 0.0 ; 
  
   if ( x > gvMap . w ) hspeed =  - 0.0 ; 
+ 
+  } ;  returnVal . draw = function (  ) {  if ( frozen )  { 
+ drawSprite ( sprJumpy , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ if ( frozen <= 120 )  { 
+  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
+ 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else drawSprite ( sprJumpy ,  (  squirrelThreeWaysCompare ( 0 , round ( vspeed / 2.0 )  )  )  + 1 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  
   } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _element == "fire" )  { 
  hurtFire (  )  ; 
@@ -2283,7 +2788,7 @@ newActor ( Poof , x , y )  ;
  baseMethods . die  (  )  ; 
  } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . flip = false ; 
  squirrelClassFunction . squish = false ; 
  squirrelClassFunction . squishTime = 0.0 ; 
@@ -2292,8 +2797,8 @@ newActor ( Poof , x , y )  ;
  squirrelClassFunction . touchDamage = 3.0 ; 
  squirrelClassFunction . sharpTop = true ; 
  squirrelClassFunction . sharpSide = true ; 
- return squirrelClassFunction; })()) ; 
-Haywire =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Haywire =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -2306,6 +2811,7 @@ Haywire =  ((function(){ let squirrelClassFunction = function ( ) { var returnVa
  returnVal . mspeed = 1.0 ; 
  returnVal . hspeed = 0.0 ; 
  returnVal . touchDamage = 2.0 ; 
+ returnVal . anAgro =  [ 4 , 4 , 4 , 5 , 5 , 5 , 5 , 5 , 5 , 6 , 5 , 5 , 5 , 5 , 7 , 7 , 8 , 9 , 8 , 9 , 10 , 11 , 10 , 11 , 10 , 11 , 10 , 11 , 10 , 11 , 10 , 11 , 10 , 11 , 10 , 11 , 10 , 11 , 10 , 11 , 10 , 11 , 10 , 11 ]  ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
@@ -2332,7 +2838,7 @@ shape = Rec ( x , y , 6 , 6 , 0 , 0 , 1 )  ;
  
   if ( squishTime >= 200 && chasing )  { 
  die (  )  ; 
-fireWeapon ( ExplodeF , x , y - 1 , 0 , id )  ; 
+fireWeapon ( ExplodeF2 , x , y - 1 , 0 , id )  ; 
  } 
   
   if ( y > gvMap . h + 8 ) die (  )  ; 
@@ -2398,57 +2904,51 @@ y -= 1.0 ;
  
   } 
   
-  if ( gvPlayer )  if ( inDistance2 ( x , y , gvPlayer . x , gvPlayer . y , 64 +  ( 16 * game . difficulty )  )  ) squish = true ; 
+  var target = findPlayer (  )  ;
+  if ( target != null )  if ( inDistance2 ( x , y , target . x , target . y , 8 +  ( 16 * game . difficulty )  )  ) squish = true ; 
  
   
   } 
   
-  if ( gvPlayer && chasing )  { 
-  if ( x < gvPlayer . x - 8 )  if ( hspeed <  ( 2.5 +  (  ( 2.0 / 200.0 )  * squishTime )  )  )  { 
+  var target = findPlayer (  )  ;
+  if ( target != null && chasing )  { 
+  if ( x < target . x - 8 )  if ( hspeed <  ( 2.5 +  (  ( 2.0 / 200.0 )  * squishTime )  )  )  { 
  hspeed += 0.1 ; 
- if ( hspeed < 0 ) hspeed += 0.1 ; 
+ if ( hspeed < 0 ) hspeed += 0.05 ; 
  
   } 
   
   
-  if ( x > gvPlayer . x + 8 )  if ( hspeed >  -  ( 2.5 +  (  ( 2.0 / 200.0 )  * squishTime )  )  )  { 
+  if ( x > target . x + 8 )  if ( hspeed >  -  ( 2.5 +  (  ( 2.0 / 200.0 )  * squishTime )  )  )  { 
  hspeed -= 0.1 ; 
- if ( hspeed > 0 ) hspeed -= 0.1 ; 
+ if ( hspeed > 0 ) hspeed -= 0.05 ; 
  
   } 
   
   
-  if (  ! placeFree ( x , y + 1 )  && y > gvPlayer . y + 16 ) vspeed =  - 5.0 ; 
+  if (  ! placeFree ( x , y + 1 )  && y > target . y + 16 ) vspeed =  - 5.0 ; 
  
   } 
   
   else hspeed = 0.0 ; 
  
   if ( frozen )  { 
-  if ( gvPlayer )  if ( icebox ==  - 1 &&  ! hitTest ( shape , gvPlayer . shape )  )  { 
+  var canice = true ;
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
+ 
+  if ( icebox ==  - 1 && canice )  { 
   if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
  
   } 
   
-  
- drawSpriteEx ( sprHaywire , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- if ( frozen <= 120 )  { 
-  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
- 
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
   } 
-  
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
- chasing = false ; 
-squishTime = 0.0 ; 
- } 
   
   else  { 
   if ( icebox !=  - 1 )  { 
- mapDeleteSolid ( icebox )  ; 
-newActor ( IceChunks , x , y )  ; 
+ newActor ( IceChunks , x , y )  ; 
+mapDeleteSolid ( icebox )  ; 
 icebox =  - 1 ; 
  if ( gvPlayer )  if ( x > gvPlayer . x ) flip = true ; 
  
@@ -2458,8 +2958,7 @@ icebox =  - 1 ;
   } 
   
   if ( chasing )  { 
- drawSpriteEx ( sprHaywire , wrap ( getFrames (  )  / 6 , 8 , 11 )  , x - camx , y - camy , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- if ( getFrames (  )  % 8 == 0 )  { 
+  if ( getFrames (  )  % 8 == 0 )  { 
   var c ;
   if (  ! flip ) c = actor [ newActor ( FlameTiny , x - 6 , y - 8 )  ]  ; 
  
@@ -2471,19 +2970,14 @@ c . hspeed = randFloat ( 0.2 )  - 0.1 ;
   
   } 
   
-  else drawSpriteEx ( sprHaywire , wrap ( getFrames (  )  / 10 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
   } 
   
   } 
   
   else  { 
- squishTime += 1.5 ; 
- if ( chasing ) frame += 0.25 ; 
- 
-  else frame += 0.075 ; 
- 
-  if ( squishTime >= 90 &&  ! chasing )  { 
+ squishTime += 1.0 ; 
+frame += 0.25 ; 
+ if ( squishTime >= 180 -  ( game . difficulty * 30 )  &&  ! chasing )  { 
  chasing = true ; 
 squishTime = 0 ; 
 popSound ( sndFizz , 0 )  ; 
@@ -2491,13 +2985,9 @@ popSound ( sndFizz , 0 )  ;
   
   if ( squishTime >= 300 && chasing )  { 
  die (  )  ; 
-fireWeapon ( ExplodeF , x , y , 0 , id )  ; 
+fireWeapon ( ExplodeF2 , x , y , 0 , id )  ; 
  } 
   
-  if (  ! chasing ) drawSpriteEx ( sprHaywire , wrap ( frame , 4 , 7 )  , x - camx , y - camy , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  else drawSpriteEx ( sprHaywire , wrap ( frame , 8 , 11 )  , x - camx , y - camy , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
   if ( frozen )  { 
  squish = false ; 
 squishTime = 0 ; 
@@ -2512,10 +3002,31 @@ setDrawColor ( 0xff0000ff )  ;
  
   } 
   
-  } ;  returnVal . hurtPlayer = function ( target ) {  if ( squish &&  ! chasing )  return ; 
+  } ;  returnVal . draw = function (  ) {  if ( frozen )  { 
+ drawSprite ( sprHaywire , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ if ( frozen <= 120 )  { 
+  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
+ 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
   
-  baseMethods . hurtPlayer  ( target )  ; 
- } ;  returnVal . hurtBlast = function (  ) {  if ( squish )  return ; 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else  if ( chasing ) drawSprite ( sprHaywire , wrap ( getFrames (  )  / 4 , 12 , 15 )  , x - camx , y - camy , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else  if ( squish &&  ! chasing ) drawSprite ( sprHaywire , anAgro [ wrap ( floor ( frame )  , 0 , anAgro . len (  )  - 1 )  ]  , x - camx , y - camy , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else  if ( squish ) drawSprite ( sprHaywire , wrap ( frame , 12 , 15 )  , x - camx , y - camy , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else drawSprite ( sprHaywire , wrap ( getFrames (  )  / 16 , 0 , 3 )  , x - camx , y - camy , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  
+  
+  
+  } ;  returnVal . hurtBlast = function (  ) {  if ( squish )  return ; 
   
   if ( frozen ) frozen = 0 ; 
  
@@ -2527,13 +3038,26 @@ icebox =  - 1 ;
  } 
   
  squish = true ; 
- } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _element == "fire" )  { 
+ } ;  returnVal . hurtPlayer = function ( target ) {  if ( blinking || squish &&  ! chasing )  return ; 
+  
+ target . hurt = touchDamage * target . damageMult [ element ]  ; 
+ } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _element == "water" )  { 
+ squish = false ; 
+squishTime = 0 ; 
+chasing = false ; 
+ return ; 
+  } 
+  
+  if ( _element == "fire" || _element == "shock" || _blast )  { 
  hurtFire (  )  ; 
  return ; 
   } 
   
   else  if ( _element == "ice" )  { 
- hurtIce (  )  ; 
+ chasing = false ; 
+squish = false ; 
+squishTime = 0.0 ; 
+hurtIce (  )  ; 
  return ; 
   } 
   
@@ -2550,6 +3074,8 @@ icebox =  - 1 ;
   
   if (  ! _stomp ) vspeed =  - 2.0 ; 
  
+  if (  ! squish ) frame = 0.0 ; 
+ 
  squish = true ; 
  } ;  returnVal . hurtFire = function (  ) {  if ( icebox !=  - 1 )  { 
  mapDeleteSolid ( icebox )  ; 
@@ -2557,7 +3083,7 @@ newActor ( IceChunks , x , y )  ;
  } 
   
   if (  ! burnt )  { 
- fireWeapon ( ExplodeF , x , y - 1 , 0 , id )  ; 
+ fireWeapon ( ExplodeF2 , x , y - 1 , 0 , id )  ; 
 die (  )  ; 
 popSound ( sndFlame , 0 )  ; 
 burnt = true ; 
@@ -2567,7 +3093,7 @@ burnt = true ;
  } ;  returnVal . _typeof = function (  ) {  return "Haywire" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . burnt = false ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . burnt = false ; 
  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . flip = false ; 
  squirrelClassFunction . squish = false ; 
@@ -2576,8 +3102,190 @@ burnt = true ;
  squirrelClassFunction . mspeed = 1.0 ; 
  squirrelClassFunction . hspeed = 0.0 ; 
  squirrelClassFunction . touchDamage = 2.0 ; 
- return squirrelClassFunction; })()) ; 
-Sawblade =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PathCrawler ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction . anAgro =  [ 4 , 4 , 4 , 5 , 5 , 5 , 5 , 5 , 5 , 6 , 5 , 5 , 5 , 5 , 7 , 7 , 8 , 9 , 8 , 9 , 10 , 11 , 10 , 11 , 10 , 11 , 10 , 11 , 10 , 11 , 10 , 11 , 10 , 11 , 10 , 11 , 10 , 11 , 10 , 11 , 10 , 11 , 10 , 11 ]  ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Goldbomb =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+     if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
+         squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
+ } 
+ returnVal . squish = 0 ; 
+ returnVal . scared = 0 ; 
+ returnVal . wait = 60 ; 
+ returnVal . anim = "walk" ; 
+ returnVal . mspeed = 4.0 ; 
+ returnVal . dead = false ; 
+ returnVal . an =  { walk :  [ 0 , 1 , 2 , 3 ]  , explode :  [ 4 , 4 , 5 , 5 , 5 , 5 , 6 , 7 , 6 , 7 , 6 , 7 , 6 , 7 ]  , run :  [ 8 , 9 , 10 , 11 ]  , cry :  [ 12 , 13 ]  , peek :  [ 14 , 15 ]  }  ; 
+ returnVal . frame = 0.0 ; 
+ returnVal . flip = 0 ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   (baseConstructor.bind(this))  ( _x , _y , _arr )  ; 
+shape = Rec ( x , y , 4 , 8 , 0 )  ; 
+hspeed = choose ( 1.0 ,  - 1.0 )  ; 
+mspeed = 4.0 +  ( game . difficulty * 0.5 )  ; 
+ } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
+ if (  ! active )  return ; 
+  
+  var target = findPlayer (  )  ;
+  if ( target != null )  { 
+  if ( inDistance2 ( target . x , target . y , x , y , 64 +  ( 16 * game . difficulty )  )  ) scared = 300 ; 
+ 
+  if ( scared && fabs ( hspeed )  < mspeed ) hspeed += 0.1 *  (  squirrelThreeWaysCompare ( x , target . x )  )  ; 
+ 
+  } 
+  
+  if ( frozen )  { 
+  var canice = true ;
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
+ 
+  if ( icebox ==  - 1 && canice )  { 
+  if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
+ 
+  } 
+  
+ hspeed = 0 ; 
+ } 
+  
+  else  { 
+  if ( icebox !=  - 1 )  { 
+ newActor ( IceChunks , x , y )  ; 
+mapDeleteSolid ( icebox )  ; 
+icebox =  - 1 ; 
+ if ( target )  if ( x > gvPlayer . x ) flip = 0 ; 
+ 
+  else flip = 1 ; 
+ 
+  
+  } 
+  
+  } 
+  
+  if ( scared > 0 ) scared --  ; 
+ 
+  if ( scared < 0 ) scared = 0 ; 
+ 
+  } ;  returnVal . physics = function (  ) {  if (  ! active )  return ; 
+  
+  if ( fabs ( hspeed )  > 1 ) hspeed *= 0.99 ; 
+ 
+  if ( placeFree ( x , y + 1 )  ) vspeed += 0.2 ; 
+ 
+  if ( placeFree ( x , y + vspeed )  ) y += vspeed ; 
+ 
+  else vspeed /= 2 ; 
+ 
+  if ( placeFree ( x + hspeed , y )  ) x += hspeed ; 
+ 
+  else  if ( placeFree ( x + hspeed , y - 2 )  )  { 
+ x += hspeed ; 
+y -= 2.0 ; 
+ } 
+  
+  else  if (  ( placeFree ( x + hspeed , y - 16 )  || placeFree ( x + hspeed , y - 32 )  )  && scared ) vspeed =  - 4.0 ; 
+ 
+  else  if ( scared ) hspeed /= 2.0 ; 
+ 
+  else hspeed =  - hspeed ; 
+ 
+  
+  
+  
+  if ( hspeed > 0 ) flip = 0 ; 
+ 
+  if ( hspeed < 0 ) flip = 1 ; 
+ 
+ shape . setPos ( x , y )  ; 
+ } ;  returnVal . animation = function (  ) {  switch ( anim )  {  case "walk" : frame += 0.1 ; 
+ if ( scared ) anim = "run" ; 
+ 
+  break ;  case "run" :  if ( fabs ( hspeed )  <= 0.2 ) anim = "cry" ; 
+ 
+ frame += 0.1 * fabs ( hspeed )  ; 
+ if (  ! scared )  { 
+ anim = "peek" ; 
+frame = 0.0 ; 
+ } 
+  
+  break ;  case "cry" :  if (  ! scared )  { 
+ frame = 0.0 ; 
+anim = "peek" ; 
+ } 
+  
+  if ( fabs ( hspeed )  > 0.2 ) anim = "run" ; 
+ 
+ frame += 0.2 ; 
+ break ;  case "peek" : hspeed = 0.0 ; 
+frame += 0.1 ; 
+ if ( frame > 6 )  { 
+ anim = "walk" ; 
+hspeed = choose ( 1.0 ,  - 1.0 )  ; 
+ } 
+  
+  break ;  case "explode" : frame += 0.2 ; 
+ if ( frame > an [ "explode" ]  . len (  )  - 1 ) die (  )  ; 
+ 
+ hspeed = 0.0 ; 
+ break ;  }  if ( frozen )  { 
+ frame = 0.0 ; 
+anim = "cry" ; 
+ } 
+  
+  if ( health <= 0.0 ) die (  )  ; 
+ 
+  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( dead )  return ; 
+  
+  if ( _element == "fire" || _blast ) die (  )  ; 
+ 
+  else  if ( _element == "ice" ) frozen = 600 ; 
+ 
+  else  if ( anim != "explode" )  { 
+ frame = 0.0 ; 
+anim = "explode" ; 
+popSound ( sndFizz )  ; 
+ } 
+  
+  
+  
+  } ;  returnVal . die = function (  ) {  baseMethods . die  (  )  ; 
+dead = true ; 
+fireWeapon ( ExplodeF2 , x , y , 0 , 0 )  ; 
+ for (  var i = 0 ;
+ i < 20 ; i ++  )  { 
+  var c = actor [ newActor ( CoinSmall , x , y )  ]  ;
+ c . hspeed *= 1.5 ; 
+c . vspeed *= 1.5 ; 
+ } 
+  } ;  returnVal . draw = function (  ) { drawSprite ( sprGoldbomb , an [ anim ]  [ wrap ( frame , 0 , an [ anim ]  . len (  )  - 1 )  ]  , x - camx , y - camy , 0 , flip )  ; 
+ if ( frozen )  { 
+  if ( frozen <= 120 )  { 
+  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
+ 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  } ;  returnVal . _typeof = function (  ) {  return "Goldbomb" ;
+  } ; 
+ } 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . squish = 0 ; 
+ squirrelClassFunction . scared = 0 ; 
+ squirrelClassFunction . wait = 60 ; 
+ squirrelClassFunction . anim = "walk" ; 
+ squirrelClassFunction . mspeed = 4.0 ; 
+ squirrelClassFunction . dead = false ; 
+ squirrelClassFunction . an =  { walk :  [ 0 , 1 , 2 , 3 ]  , explode :  [ 4 , 4 , 5 , 5 , 5 , 5 , 6 , 7 , 6 , 7 , 6 , 7 , 6 , 7 ]  , run :  [ 8 , 9 , 10 , 11 ]  , cry :  [ 12 , 13 ]  , peek :  [ 14 , 15 ]  }  ; 
+ squirrelClassFunction . frame = 0.0 ; 
+ squirrelClassFunction . flip = 0 ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Sawblade =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PathCrawler ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -2588,16 +3296,17 @@ Sawblade =  ((function(){ let squirrelClassFunction = function ( ) { var returnV
    (baseConstructor.bind(this))  ( _x , _y , _arr )  ; 
 shape = Rec ( x , y , 6 , 6 , 0 )  ; 
  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
-drawSprite ( sprSawblade , getFrames (  )  / 2 , x - camx , y - camy )  ; 
-drawLightEx ( sprLightIce , 0 , x - camx , y - camy , 0 , 0 , 0.125 , 0.125 )  ; 
 shape . setPos ( x , y )  ; 
- if ( gvPlayer )  if ( hitTest ( shape , gvPlayer . shape )  ) gvPlayer . getHurt ( 1 + game . difficulty , "normal" , true , false )  ; 
+ if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) gvPlayer . getHurt ( 2 + game . difficulty , "normal" , true , false )  ; 
  
-  
-  } ; 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) gvPlayer2 . getHurt ( 2 + game . difficulty , "normal" , true , false )  ; 
+ 
+  } ;  returnVal . draw = function (  ) { drawSprite ( sprSawblade , getFrames (  )  / 2 , x - camx , y - camy )  ; 
+drawLight ( sprLightIce , 0 , x - camx , y - camy , 0 , 0 , 0.125 , 0.125 )  ; 
+ } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  return squirrelClassFunction; })()) ; 
-Livewire =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = PathCrawler;  return squirrelClassFunction; })()) ; 
+Livewire =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -2679,28 +3388,22 @@ y -= 1.0 ;
   } 
   
   if ( frozen )  { 
-  if ( gvPlayer )  if ( icebox ==  - 1 &&  ! hitTest ( shape , gvPlayer . shape )  )  { 
+  var canice = true ;
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
+ 
+  if ( icebox ==  - 1 && canice )  { 
   if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
  
   } 
   
-  
- drawSpriteEx ( sprLivewire , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- if ( frozen <= 120 )  { 
-  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
- 
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
-  } 
-  
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
   } 
   
   else  { 
   if ( icebox !=  - 1 )  { 
- mapDeleteSolid ( icebox )  ; 
-newActor ( IceChunks , x , y )  ; 
+ newActor ( IceChunks , x , y )  ; 
+mapDeleteSolid ( icebox )  ; 
 icebox =  - 1 ; 
  if ( gvPlayer )  if ( x > gvPlayer . x ) flip = true ; 
  
@@ -2709,8 +3412,7 @@ icebox =  - 1 ;
   
   } 
   
- drawSpriteEx ( sprLivewire , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- } 
+  } 
   
   } 
   
@@ -2719,19 +3421,11 @@ icebox =  - 1 ;
 frame += 0.01 * squishTime ; 
  if ( squishTime >= 180 )  { 
  die (  )  ; 
-fireWeapon ( ExplodeT , x , y , 0 , id )  ; 
-fireWeapon ( ExplodeT , x , y + 24 , 0 , id )  ; 
-fireWeapon ( ExplodeT , x , y - 24 , 0 , id )  ; 
-fireWeapon ( ExplodeT , x + 24 , y , 0 , id )  ; 
-fireWeapon ( ExplodeT , x - 24 , y , 0 , id )  ; 
-fireWeapon ( ExplodeT , x + 20 , y + 20 , 0 , id )  ; 
-fireWeapon ( ExplodeT , x + 20 , y - 20 , 0 , id )  ; 
-fireWeapon ( ExplodeT , x - 20 , y + 20 , 0 , id )  ; 
-fireWeapon ( ExplodeT , x - 20 , y - 20 , 0 , id )  ; 
-fireWeapon ( ExplodeT , x + 20 , y - 20 , 0 , id )  ; 
+ var c = fireWeapon ( ExplodeT2 , x , y , 0 , id )  ;
+ c . power = 4.0 ; 
  } 
   
- drawSpriteEx ( sprLivewire , wrap ( frame , 4 , 7 )  , x - camx , y - camy , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ drawSprite ( sprLivewire , wrap ( frame , 4 , 7 )  , x - camx , y - camy , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  if ( frozen )  { 
  squish = false ; 
 squishTime = 0 ; 
@@ -2745,15 +3439,29 @@ setDrawColor ( 0xff0000ff )  ;
  
   } 
   
-  } ;  returnVal . hurtPlayer = function ( target ) {  if ( squish )  return ; 
+  } ;  returnVal . draw = function (  ) {  if ( squish ) drawSprite ( sprLivewire , wrap ( frame , 4 , 7 )  , x - camx , y - camy , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else  if ( frozen )  { 
+ drawSprite ( sprLivewire , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ if ( frozen <= 120 )  { 
+  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
+ 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
   
-  baseMethods . hurtPlayer  ( target )  ; 
- } ;  returnVal . hurtBlast = function (  ) {  if ( squish )  return ; 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else drawSprite ( sprLivewire , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  
+  } ;  returnVal . hurtBlast = function (  ) {  if ( squish )  return ; 
   
   if ( frozen ) frozen = 0 ; 
  
- popSound ( sndFizz , 0 )  ; 
- if ( icebox !=  - 1 )  { 
+  if ( icebox !=  - 1 )  { 
  mapDeleteSolid ( icebox )  ; 
 newActor ( IceChunks , x , y )  ; 
  } 
@@ -2761,13 +3469,13 @@ newActor ( IceChunks , x , y )  ;
  squish = true ; 
  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( squish )  return ; 
   
-  if ( _blast )  { 
- hurtBlast (  )  ; 
+  if ( _element == "ice" )  { 
+ hurtIce (  )  ; 
  return ; 
   } 
   
-  if ( _element == "ice" )  { 
- hurtIce (  )  ; 
+  if ( _blast )  { 
+ hurtBlast (  )  ; 
  return ; 
   } 
   
@@ -2775,13 +3483,13 @@ newActor ( IceChunks , x , y )  ;
   
  popSound ( sndFizz , 0 )  ; 
  if ( _stomp )  { 
-  if ( getcon ( "jump" , "hold" )  ) gvPlayer . vspeed =  - 8 ; 
+  if ( getcon ( "jump" , "hold" )  ) _by . vspeed =  - 8 ; 
  
-  else gvPlayer . vspeed =  - 4 ; 
+  else _by . vspeed =  - 4 ; 
  
-  if ( gvPlayer . anim == gvPlayer . anJumpT || gvPlayer . anim == gvPlayer . anFall )  { 
- gvPlayer . anim = gvPlayer . anJumpU ; 
-gvPlayer . frame = gvPlayer . anJumpU [ 0 ]  ; 
+  if ( _by . anim == "jumpT" || _by . anim == "fall" )  { 
+ _by . anim = "jumpU" ; 
+_by . frame = 0 ; 
  } 
   
   } 
@@ -2800,7 +3508,7 @@ newActor ( IceChunks , x , y )  ;
   } ;  returnVal . hurtIce = function (  ) { frozen = 120 ; 
  } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . burnt = false ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . burnt = false ; 
  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . flip = false ; 
  squirrelClassFunction . squish = false ; 
@@ -2808,8 +3516,8 @@ newActor ( IceChunks , x , y )  ;
  squirrelClassFunction . touchDamage = 2.0 ; 
  squirrelClassFunction . element = "shock" ; 
  squirrelClassFunction . damageMult =  { normal : 1.0 , fire : 0.0 , ice : 1.0 , earth : 1.0 , air : 1.0 , toxic : 1.0 , shock : 0.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 , star : 10.0 }  ; 
- return squirrelClassFunction; })()) ; 
-Blazeborn =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Blazeborn =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -2820,7 +3528,7 @@ Blazeborn =  ((function(){ let squirrelClassFunction = function ( ) { var return
  returnVal . smart = false ; 
  returnVal . moving = false ; 
  returnVal . element = "fire" ; 
- returnVal . touchDamage = 2.0 ; 
+ returnVal . touchDamage = 4.0 ; 
  returnVal . sharpTop = true ; 
  returnVal . sharpSide = true ; 
  
@@ -2829,7 +3537,7 @@ Blazeborn =  ((function(){ let squirrelClassFunction = function ( ) { var return
 
    (baseConstructor.bind(this))  ( _x . tofloat (  )  , _y . tofloat (  )  )  ; 
 shape = Rec ( x , y , 6 , 6 , 0 )  ; 
-smart = _arr ; 
+smart = bool ( _arr )  ; 
  } ;  returnVal . physics = function (  ) {  } ;  returnVal . animation = function (  ) {  } ;  returnVal . routine = function (  ) {  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
  if ( active )  { 
   if (  ! moving )  if ( gvPlayer )  if ( x > gvPlayer . x )  { 
@@ -2900,18 +3608,45 @@ y -= 1.0 ;
   } 
   
   if ( frozen )  { 
-  if ( gvPlayer )  if ( icebox ==  - 1 &&  ! hitTest ( shape , gvPlayer . shape )  )  { 
  newActor ( Flame , x , y - 1 )  ; 
 die (  )  ; 
 popSound ( sndFlame , 0 )  ; 
  } 
   
+  else  { 
+  if ( icebox !=  - 1 )  { 
+ newActor ( IceChunks , x , y )  ; 
+mapDeleteSolid ( icebox )  ; 
+icebox =  - 1 ; 
+ if ( gvPlayer )  if ( x > gvPlayer . x ) flip = true ; 
+ 
+  else flip = false ; 
+ 
   
-  if ( smart ) drawSpriteEx ( sprBlazeborn , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+  } 
+  
+  } 
+  
+  } 
+  
+  else  { 
+ squishTime += 0.025 ; 
+ if ( squishTime >= 1 )  if ( smart ) drawSprite ( sprBlazeborn , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  
-  else drawSpriteEx ( sprBlazeborn , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+  else drawSprite ( sprBlazeborn , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  
-  if ( frozen <= 120 )  { 
+  
+  } 
+  
+ shape . setPos ( x , y )  ; 
+setDrawColor ( 0xff0000ff )  ; 
+ if ( debug ) shape . draw (  )  ; 
+ 
+  } 
+  
+  } ;  returnVal . draw = function (  ) {  if ( frozen )  { 
+ drawSprite ( sprBlazeborn , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ if ( frozen <= 120 )  { 
   if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
  
   else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
@@ -2922,78 +3657,46 @@ popSound ( sndFlame , 0 )  ;
  
   } 
   
-  else  { 
-  if ( icebox !=  - 1 )  { 
- mapDeleteSolid ( icebox )  ; 
-newActor ( IceChunks , x , y )  ; 
-icebox =  - 1 ; 
- if ( gvPlayer )  if ( x > gvPlayer . x ) flip = true ; 
+  else drawSprite ( sprBlazeborn , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  
-  else flip = false ; 
- 
-  
-  } 
-  
-  if ( smart ) drawSpriteEx ( sprBlazeborn , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  else drawSpriteEx ( sprBlazeborn , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  } 
-  
-  } 
-  
-  else  { 
- squishTime += 0.025 ; 
- if ( squishTime >= 1 )  if ( smart ) drawSpriteEx ( sprDeathcap , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  else drawSpriteEx ( sprDeathcap , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  
-  } 
-  
- drawLightEx ( sprLightFire , 0 , x - camx , y - camy , randInt ( 360 )  , 0 , 0.5 + sin ( getFrames (  )  . tofloat (  )  / 2.5 )  * 0.05 , 0.5 + sin ( getFrames (  )  . tofloat (  )  / 2.5 )  * 0.05 )  ; 
-shape . setPos ( x , y )  ; 
-setDrawColor ( 0xff0000ff )  ; 
- if ( debug ) shape . draw (  )  ; 
- 
-  } 
-  
-  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _element == "fire" )  { 
- hurtFire (  )  ; 
- return ; 
-  } 
-  
-  if ( _element == "ice" )  { 
+ drawLight ( sprLightFire , 0 , x - camx , y - camy , randInt ( 360 )  , 0 , 0.5 + sin ( getFrames (  )  . tofloat (  )  / 2.5 )  * 0.05 , 0.5 + sin ( getFrames (  )  . tofloat (  )  / 2.5 )  * 0.05 )  ; 
+ } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _element == "ice" || _element == "water" )  { 
  hurtIce (  )  ; 
  return ; 
   } 
   
- hurtBlast (  )  ; 
- } ;  returnVal . hurtBlast = function (  ) { newActor ( Poof , x , y )  ; 
+  if ( _element == "fire" )  { 
+ hurtFire (  )  ; 
+ return ; 
+  } 
+  
+  if ( _mag > 0 ) hurtBlast (  )  ; 
+ 
+  } ;  returnVal . hurtBlast = function (  ) { newActor ( Poof , x , y )  ; 
 die (  )  ; 
 popSound ( sndFlame , 0 )  ; 
  if ( icebox !=  - 1 ) mapDeleteSolid ( icebox )  ; 
  
   } ;  returnVal . hurtFire = function (  ) { die (  )  ; 
-fireWeapon ( ExplodeF , x , y , 2 , id )  ; 
+fireWeapon ( ExplodeF2 , x , y , 2 , id )  ; 
 newActor ( Flame , x , y - 1 )  ; 
  } ;  returnVal . hurtIce = function (  ) { newActor ( Poof , x , y )  ; 
 die (  )  ; 
  } ;  returnVal . _typeof = function (  ) {  return "Blazeborn" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . flip = false ; 
  squirrelClassFunction . squish = false ; 
  squirrelClassFunction . squishTime = 0.0 ; 
  squirrelClassFunction . smart = false ; 
  squirrelClassFunction . moving = false ; 
  squirrelClassFunction . element = "fire" ; 
- squirrelClassFunction . touchDamage = 2.0 ; 
+ squirrelClassFunction . touchDamage = 4.0 ; 
  squirrelClassFunction . sharpTop = true ; 
  squirrelClassFunction . sharpSide = true ; 
- return squirrelClassFunction; })()) ; 
-Wildcap =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Wildcap =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -3010,7 +3713,7 @@ Wildcap =  ((function(){ let squirrelClassFunction = function ( ) { var returnVa
 
    (baseConstructor.bind(this))  ( _x . tofloat (  )  , _y . tofloat (  )  )  ; 
 shape = Rec ( x , y , 6 , 6 , 0 )  ; 
-smart = _arr ; 
+smart = bool ( _arr )  ; 
  } ;  returnVal . routine = function (  ) {  } ;  returnVal . animation = function (  ) {  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
  if ( active )  { 
   if (  ! moving )  if ( gvPlayer )  if ( x > gvPlayer . x )  { 
@@ -3081,25 +3784,16 @@ y -= 1.0 ;
   } 
   
   if ( frozen )  { 
-  if ( gvPlayer )  if ( icebox ==  - 1 &&  ! hitTest ( shape , gvPlayer . shape )  )  { 
+  var canice = true ;
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
+ 
+  if ( icebox ==  - 1 && canice )  { 
   if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
  
   } 
   
-  
-  if ( smart ) drawSpriteEx ( sprWildcap , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  else drawSpriteEx ( sprWildcap , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  if ( frozen <= 120 )  { 
-  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
- 
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
-  } 
-  
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
   } 
   
   else  { 
@@ -3114,10 +3808,6 @@ icebox =  - 1 ;
   
   } 
   
-  if ( smart ) drawSpriteEx ( sprWildcap , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  else drawSpriteEx ( sprWildcap , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
   } 
   
   } 
@@ -3125,10 +3815,6 @@ icebox =  - 1 ;
   else  { 
  squishTime += 0.025 ; 
  if ( squishTime >= 1 ) die (  )  ; 
- 
-  if ( smart ) drawSpriteEx ( sprWildcap , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  else drawSpriteEx ( sprWildcap , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  
   } 
   
@@ -3139,10 +3825,25 @@ icebox =  - 1 ;
  
   } 
   
-  } ;  returnVal . hurtPlayer = function ( target ) {  if ( squish )  return ; 
+  } ;  returnVal . draw = function (  ) {  if ( frozen )  { 
+ drawSprite ( sprWildcap , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ if ( frozen <= 120 )  { 
+  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
+ 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
   
-  baseMethods . hurtPlayer  ( target )  ; 
- } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( squish )  return ; 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else  if ( squish ) drawSprite ( sprWildcap , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else drawSprite ( sprWildcap , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  
+  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( squish )  return ; 
   
   if ( _blast )  { 
  hurtblast (  )  ; 
@@ -3166,17 +3867,17 @@ popSound ( sndFlame , 0 )  ;
  return ; 
   } 
   
-  if ( gvPlayer . rawin ( "anSlide" )  )  { 
-  if ( gvPlayer . anim == gvPlayer . anSlide && hitTest ( shape , gvPlayer . shape )  )  { 
- gvPlayer . hurt = 1 ; 
+  if (  ( (_by[ ( "anim" ) ] !== undefined) )  )  { 
+  if ( _by . anim == "slide" && hitTest ( shape , _by . shape )  )  { 
+ _by . hurt = 1 ; 
  var c = newActor ( DeadNME , x , y )  ;
   if ( smart ) actor [ c ]  . sprite = sprWildcap ; 
  
   else actor [ c ]  . sprite = sprWildcap ; 
  
- actor [ c ]  . vspeed = min (  - fabs ( gvPlayer . hspeed )  ,  - 4 )  ; 
-actor [ c ]  . hspeed =  ( gvPlayer . hspeed / 16 )  ; 
-actor [ c ]  . spin =  ( gvPlayer . hspeed * 7 )  ; 
+ actor [ c ]  . vspeed = min (  - fabs ( _by . hspeed )  ,  - 4 )  ; 
+actor [ c ]  . hspeed =  ( _by . hspeed / 16 )  ; 
+actor [ c ]  . spin =  ( _by . hspeed * 7 )  ; 
 actor [ c ]  . angle = 180 ; 
 die (  )  ; 
 popSound ( sndKick , 0 )  ; 
@@ -3205,9 +3906,11 @@ popSound ( sndKick , 0 )  ;
   
   else popSound ( sndSquish , 0 )  ; 
  
- squish = true ; 
-blinking = 120 ; 
- } ;  returnVal . hurtblast = function (  ) {  var c = newActor ( DeadNME , x , y )  ;
+  if ( _mag > 0 ) squish = true ; 
+ 
+  if ( _mag > 0 ) blinking = 120 ; 
+ 
+  } ;  returnVal . hurtblast = function (  ) {  var c = newActor ( DeadNME , x , y )  ;
   if ( smart ) actor [ c ]  . sprite = sprWildcap ; 
  
   else actor [ c ]  . sprite = sprWildcap ; 
@@ -3232,15 +3935,15 @@ popSound ( sndFlame , 0 )  ;
  } ;  returnVal . _typeof = function (  ) {  return "Wildcap" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . flip = false ; 
  squirrelClassFunction . squish = false ; 
  squirrelClassFunction . squishTime = 0.0 ; 
  squirrelClassFunction . smart = false ; 
  squirrelClassFunction . moving = false ; 
  squirrelClassFunction . touchDamage = 4.0 ; 
- return squirrelClassFunction; })()) ; 
-Tallcap =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Tallcap =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -3257,7 +3960,7 @@ Tallcap =  ((function(){ let squirrelClassFunction = function ( ) { var returnVa
 
    (baseConstructor.bind(this))  ( _x . tofloat (  )  , _y . tofloat (  )  )  ; 
 shape = Rec ( x , y , 6 , 14 , 0 , 0 ,  - 6 )  ; 
-smart = _arr ; 
+smart = bool ( _arr )  ; 
  } ;  returnVal . routine = function (  ) {  } ;  returnVal . animation = function (  ) {  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
  if ( active )  { 
   if (  ! moving )  if ( gvPlayer )  if ( x > gvPlayer . x )  { 
@@ -3328,25 +4031,16 @@ y -= 1.0 ;
   } 
   
   if ( frozen )  { 
-  if ( gvPlayer )  if ( icebox ==  - 1 &&  ! hitTest ( shape , gvPlayer . shape )  )  { 
+  var canice = true ;
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
+ 
+  if ( icebox ==  - 1 && canice )  { 
   if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
  
   } 
   
-  
-  if ( smart ) drawSpriteEx ( sprSmartTallCap , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  else drawSpriteEx ( sprTallCap , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  if ( frozen <= 120 )  { 
-  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapTall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 7 )  ; 
- 
-  else drawSprite ( sprIceTrapTall , 0 , x - camx , y - camy - 7 )  ; 
- 
-  } 
-  
-  else drawSprite ( sprIceTrapTall , 0 , x - camx , y - camy - 7 )  ; 
- 
   } 
   
   else  { 
@@ -3361,35 +4055,39 @@ icebox =  - 1 ;
   
   } 
   
-  if ( smart ) drawSpriteEx ( sprSmartTallCap , getFrames (  )  / 8 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  else drawSpriteEx ( sprTallCap , getFrames (  )  / 8 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
   } 
   
   } 
   
-  else  { 
- squishTime += 0.025 ; 
- if ( squishTime >= 1 ) die (  )  ; 
+  } 
+  
+  } ;  returnVal . draw = function (  ) {  if ( frozen )  { 
+  if ( smart ) drawSprite ( sprSmartTallCap , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  
-  if ( smart ) drawSpriteEx ( sprSmartTallCap , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+  else drawSprite ( sprTallCap , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
  
-  else drawSpriteEx ( sprTallCap , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+  if ( frozen <= 120 )  { 
+  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapTall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 7 )  ; 
+ 
+  else drawSprite ( sprIceTrapTall , 0 , x - camx , y - camy - 7 )  ; 
  
   } 
+  
+  else drawSprite ( sprIceTrapTall , 0 , x - camx , y - camy - 7 )  ; 
+ 
+  } 
+  
+  else  if ( smart ) drawSprite ( sprSmartTallCap , getFrames (  )  / 8 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else drawSprite ( sprTallCap , getFrames (  )  / 8 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
   
   if (  ! squish ) shape . setPos ( x , y )  ; 
  
  setDrawColor ( 0xff0000ff )  ; 
  if ( debug ) shape . draw (  )  ; 
  
-  } 
-  
-  } ;  returnVal . hurtPlayer = function ( target ) {  if ( squish )  return ; 
-  
-  baseMethods . hurtPlayer  ( target )  ; 
- } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( squish )  return ; 
+  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( squish )  return ; 
   
   if ( _element == "ice" )  { 
  frozen = 600 ; 
@@ -3397,9 +4095,11 @@ icebox =  - 1 ;
   } 
   
  die (  )  ; 
-squish = true ; 
-blinking = 120 ; 
- } ;  returnVal . hurtblast = function (  ) {  var c = newActor ( DeadNME , x , y )  ;
+ if ( _mag > 0 ) squish = true ; 
+ 
+  if ( _mag > 0 ) blinking = 120 ; 
+ 
+  } ;  returnVal . hurtblast = function (  ) {  var c = newActor ( DeadNME , x , y )  ;
   if ( smart ) actor [ c ]  . sprite = sprSmartTallCap ; 
  
   else actor [ c ]  . sprite = sprTallCap ; 
@@ -3436,15 +4136,300 @@ popSound ( sndSquish , 0 )  ;
  } ;  returnVal . _typeof = function (  ) {  return "Tallcap" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . flip = false ; 
  squirrelClassFunction . squish = false ; 
  squirrelClassFunction . squishTime = 0.0 ; 
  squirrelClassFunction . smart = false ; 
  squirrelClassFunction . moving = false ; 
  squirrelClassFunction . touchDamage = 2.0 ; 
- return squirrelClassFunction; })()) ; 
-Owl =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Ivy =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+     if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
+         squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
+ } 
+ returnVal . frame = 0.0 ; 
+ returnVal . flip = false ; 
+ returnVal . squish = false ; 
+ returnVal . squishTime = 0.0 ; 
+ returnVal . smart = false ; 
+ returnVal . moving = false ; 
+ returnVal . touchDamage = 4.0 ; 
+ returnVal . element = "toxic" ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   (baseConstructor.bind(this))  ( _x . tofloat (  )  , _y . tofloat (  )  )  ; 
+shape = Rec ( x , y , 6 , 6 , 0 )  ; 
+ if (  squirrelTypeOf ( _arr )  == "array" && _arr . len (  )  > 0 ) smart = bool ( _arr [ 0 ]  )  ; 
+ 
+  else  if ( _arr == null ||  (  ( (_arr[ ( "len" ) ] !== undefined) )  && _arr . len (  )  == 0 )  ) smart = bool ( _arr )  ; 
+ 
+  else smart = false ; 
+ 
+  
+  } ;  returnVal . routine = function (  ) {  } ;  returnVal . animation = function (  ) {  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
+ if ( active )  { 
+  if (  ! moving )  { 
+  if ( gvPlayer && x > gvPlayer . x ) flip = true ; 
+ 
+ moving = true ; 
+ } 
+  
+  if (  ! squish )  { 
+  if ( placeFree ( x , y + 1 )  ) vspeed += 0.1 ; 
+ 
+  if ( vspeed > 0.2 ) vspeed = 0.2 ; 
+ 
+  if ( placeFree ( x , y + vspeed )  ) y += vspeed ; 
+ 
+  else vspeed /= 2 ; 
+ 
+  if ( y > gvMap . h + 8 ) die (  )  ; 
+ 
+  if (  ! frozen )  { 
+  if ( flip )  { 
+  if ( placeFree ( x - 1 , y )  ) x -= 1.0 ; 
+ 
+  else  if ( placeFree ( x - 2 , y - 2 )  )  { 
+ x -= 1.0 ; 
+y -= 1.0 ; 
+ } 
+  
+  else  if ( placeFree ( x - 1 , y - 2 )  )  { 
+ x -= 1.0 ; 
+y -= 1.0 ; 
+ } 
+  
+  else flip = false ; 
+ 
+  
+  
+  if ( smart )  if ( placeFree ( x - 6 , y + 14 )  &&  ! placeFree ( x , y + 2 )  ) flip = false ; 
+ 
+  
+  if ( x <= 0 ) flip = false ; 
+ 
+  } 
+  
+  else  { 
+  if ( placeFree ( x + 1 , y )  ) x += 1.0 ; 
+ 
+  else  if ( placeFree ( x + 1 , y - 1 )  )  { 
+ x += 1.0 ; 
+y -= 1.0 ; 
+ } 
+  
+  else  if ( placeFree ( x + 2 , y - 2 )  )  { 
+ x += 1.0 ; 
+y -= 1.0 ; 
+ } 
+  
+  else flip = true ; 
+ 
+  
+  
+  if ( smart )  if ( placeFree ( x + 6 , y + 14 )  &&  ! placeFree ( x , y + 2 )  ) flip = true ; 
+ 
+  
+  if ( x >= gvMap . w ) flip = true ; 
+ 
+  } 
+  
+  } 
+  
+  if ( frozen )  { 
+  var canice = true ;
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
+ 
+  if ( icebox ==  - 1 && canice )  { 
+  if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
+ 
+  } 
+  
+  } 
+  
+  else  { 
+  if ( icebox !=  - 1 )  { 
+ newActor ( IceChunks , x , y )  ; 
+mapDeleteSolid ( icebox )  ; 
+icebox =  - 1 ; 
+ if ( gvPlayer )  if ( x > gvPlayer . x ) flip = true ; 
+ 
+  else flip = false ; 
+ 
+  
+  } 
+  
+  } 
+  
+  } 
+  
+  else  { 
+ squishTime += 0.025 ; 
+ if ( squishTime >= 1 ) die (  )  ; 
+ 
+  } 
+  
+  if (  ! squish ) shape . setPos ( x , y )  ; 
+ 
+ setDrawColor ( 0xff0000ff )  ; 
+ if ( debug ) shape . draw (  )  ; 
+ 
+  } 
+  
+  } ;  returnVal . draw = function (  ) {  if (  ! active )  return ; 
+  
+  if (  ! squish )  { 
+  if ( frozen )  { 
+  if ( smart ) drawSprite ( sprIvyRed , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else drawSprite ( sprIvyGreen , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  if ( frozen <= 120 )  { 
+  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
+ 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else  { 
+  if ( smart )  { 
+  if ( placeFree ( x , y + 2 )  ) drawSprite ( sprIvyRed , wrap ( getFrames (  )  / 8 , 4 , 7 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else drawSprite ( sprIvyRed , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  } 
+  
+  else  { 
+  if ( placeFree ( x , y + 2 )  ) drawSprite ( sprIvyGreen , wrap ( getFrames (  )  / 8 , 4 , 7 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else drawSprite ( sprIvyGreen , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  } 
+  
+  } 
+  
+  } 
+  
+  else  { 
+  if ( smart ) drawSprite ( sprIvyRed , floor ( 9.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else drawSprite ( sprIvyGreen , floor ( 9.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  } 
+  
+  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( squish )  return ; 
+  
+  if ( _element == "ice" )  { 
+ frozen = 600 ; 
+ return ; 
+  } 
+  
+  if ( _blast )  { 
+ hurtblast (  )  ; 
+ return ; 
+  } 
+  
+  if ( _element == "fire" )  { 
+ newActor ( Flame , x , y - 1 )  ; 
+die (  )  ; 
+popSound ( sndFlame , 0 )  ; 
+ if ( randInt ( 20 )  == 0 )  { 
+  var a = actor [ newActor ( MuffinBlue , x , y )  ]  ;
+ a . vspeed =  - 2 ; 
+ } 
+  
+  return ; 
+  } 
+  
+  if (  ( (_by[ ( "anim" ) ] !== undefined) )  )  { 
+  if ( _by . anim == "slide" && hitTest ( shape , _by . shape )  )  { 
+  var c = newActor ( DeadNME , x , y )  ;
+  if ( smart ) actor [ c ]  . sprite = sprIvyRed ; 
+ 
+  else actor [ c ]  . sprite = sprIvyGreen ; 
+ 
+ actor [ c ]  . vspeed = min (  - fabs ( _by . hspeed )  ,  - 4 )  ; 
+actor [ c ]  . hspeed =  ( _by . hspeed / 16 )  ; 
+actor [ c ]  . spin =  ( _by . hspeed * 7 )  ; 
+actor [ c ]  . angle = 180 ; 
+actor [ c ]  . frame = 8 ; 
+die (  )  ; 
+popSound ( sndKick , 0 )  ; 
+ return ; 
+  } 
+  
+  } 
+  
+  if (  ! _stomp && _mag > 0 )  { 
+  var c = newActor ( DeadNME , x , y )  ;
+  if ( smart ) actor [ c ]  . sprite = sprIvyRed ; 
+ 
+  else actor [ c ]  . sprite = sprIvyGreen ; 
+ 
+ actor [ c ]  . vspeed =  - 4.0 ; 
+actor [ c ]  . spin = 4 ; 
+actor [ c ]  . angle = 180 ; 
+actor [ c ]  . frame = 8 ; 
+die (  )  ; 
+popSound ( sndKick , 0 )  ; 
+ if ( randInt ( 20 )  == 0 )  { 
+  var a = actor [ newActor ( MuffinBlue , x , y )  ]  ;
+ a . vspeed =  - 2 ; 
+ } 
+  
+  } 
+  
+  else popSound ( sndSquish , 0 )  ; 
+ 
+  if ( _mag > 0 ) squish = true ; 
+ 
+  if ( _mag > 0 ) blinking = 120 ; 
+ 
+  } ;  returnVal . hurtblast = function (  ) {  var c = newActor ( DeadNME , x , y )  ;
+  if ( smart ) actor [ c ]  . sprite = sprIvyRed ; 
+ 
+  else actor [ c ]  . sprite = sprIvyGreen ; 
+ 
+ actor [ c ]  . vspeed =  - 4 ; 
+actor [ c ]  . hspeed =  ( 4 / 16 )  ; 
+actor [ c ]  . spin =  ( 4 * 7 )  ; 
+actor [ c ]  . angle = 180 ; 
+actor [ c ]  . frame = 8 ; 
+die (  )  ; 
+popSound ( sndKick , 0 )  ; 
+ if ( icebox !=  - 1 ) mapDeleteSolid ( icebox )  ; 
+ 
+  } ;  returnVal . hurtFire = function (  ) { newActor ( Flame , x , y - 1 )  ; 
+die (  )  ; 
+popSound ( sndFlame , 0 )  ; 
+ if ( randInt ( 20 )  == 0 )  { 
+  var a = actor [ newActor ( MuffinBlue , x , y )  ]  ;
+ a . vspeed =  - 2 ; 
+ } 
+  
+  } ;  returnVal . hurtIce = function (  ) { frozen = 600 ; 
+ } ;  returnVal . _typeof = function (  ) {  return "Ivy" ;
+  } ; 
+ } 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ squirrelClassFunction . flip = false ; 
+ squirrelClassFunction . squish = false ; 
+ squirrelClassFunction . squishTime = 0.0 ; 
+ squirrelClassFunction . smart = false ; 
+ squirrelClassFunction . moving = false ; 
+ squirrelClassFunction . touchDamage = 4.0 ; 
+ squirrelClassFunction . element = "toxic" ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Owl =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -3452,14 +4437,17 @@ Owl =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = 
  returnVal . pyOffset = 0 ; 
  returnVal . pid = 0 ; 
  returnVal . touchDamage = 2.0 ; 
- returnVal . health = 4.0 ; 
+ returnVal . health = 3.0 ; 
  returnVal . flip = 0 ; 
  returnVal . canMoveH = true ; 
  returnVal . canMoveV = true ; 
  returnVal . freezeSprite = sprIceTrapLarge ; 
  returnVal . nocount = true ; 
- returnVal . blinkMax = 2 ; 
- returnVal . damageMult =  { normal : 1.0 , fire : 2.0 , ice : 1.0 , earth : 1.0 , air : 1.0 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 }  ; 
+ returnVal . blinkMax = 30 ; 
+ returnVal . target = null ; 
+ returnVal . minFreezeTime = 300 ; 
+ returnVal . mspeed = 1.0 ; 
+ returnVal . damageMult =  { normal : 1.0 , fire : 2.0 , ice : 0.0 , earth : 2.0 , air : 0.5 , toxic : 1.0 , shock : 2.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 }  ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
@@ -3471,28 +4459,30 @@ hspeed = 0.5 ;
  
   if (  squirrelTypeOf ( _arr )  == "array" ) arg = _arr ; 
  
-  var narg = clone ( arg )  ;
-  if ( (narg[0] !== undefined) ) narg . remove ( 0 )  ; 
+  var narg =  window.clone(  ( arg ) )  ;
+  if (  ( (narg[ ( 0 ) ] !== undefined) )  ) narg . remove ( 0 )  ; 
  
-  if ( (arg[0] !== undefined) )  { 
+  if (  ( (arg[ ( 0 ) ] !== undefined) )  )  { 
   if ( getroottable (  )  . rawin ( arg [ 0 ]  )  )  { 
   if ( getroottable (  )  [ arg [ 0 ]  ]  . rawin ( "shape" )  ) passenger = actor [ newActor ( getroottable (  )  [ arg [ 0 ]  ]  , x , y , narg )  ]  ; 
  
-  else passenger = actor [ newActor ( MuffinEvil , x , y )  ]  ; 
+  else passenger = actor [ newActor ( SkyDive , x , y )  ]  ; 
  
   } 
   
-  else passenger = actor [ newActor ( MuffinEvil , x , y )  ]  ; 
+  else passenger = actor [ newActor ( SkyDive , x , y )  ]  ; 
  
   } 
   
-  else passenger = actor [ newActor ( MuffinEvil , x , y )  ]  ; 
+  else passenger = actor [ newActor ( SkyDive , x , y )  ]  ; 
  
  pyOffset = passenger . shape . h ; 
 pid = passenger . id ; 
 shape = Rec ( x , y , 8 , 12 , 0 )  ; 
 routine = ruCarry ; 
- } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
+mspeed = 2 + game . difficulty ; 
+ } ;  returnVal . run = function (  ) { target = findPlayer (  )  ; 
+ baseMethods . run  (  )  ; 
  if (  ! active )  if ( checkActor ( pid )  )  { 
  passenger . x = x ; 
 passenger . y = y + pyOffset + 12 ; 
@@ -3501,6 +4491,33 @@ passenger . y = y + pyOffset + 12 ;
  passenger . vspeed = 0.0 ; 
  } 
   
+  
+  if ( frozen )  { 
+  var canice = true ;
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
+ 
+  if ( icebox ==  - 1 && canice )  { 
+  if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
+ 
+  } 
+  
+  } 
+  
+  else  { 
+  if ( icebox !=  - 1 )  { 
+ newActor ( IceChunks , x , y )  ; 
+mapDeleteSolid ( icebox )  ; 
+icebox =  - 1 ; 
+ if ( gvPlayer )  if ( x > gvPlayer . x ) flip = true ; 
+ 
+  else flip = false ; 
+ 
+  
+  } 
+  
+  } 
   
   } ;  returnVal . physics = function (  ) {  var tempShape = shape ;
  canMoveH =  !  ( frozen > 0 )  ; 
@@ -3540,41 +4557,51 @@ passenger . y = y + pyOffset + 12 ;
  
   if ( hspeed < 0 ) flip = 1 ; 
  
-  if ( gvPlayer &&  ! placeFree ( x , y )  )  { 
-  if ( x < gvPlayer . x ) flip = 0 ; 
+  if ( target &&  ! placeFree ( x , y )  )  { 
+  if ( x < target . x ) flip = 0 ; 
  
-  if ( x > gvPlayer . x ) flip = 1 ; 
+  if ( x > target . x ) flip = 1 ; 
  
   } 
   
- drawSpriteExZ ( 1 , sprOwlBrown , wrap ( getFrames (  )  / 6 , 1 , 4 )  , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
+  } 
+  
+  } ;  returnVal . draw = function (  ) {  if ( frozen )  { 
+ drawSpriteZ ( 1 , sprOwlBrown , 0 , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
+drawSpriteZ ( 1 , sprIceTrapSmall , 0 , x - camx , y - camy , 0 , 0 , 1 , 1 , 1 )  ; 
  } 
   
-  else drawSpriteExZ ( 1 , sprOwlBrown , 0 , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
+  else drawSpriteZ ( 1 , sprOwlBrown , wrap ( getFrames (  )  / 4 , 1 , 4 )  , x - camx , y - camy , 0 , flip , 1 , 1 ,  ( blinking ? blinking / 10.0 : 1 )  )  ; 
  
-  } ;  returnVal . ruCarry = function (  ) {  if ( gvPlayer )  { 
-  if ( x > gvPlayer . x && hspeed >  - 3 ) hspeed -= 0.05 ; 
+  } ;  returnVal . ruCarry = function (  ) {  if ( target != null )  { 
+  if ( x > target . x && hspeed >  - mspeed ) hspeed -= 0.05 ; 
  
-  if ( x < gvPlayer . x && hspeed < 3 ) hspeed += 0.05 ; 
+  if ( x < target . x && hspeed < mspeed ) hspeed += 0.05 ; 
  
-  if ( y > gvPlayer . y - 64 && vspeed >  - 1 ) vspeed -= 0.05 ; 
+  if ( y > target . y - 64 && vspeed >  - 1 ) vspeed -= 0.05 ; 
  
-  if ( y < gvPlayer . y - 64 && vspeed < 1 ) vspeed += 0.05 ; 
+  if ( y < target . y - 64 && vspeed < 1 ) vspeed += 0.05 ; 
  
-  if ( distance2 ( x , y , gvPlayer . x , gvPlayer . y )  <= 96 && y < gvPlayer . y && abs ( x - gvPlayer . x )  < 8 ) pid =  - 1 ; 
- 
+  if ( distance2 ( x , y , target . x , target . y )  <= 96 && y < target . y && abs ( x - target . x )  < 8 && checkActor ( pid )  )  { 
+ actor [ pid ]  . held = false ; 
+pid =  - 1 ; 
+popSound ( sndDrop )  ; 
+ } 
+  
   } 
   
+  if ( checkActor ( pid )  &&  ( (actor [ pid ] [ ( "held" ) ] !== undefined) )  ) actor [ pid ]  . held = true ; 
+ 
   if (  ! checkActor ( pid )  ) routine = ruFlee ; 
  
-  } ;  returnVal . ruFlee = function (  ) {  if ( gvPlayer )  { 
-  if ( x < gvPlayer . x && hspeed >  - 3 ) hspeed -= 0.05 ; 
+  } ;  returnVal . ruFlee = function (  ) {  if ( target )  { 
+  if ( x < target . x && hspeed >  - 3 ) hspeed -= 0.05 ; 
  
-  if ( x > gvPlayer . x && hspeed < 3 ) hspeed += 0.05 ; 
+  if ( x > target . x && hspeed < 3 ) hspeed += 0.05 ; 
  
-  if ( y < gvPlayer . y && vspeed >  - 1 ) vspeed -= 0.05 ; 
+  if ( y < target . y && vspeed >  - 1 ) vspeed -= 0.05 ; 
  
-  if ( y > gvPlayer . y && vspeed < 1 ) vspeed += 0.05 ; 
+  if ( y > target . y && vspeed < 1 ) vspeed += 0.05 ; 
  
   } 
   
@@ -3584,22 +4611,26 @@ passenger . y = y + pyOffset + 12 ;
 actor [ c ]  . vspeed =  - 5.0 ; 
 actor [ c ]  . spin = 30 ; 
 popSound ( sndKick , 0 )  ; 
+mapDeleteSolid ( icebox )  ; 
  } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . passenger = null ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . passenger = null ; 
  squirrelClassFunction . pyOffset = 0 ; 
  squirrelClassFunction . pid = 0 ; 
  squirrelClassFunction . touchDamage = 2.0 ; 
- squirrelClassFunction . health = 4.0 ; 
+ squirrelClassFunction . health = 3.0 ; 
  squirrelClassFunction . flip = 0 ; 
  squirrelClassFunction . canMoveH = true ; 
  squirrelClassFunction . canMoveV = true ; 
  squirrelClassFunction . freezeSprite = sprIceTrapLarge ; 
  squirrelClassFunction . nocount = true ; 
- squirrelClassFunction . blinkMax = 2 ; 
- squirrelClassFunction . damageMult =  { normal : 1.0 , fire : 2.0 , ice : 1.0 , earth : 1.0 , air : 1.0 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 }  ; 
- return squirrelClassFunction; })()) ; 
-MrIceguy =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction . blinkMax = 30 ; 
+ squirrelClassFunction . target = null ; 
+ squirrelClassFunction . minFreezeTime = 300 ; 
+ squirrelClassFunction . mspeed = 1.0 ; 
+ squirrelClassFunction . damageMult =  { normal : 1.0 , fire : 2.0 , ice : 0.0 , earth : 2.0 , air : 0.5 , toxic : 1.0 , shock : 2.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 }  ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+MrIceguy =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -3607,12 +4638,14 @@ MrIceguy =  ((function(){ let squirrelClassFunction = function ( ) { var returnV
  returnVal . slideTimer = 8 ; 
  returnVal . hurtTimer = 600 ; 
  returnVal . flip = 0 ; 
+ returnVal . freezeTime = 0 ; 
  returnVal . damageMult =  { normal : 1.0 , fire : 2.0 , ice : 0.0 , earth : 1.0 , air : 1.0 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 0.0 }  ; 
  returnVal . health = 2.0 ; 
  returnVal . touchDamage = 2.0 ; 
  returnVal . friction = 0.0 ; 
  returnVal . gravity = 0.15 ; 
  returnVal . held = false ; 
+ returnVal . target = null ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
@@ -3625,6 +4658,10 @@ routine = ruNormal ;
  } 
   
   else hspeed = 1.0 ; 
+ 
+  } ;  returnVal . run = function (  ) { target = findPlayer (  )  ; 
+ baseMethods . run  (  )  ; 
+ if ( sprMrIceguy != defMrIceguy ) element = "normal" ; 
  
   } ;  returnVal . physics = function (  ) {  if ( placeFree ( x , y +  (  squirrelThreeWaysCompare ( 0 , gravity )  )  )  &&  ! phantom ) vspeed += gravity ; 
  
@@ -3691,15 +4728,15 @@ yprev = y ;
  
   if ( hspeed < 0 ) flip = 1 ; 
  
-  if ( routine == ruNormal ) drawSpriteExZ ( 1 , sprMrIceguy ,  ( getFrames (  )  / 8 )  % 4 , x - camx , y - camy , 0 , flip , 1 , 1 , 1.0 )  ; 
- 
-  if ( routine == ruSlide ) drawSpriteExZ ( 1 , sprMrIceguy , 4 +  ( hurtTimer <= 30 )  . tointeger (  )  , x - camx , y - camy , 0 , flip , 1 , 1 , 1.0 )  ; 
- 
-  if ( debug ) shape . draw (  )  ; 
- 
   if ( y > gvMap . h + 32 ) die (  )  ; 
  
   if ( health < 2 ) health ++  ; 
+ 
+  } ;  returnVal . draw = function (  ) {  if ( routine == ruNormal ) drawSpriteZ ( 1 , sprMrIceguy ,  ( getFrames (  )  / 8 )  % 4 , x - camx , y - camy , 0 , flip , 1 , 1 , 1.0 )  ; 
+ 
+  if ( routine == ruSlide ) drawSpriteZ ( 1 , sprMrIceguy , 4 +  ( hurtTimer <= 30 )  . tointeger (  )  , x - camx , y - camy , 0 , flip , 1 , 1 , 1.0 )  ; 
+ 
+  if ( debug ) shape . draw (  )  ; 
  
   } ;  returnVal . ruNormal = function (  ) {  if ( flip && hspeed >  - 1.5 ) hspeed -= 0.5 ; 
  
@@ -3761,73 +4798,25 @@ health = 2.0 ;
  hspeed =  (  squirrelThreeWaysCompare ( x , gvPlayer . x )  )  . tofloat (  )  ; 
  } 
   
+  else  if ( gvPlayer2 )  { 
+ hspeed =  (  squirrelThreeWaysCompare ( x , gvPlayer2 . x )  )  . tofloat (  )  ; 
+ } 
+  
   else hspeed = 1.0 ; 
  
+  
   } 
   
   if (  ! held &&  (  (  ! placeFree ( x + hspeed , y )  &&  ! placeFree ( x + hspeed , y - 4 )  )  || x + hspeed < 0 || x + hspeed > gvMap . w )  )  { 
  flip =  (  ! flip )  . tointeger (  )  ; 
 fireWeapon ( StompPoof , x +  ( 10 *  (  squirrelThreeWaysCompare ( hspeed , 0 )  )  )  , y , 0 , id )  ; 
 hspeed =  - hspeed ; 
- if (  ! held && x > camx - 32 && x < camx + 32 + screenW (  )  && y > camy - 32 && y < camy + 32 + screenH (  )  ) popSound ( sndIceblock )  ; 
+ if (  ! held && isOnScreen (  )  ) popSound ( sndIceblock )  ; 
  
   } 
   
-  if ( gvPlayer )  { 
-  if ( hitTest ( shape , gvPlayer . shape )  && getcon ( "shoot" , "hold" )  &&  ( gvPlayer . holding == 0 || gvPlayer . holding == id )  && hspeed == 0 )  { 
- y = gvPlayer . y ; 
-flip = gvPlayer . flip ; 
- if ( flip == 0 ) x = gvPlayer . x + 10 ; 
+  if ( target && hspeed == 0 ) holdMe ( 4 )  ; 
  
-  else x = gvPlayer . x - 10 ; 
- 
- x += gvPlayer . hspeed ; 
-y += gvPlayer . vspeed ; 
-held = true ; 
-gvPlayer . holding = id ; 
- } 
-  
-  if ( gvPlayer . rawin ( "anSlide" )  && gvPlayer . anim == gvPlayer . anSlide && held )  { 
- gvPlayer . holding = 0 ; 
- if (  ! placeFree ( x , y )  )  { 
-  var escapedir =  squirrelThreeWaysCompare ( gvPlayer . x , x )  ;
-  while (  ! placeFree ( x , y )  ) x += escapedir ; 
- 
-  } 
-  
- held = false ; 
- } 
-  
-  if ( gvPlayer . rawin ( "anClimb" )  && gvPlayer . anim == gvPlayer . anClimb && held )  { 
- gvPlayer . holding = 0 ; 
- if (  ! placeFree ( x , y )  )  { 
-  var escapedir =  squirrelThreeWaysCompare ( gvPlayer . x , x )  ;
-  while (  ! placeFree ( x , y )  ) x += escapedir ; 
- 
-  } 
-  
- held = false ; 
- } 
-  
-  } 
-  
-  if (  ! getcon ( "shoot" , "hold" )  )  { 
-  if ( getcon ( "shoot" , "release" )  && getcon ( "up" , "hold" )  && held ) vspeed =  - 4.0 ; 
- 
-  if ( held && gvPlayer )  { 
- gvPlayer . holding = 0 ; 
-x += gvPlayer . hspeed * 2 ; 
- if (  ! placeFree ( x , y )  )  { 
-  var escapedir =  squirrelThreeWaysCompare ( gvPlayer . x , x )  ;
-  while (  ! placeFree ( x , y )  ) x += escapedir ; 
- 
-  } 
-  
-  } 
-  
- held = false ; 
- } 
-  
   if ( held )  { 
  blinking = 10 ; 
 slideTimer = 10 ; 
@@ -3853,7 +4842,8 @@ gravity =  - 0.1 ;
   else  if ( gvPlayer ) hspeed =  ( max ( 4.0 , fabs ( gvPlayer . hspeed * 1.5 )  )  )  *  (  squirrelThreeWaysCompare ( x , gvPlayer . x )  )  ; 
  
   
- popSound ( sndKick )  ; 
+ blinking = blinkMax ; 
+popSound ( sndKick )  ; 
  } 
   
   else  { 
@@ -3865,15 +4855,15 @@ popSound ( sndSquish )  ;
  
   } 
   
-  } ;  returnVal . hurtPlayer = function ( target ) {  if ( held )  return ; 
+  } ;  returnVal . hurtPlayer = function ( pt ) {  if ( held )  return ; 
   
   if ( slideTimer > 0 && hspeed != 0 && routine == ruSlide )  return ; 
   
-  if ( routine == ruSlide && gvPlayer . vspeed >= 0 )  { 
+  if ( routine == ruSlide && pt . vspeed >= 0 )  { 
   if ( hspeed == 0 || slideTimer > 0 )  { 
   if ( hspeed != 0 ) hspeed = 0.0 ; 
  
-  else  if ( gvPlayer ) hspeed =  ( max ( 4.0 , fabs ( gvPlayer . hspeed * 1.5 )  )  )  *  (  squirrelThreeWaysCompare ( x , gvPlayer . x )  )  ; 
+  else  if ( pt ) hspeed =  ( max ( 4.0 , fabs ( pt . hspeed * 1.5 )  )  )  *  (  squirrelThreeWaysCompare ( x , pt . x )  )  ; 
  
   
  slideTimer = 10 ; 
@@ -3886,22 +4876,27 @@ popSound ( sndKick )  ;
   if ( slideTimer <= 0 || routine == ruNormal )  baseMethods . hurtPlayer  ( target )  ; 
  
   } ;  returnVal . die = function (  ) {  baseMethods . die  (  )  ; 
-newActor ( IceChunks , x , y )  ; 
- } ;  returnVal . _typeof = function (  ) {  return "MrIceguy" ;
+ if ( element == "ice" ) newActor ( IceChunks , x , y )  ; 
+ 
+  else newActor ( Poof , x , y )  ; 
+ 
+  } ;  returnVal . _typeof = function (  ) {  return "MrIceguy" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . element = "ice" ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . element = "ice" ; 
  squirrelClassFunction . slideTimer = 8 ; 
  squirrelClassFunction . hurtTimer = 600 ; 
  squirrelClassFunction . flip = 0 ; 
+ squirrelClassFunction . freezeTime = 0 ; 
  squirrelClassFunction . damageMult =  { normal : 1.0 , fire : 2.0 , ice : 0.0 , earth : 1.0 , air : 1.0 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 0.0 }  ; 
  squirrelClassFunction . health = 2.0 ; 
  squirrelClassFunction . touchDamage = 2.0 ; 
  squirrelClassFunction . friction = 0.0 ; 
  squirrelClassFunction . gravity = 0.15 ; 
  squirrelClassFunction . held = false ; 
- return squirrelClassFunction; })()) ; 
-SpikeCap =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction . target = null ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+SpikeCap =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -3921,15 +4916,18 @@ SpikeCap =  ((function(){ let squirrelClassFunction = function ( ) { var returnV
 
    (baseConstructor.bind(this))  ( _x . tofloat (  )  , _y . tofloat (  )  )  ; 
 shape = Rec ( x , y , 6 , 6 , 0 )  ; 
-smart = _arr ; 
+smart = bool ( _arr )  ; 
  } ;  returnVal . routine = function (  ) {  } ;  returnVal . animation = function (  ) {  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
  if ( active )  { 
-  if (  ! moving )  if ( gvPlayer )  if ( inDistance2 ( x , y , gvPlayer . x , gvPlayer . y , 64 )  )  { 
- flip = x > gvPlayer . x ; 
+  if (  ! moving )  { 
+  var target = findPlayer (  )  ;
+  if ( target != null )  if ( inDistance2 ( x , y , target . x , target . y , 64 )  )  { 
+ flip = x > target . x ; 
 moving = true ; 
  } 
   
   
+  } 
   
   if (  ! squish )  { 
   if ( placeFree ( x , y + 1 )  ) vspeed += 0.1 ; 
@@ -3993,28 +4991,23 @@ y -= 1.0 ;
  getupTime -= 0.2 ; 
  if ( getupTime < 0 ) getupTime = 0 ; 
  
-  if ( gvPlayer ) flip = x > gvPlayer . x ; 
+  var target = findPlayer (  )  ;
+  if ( target != null ) flip = x > target . x ; 
  
   } 
   
   
   if ( frozen )  { 
-  if ( gvPlayer )  if ( icebox ==  - 1 &&  ! hitTest ( shape , gvPlayer . shape )  )  { 
+  var canice = true ;
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
+ 
+  if ( icebox ==  - 1 && canice )  { 
   if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
  
   } 
   
-  
- drawSpriteEx ( sprSpikeCap , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- if ( frozen <= 120 )  { 
-  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
- 
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
-  } 
-  
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
   } 
   
   else  { 
@@ -4029,10 +5022,6 @@ icebox =  - 1 ;
   
   } 
   
-  if ( getupTime == 0 ) drawSpriteEx ( sprSpikeCap , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
-  else drawSpriteEx ( sprSpikeCap , 6.0 - getupTime , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- 
   } 
   
   } 
@@ -4041,20 +5030,34 @@ icebox =  - 1 ;
  squishTime += 0.025 ; 
  if ( squishTime >= 1 ) die (  )  ; 
  
- drawSpriteEx ( sprGradcap , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- } 
+  } 
   
   if (  ! squish ) shape . setPos ( x , y )  ; 
  
- setDrawColor ( 0xff0000ff )  ; 
- if ( debug ) shape . draw (  )  ; 
+  } 
+  
+  } ;  returnVal . draw = function (  ) {  if ( frozen )  { 
+ drawSprite ( sprSpikeCap , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ if ( frozen <= 120 )  { 
+  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
+ 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
  
   } 
   
-  } ;  returnVal . hurtPlayer = function ( target ) {  if ( squish )  return ; 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
   
-  baseMethods . hurtPlayer  ( target )  ; 
- } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( squish )  return ; 
+  else  if ( moving && getupTime <= 0 ) drawSprite ( sprSpikeCap , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else drawSprite ( sprSpikeCap , 6.0 - getupTime , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  
+ setDrawColor ( 0xff0000ff )  ; 
+ if ( debug ) shape . draw (  )  ; 
+ 
+  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( squish )  return ; 
   
   if ( _element == "fire" )  { 
  hurtFire (  )  ; 
@@ -4094,13 +5097,13 @@ actor [ c ]  . flip = flip . tointeger (  )  ;
  return ; 
   } 
   
-  if ( gvPlayer . rawin ( "anSlide" )  )  { 
-  if ( gvPlayer . anim == gvPlayer . anSlide && hitTest ( shape , gvPlayer . shape )  )  { 
+  if (  ( (_by[ ( "anim" ) ] !== undefined) )  )  { 
+  if ( _by . anim == "slide" && hitTest ( shape , _by . shape )  )  { 
   var c = newActor ( DeadNME , x , y )  ;
  actor [ c ]  . sprite = sprSpikeCap ; 
-actor [ c ]  . vspeed = min (  - fabs ( gvPlayer . hspeed )  ,  - 4 )  ; 
-actor [ c ]  . hspeed =  ( gvPlayer . hspeed / 16 )  ; 
-actor [ c ]  . spin =  ( gvPlayer . hspeed * 7 )  ; 
+actor [ c ]  . vspeed = min (  - fabs ( _by . hspeed )  ,  - 4 )  ; 
+actor [ c ]  . hspeed =  ( _by . hspeed / 16 )  ; 
+actor [ c ]  . spin =  ( _by . hspeed * 7 )  ; 
 actor [ c ]  . angle = 180 ; 
 die (  )  ; 
 popSound ( sndKick , 0 )  ; 
@@ -4109,7 +5112,7 @@ popSound ( sndKick , 0 )  ;
   
   } 
   
-  if (  ! _stomp )  { 
+  if (  ! _stomp && _mag > 0 )  { 
   var c = newActor ( DeadNME , x , y )  ;
  actor [ c ]  . sprite = sprSpikeCap ; 
 actor [ c ]  . vspeed =  - 4.0 ; 
@@ -4126,9 +5129,11 @@ popSound ( sndKick , 0 )  ;
   
   else popSound ( sndSquish , 0 )  ; 
  
- squish = true ; 
-blinking = 120 ; 
- } ;  returnVal . hurtblast = function (  ) {  var c = newActor ( DeadNME , x , y )  ;
+  if ( _mag > 0 ) squish = true ; 
+ 
+  if ( _mag > 0 ) blinking = 120 ; 
+ 
+  } ;  returnVal . hurtblast = function (  ) {  var c = newActor ( DeadNME , x , y )  ;
  actor [ c ]  . sprite = sprSpikeCap ; 
 actor [ c ]  . vspeed =  - 4 ; 
 actor [ c ]  . hspeed =  ( 4 / 16 )  ; 
@@ -4155,7 +5160,7 @@ actor [ c ]  . frame = 7 ;
  } ;  returnVal . _typeof = function (  ) {  return "SpikeCap" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . flip = false ; 
  squirrelClassFunction . squish = false ; 
  squirrelClassFunction . squishTime = 0.0 ; 
@@ -4165,8 +5170,8 @@ actor [ c ]  . frame = 7 ;
  squirrelClassFunction . touchDamage = 2.0 ; 
  squirrelClassFunction . sharpTop = true ; 
  squirrelClassFunction . sharpSide = true ; 
- return squirrelClassFunction; })()) ; 
-CaptainMorel =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+CaptainMorel =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -4184,7 +5189,7 @@ CaptainMorel =  ((function(){ let squirrelClassFunction = function ( ) { var ret
 
    (baseConstructor.bind(this))  ( _x . tofloat (  )  , _y . tofloat (  )  )  ; 
 shape = Rec ( x , y , 6 , 6 , 0 )  ; 
-smart = _arr ; 
+smart = bool ( _arr )  ; 
  } ;  returnVal . routine = function (  ) {  } ;  returnVal . animation = function (  ) {  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
  if ( active )  { 
   if (  ! moving )  { 
@@ -4252,22 +5257,16 @@ y -= 2.0 ;
   } 
   
   if ( frozen )  { 
-  if ( gvPlayer )  if ( icebox ==  - 1 &&  ! hitTest ( shape , gvPlayer . shape )  )  { 
+  var canice = true ;
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
+ 
+  if ( icebox ==  - 1 && canice )  { 
   if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
  
   } 
   
-  
- drawSpriteEx ( sprCaptainMorel , 0 +  ( flip . tointeger (  )  * 8 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
- if ( frozen <= 120 )  { 
-  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
- 
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
-  } 
-  
-  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
- 
   } 
   
   else  { 
@@ -4282,10 +5281,6 @@ icebox =  - 1 ;
   
   } 
   
-  if (  ! placeFree ( x , y + 2 )  ) drawSpriteEx ( sprCaptainMorel , wrap ( getFrames (  )  / 6 , 0 , 3 )  +  ( flip . tointeger (  )  * 9 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , 0 , 1 , 1 , 1 )  ; 
- 
-  else drawSpriteEx ( sprCaptainMorel ,  (  squirrelThreeWaysCompare ( 0 , round ( vspeed / 2.0 )  )  )  + 5 +  ( flip . tointeger (  )  * 9 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , 0 , 1 , 1 , 1 )  ; 
- 
   } 
   
   } 
@@ -4294,22 +5289,42 @@ icebox =  - 1 ;
  squishTime += 0.025 ; 
  if ( squishTime >= 1 ) die (  )  ; 
  
- drawSpriteEx ( sprCaptainMorel , floor ( 7.8 + squishTime )  +  ( flip . tointeger (  )  * 9 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , 0 , 1 , 1 , 1 )  ; 
- } 
+  } 
   
   if (  ! squish ) shape . setPos ( x , y )  ; 
  
- setDrawColor ( 0xff0000ff )  ; 
- if ( debug ) shape . draw (  )  ; 
+  } 
+  
+  } ;  returnVal . draw = function (  ) {  if ( frozen )  { 
+ drawSprite ( sprCaptainMorel , 0 +  ( flip . tointeger (  )  * 9 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ if ( frozen <= 120 )  { 
+  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
+ 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
  
   } 
   
-  } ;  returnVal . hurtPlayer = function ( target ) {  if ( blinking )  return ; 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
   
-  if ( squish )  return ; 
+  else  if ( squish ) drawSprite ( sprCaptainMorel , floor ( 7.8 + squishTime )  +  ( flip . tointeger (  )  * 9 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , 0 , 1 , 1 , 1 )  ; 
+ 
+  else  if ( placeFree ( x , y + 2 )  ) drawSprite ( sprCaptainMorel ,  (  squirrelThreeWaysCompare ( 0 , round ( vspeed / 2.0 )  )  )  + 5 +  ( flip . tointeger (  )  * 9 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , 0 , 1 , 1 , 1 )  ; 
+ 
+  else drawSprite ( sprCaptainMorel , wrap ( getFrames (  )  / 8 , 0 , 3 )  +  ( flip . tointeger (  )  * 9 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , 0 , 1 , 1 , 1 )  ; 
+ 
   
-  baseMethods . hurtPlayer  ( target )  ; 
- } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( squish )  return ; 
+  
+ setDrawColor ( 0xff0000ff )  ; 
+ if ( debug ) shape . draw (  )  ; 
+ 
+  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( squish )  return ; 
+  
+  if ( _element == "ice" )  { 
+ frozen = 600 ; 
+ return ; 
+  } 
   
   if ( _blast )  { 
  hurtblast (  )  ; 
@@ -4328,18 +5343,13 @@ popSound ( sndFlame , 0 )  ;
   return ; 
   } 
   
-  if ( _element == "ice" )  { 
- frozen = 600 ; 
- return ; 
-  } 
-  
-  if ( gvPlayer . rawin ( "anSlide" )  )  { 
-  if ( gvPlayer . anim == gvPlayer . anSlide && hitTest ( shape , gvPlayer . shape )  )  { 
+  if (  ( (_by[ ( "anim" ) ] !== undefined) )  )  { 
+  if ( _by . anim == "slide" && hitTest ( shape , _by . shape )  )  { 
   var c = newActor ( DeadNME , x , y )  ;
  actor [ c ]  . sprite = sprCaptainMorel ; 
-actor [ c ]  . vspeed = min (  - fabs ( gvPlayer . hspeed )  ,  - 4 )  ; 
-actor [ c ]  . hspeed =  ( gvPlayer . hspeed / 16 )  ; 
-actor [ c ]  . spin =  ( gvPlayer . hspeed * 7 )  ; 
+actor [ c ]  . vspeed = min (  - fabs ( _by . hspeed )  ,  - 4 )  ; 
+actor [ c ]  . hspeed =  ( _by . hspeed / 16 )  ; 
+actor [ c ]  . spin =  ( _by . hspeed * 7 )  ; 
 actor [ c ]  . angle = 180 ; 
 die (  )  ; 
 popSound ( sndKick , 0 )  ; 
@@ -4348,7 +5358,7 @@ popSound ( sndKick , 0 )  ;
   
   } 
   
-  if (  ! _stomp )  { 
+  if (  ! _stomp && _mag > 0 )  { 
   var c = newActor ( DeadNME , x , y )  ;
  actor [ c ]  . sprite = sprCaptainMorel ; 
 actor [ c ]  . vspeed =  - 4.0 ; 
@@ -4365,9 +5375,11 @@ popSound ( sndKick , 0 )  ;
   
   else popSound ( sndSquish , 0 )  ; 
  
- squish = true ; 
-blinking = 120 ; 
- } ;  returnVal . hurtblast = function (  ) {  var c = newActor ( DeadNME , x , y )  ;
+  if ( _mag > 0 ) squish = true ; 
+ 
+  if ( _mag > 0 ) blinking = 120 ; 
+ 
+  } ;  returnVal . hurtblast = function (  ) {  var c = newActor ( DeadNME , x , y )  ;
  actor [ c ]  . sprite = sprCaptainMorel ; 
 actor [ c ]  . vspeed =  - 4 ; 
 actor [ c ]  . hspeed =  ( 4 / 16 )  ; 
@@ -4389,7 +5401,7 @@ popSound ( sndFlame , 0 )  ;
  } ;  returnVal . _typeof = function (  ) {  return "CaptainMorel" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
  squirrelClassFunction . flip = false ; 
  squirrelClassFunction . squish = false ; 
  squirrelClassFunction . squishTime = 0.0 ; 
@@ -4397,8 +5409,8 @@ popSound ( sndFlame , 0 )  ;
  squirrelClassFunction . moving = false ; 
  squirrelClassFunction . touchDamage = 2.0 ; 
  squirrelClassFunction . jumpPower = 2.0 ; 
- return squirrelClassFunction; })()) ; 
-Crusher =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Crusher =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -4412,6 +5424,7 @@ Crusher =  ((function(){ let squirrelClassFunction = function ( ) { var returnVa
  returnVal . touchDamage = 2 ; 
  returnVal . nocount = true ; 
  returnVal . sprite = 0 ; 
+ returnVal . blinkMax = 60 ; 
  
  with ( returnVal ) { 
   returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
@@ -4435,17 +5448,20 @@ platform = actor [ newActor ( MoPlat , x , y ,  [  [  [ 0 , 0 ]  ,  [ 0 , 0 ]  ]
   if ( scanShape == null ) scanShape = Rec ( x , y +  ( 8000 )  , 24 ,  ( 8000 )  , 0 )  ; 
  
  shape = Rec ( x , y , 15 , 8 , 0 , 0 , 8 )  ; 
- } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
+active = true ; 
+ } ;  returnVal . run = function (  ) { health = 100 ; 
+ baseMethods . run  (  )  ; 
  if ( y < ystart )  { 
  y = ystart ; 
 vspeed = 0 ; 
 canFall = true ; 
  } 
   
-  if ( gvPlayer && hitTest ( gvPlayer . shape , scanShape )  && gvPlayer . y > y && canFall )  { 
+  if ( gvPlayer && hitTest ( gvPlayer . shape , scanShape )  && gvPlayer . y > y && canFall || gvPlayer2 && hitTest ( gvPlayer2 . shape , scanShape )  && gvPlayer2 . y > y && canFall )  { 
  gravity = 0.25 ; 
 vspeed = 1.0 ; 
 canFall = false ; 
+popSound ( sndDrop )  ; 
  } 
   
   if (  ! placeFree ( x , y + 1 )  && waiting == 0 )  { 
@@ -4469,7 +5485,9 @@ fireWeapon ( ExplodeHiddenF , x , y + 12 , 0 , id )  ;
  platform . y = y - 12 ; 
  if ( vspeed > 16 ) vspeed = 16.0 ; 
  
-  if ( sprite ) drawSpriteZ ( 6 , sprite ,  ( vspeed > 0 )  . tointeger (  )  , x - camx , y - camy )  ; 
+  if ( vspeed > 4 ) newActor ( AfterImage , x , y ,  [ sprite , 1 , 0 , 0 , 0 , 1 , 1 ]  )  ; 
+ 
+  } ;  returnVal . draw = function (  ) {  if ( sprite ) drawSpriteZ ( 6 , sprite ,  ( vspeed > 0 )  . tointeger (  )  , x - camx , y - camy )  ; 
  
   else drawSpriteZ ( 6 , sprBearyl ,  ( vspeed > 0 )  . tointeger (  )  , x - camx , y - camy )  ; 
  
@@ -4478,12 +5496,10 @@ fireWeapon ( ExplodeHiddenF , x , y + 12 , 0 , id )  ;
 shape . draw (  )  ; 
  } 
   
-  if ( vspeed > 4 ) newActor ( AfterImage , x , y ,  [ sprite , 1 , 0 , 0 , 0 , 1 , 1 ]  )  ; 
- 
-  } ;  returnVal . _typeof = function (  ) {  return "Crusher" ;
+  } ;  returnVal . hurtInvinc = function (  ) {  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  } ;  returnVal . _typeof = function (  ) {  return "Crusher" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . damageMult =  { normal : 0.0 , fire : 0.0 , ice : 0.0 , earth : 0.0 , air : 0.0 , toxic : 0.0 , shock : 0.0 , water : 0.0 , light : 0.0 , dark : 0.0 , cut : 0.0 , blast : 0.0 , stomp : 0.0 , star : 0.0 }  ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . damageMult =  { normal : 0.0 , fire : 0.0 , ice : 0.0 , earth : 0.0 , air : 0.0 , toxic : 0.0 , shock : 0.0 , water : 0.0 , light : 0.0 , dark : 0.0 , cut : 0.0 , blast : 0.0 , stomp : 0.0 , star : 0.0 }  ; 
  squirrelClassFunction . platform = null ; 
  squirrelClassFunction . gravity = 0 ; 
  squirrelClassFunction . scanShape = null ; 
@@ -4493,8 +5509,9 @@ shape . draw (  )  ;
  squirrelClassFunction . touchDamage = 2 ; 
  squirrelClassFunction . nocount = true ; 
  squirrelClassFunction . sprite = 0 ; 
- return squirrelClassFunction; })()) ; 
-Wheeler =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+ squirrelClassFunction . blinkMax = 60 ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Wheeler =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -4509,6 +5526,7 @@ Wheeler =  ((function(){ let squirrelClassFunction = function ( ) { var returnVa
  returnVal . friction = 0.0 ; 
  returnVal . minFreezeTime = 600 ; 
  returnVal . freezeSprite = sprIceTrapSmall ; 
+ returnVal . frame = 0 ; 
  returnVal . damageMult =  { normal : 1.0 , fire : 1.0 , ice : 0.0 , earth : 1.0 , air : 1.0 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 , star : 10.0 }  ; 
  
  with ( returnVal ) { 
@@ -4516,15 +5534,18 @@ Wheeler =  ((function(){ let squirrelClassFunction = function ( ) { var returnVa
 
    (baseConstructor.bind(this))  ( _x , _y , _arr )  ; 
 shape = Rec ( x , y , 7 , 7 )  ; 
- } ;  returnVal . run = function (  ) { bladesOut =  ( gvPlayer && inDistance2 ( x , y , gvPlayer . x , gvPlayer . y , 64 )  )  . tointeger (  )  * 4 ; 
- if ( gvPlayer ) flip =  ( x > gvPlayer . x )  . tointeger (  )  ; 
+ } ;  returnVal . run = function (  ) {  var target = findPlayer (  )  ;
+  if ( target != null ) bladesOut =  ( gvPlayer && inDistance2 ( x , y , gvPlayer . x , gvPlayer . y , 64 )  )  . tointeger (  )  * 4 ; 
  
-  if ( gvPlayer )  { 
-  if ( x - 16 > gvPlayer . x && hspeed >  - mspeed )  { 
+  else bladesOut = 0 ; 
+ 
+  if ( target != null )  { 
+ flip =  ( x > target . x )  . tointeger (  )  ; 
+ if ( x - 16 > target . x && hspeed >  - mspeed )  { 
  hspeed -= 0.2 ; 
  } 
   
-  if ( x + 16 < gvPlayer . x && hspeed < mspeed )  { 
+  if ( x + 16 < target . x && hspeed < mspeed )  { 
  hspeed += 0.2 ; 
  } 
   
@@ -4535,11 +5556,15 @@ shape = Rec ( x , y , 7 , 7 )  ;
   if ( frozen )  { 
  hspeed = 0 ; 
 vspeed = 0 ; 
- if ( gvPlayer )  if ( icebox ==  - 1 &&  ! hitTest ( shape , gvPlayer . shape )  )  { 
+ var canice = true ;
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
+ 
+  if ( icebox ==  - 1 && canice )  { 
   if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
  
   } 
-  
   
   } 
   
@@ -4550,18 +5575,23 @@ icebox =  - 1 ;
  } 
   
   
-  var frame = 0 ;
-  if (  ! frozen ) frame = getFrames (  )  / 2 ; 
+ frame = 0 ; 
+ if (  ! frozen ) frame = getFrames (  )  / 2 ; 
  
-  if ( turning > 0 )  { 
- turning -= 0.25 ; 
-drawSpriteEx ( sprWheelerHamster , 8.0 +  ( 4.0 - turning )  , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
- } 
-  
-  else drawSpriteEx ( sprWheelerHamster , wrap ( frame , 0 , 3 )  + bladesOut , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
+  if ( turning > 0 ) turning -= 0.25 ; 
  
   baseMethods . run  (  )  ; 
 shape . setPos ( x , y )  ; 
+ } ;  returnVal . draw = function (  ) {  if ( turning > 0 ) drawSprite ( sprWheelerHamster , 8.0 +  ( 4.0 - turning )  , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
+ 
+  else drawSprite ( sprWheelerHamster , wrap ( frame , 0 , 3 )  + bladesOut , x - camx , y - camy , 0 , flip , 1 , 1 , 1 )  ; 
+ 
+  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _element == "ice" )  { 
+ frozen = 600 ; 
+ return ; 
+  } 
+  
+  baseMethods . getHurt  ( _by , _mag , _element , _cut , _blast , _stomp )  ; 
  } ;  returnVal . physics = function (  ) {  if ( placeFree ( x , y +  (  squirrelThreeWaysCompare ( 0 , gravity )  )  )  &&  ! phantom ) vspeed += gravity ; 
  
   if ( placeFree ( x , y + vspeed )  ) y += vspeed ; 
@@ -4653,7 +5683,7 @@ c . gravity = 0.1 ;
  } ;  returnVal . _typeof = function (  ) {  return "Wheeler" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . touchDamage = 2 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . touchDamage = 2 ; 
  squirrelClassFunction . sharpSide = true ; 
  squirrelClassFunction . sharpTop = true ; 
  squirrelClassFunction . gravity = 0.2 ; 
@@ -4664,8 +5694,1825 @@ c . gravity = 0.1 ;
  squirrelClassFunction . friction = 0.0 ; 
  squirrelClassFunction . minFreezeTime = 600 ; 
  squirrelClassFunction . freezeSprite = sprIceTrapSmall ; 
+ squirrelClassFunction . frame = 0 ; 
  squirrelClassFunction . damageMult =  { normal : 1.0 , fire : 1.0 , ice : 0.0 , earth : 1.0 , air : 1.0 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 , star : 10.0 }  ; 
- return squirrelClassFunction; })()) ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+SkyDive =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+     if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
+         squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
+ } 
+ returnVal . flip = 0 ; 
+ returnVal . onGround = false ; 
+ returnVal . accel = 0.0 ; 
+ returnVal . mspeed = 1.5 ; 
+ returnVal . held = false ; 
+ returnVal . nodrop = true ; 
+ returnVal . touchDamage = 4.0 ; 
+ returnVal . nocount = true ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   (baseConstructor.bind(this))  ( _x , _y , _arr )  ; 
+shape = Rec ( x , y , 6 , 10 )  ; 
+ } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
+onGround =  ! placeFree ( x , y + 1 )  ; 
+shape . setPos ( x , y )  ; 
+ if ( onGround && vspeed > 2 || health <= 0 )  { 
+ die (  )  ; 
+ } 
+  
+  if (  ! onGround ) vspeed += 0.2 ; 
+ 
+  else vspeed = 0.0 ; 
+ 
+  var target = findPlayer (  )  ;
+  if ( target &&  ! held )  { 
+  if ( target . x - 16 > x )  { 
+ accel = 0.11 ; 
+flip = 0 ; 
+ } 
+  
+  if ( target . x + 16 < x )  { 
+ accel =  - 0.11 ; 
+flip = 1 ; 
+ } 
+  
+  } 
+  
+ hspeed += accel ; 
+ if ( hspeed > mspeed ) hspeed = mspeed ; 
+ 
+  if ( hspeed <  - mspeed ) hspeed =  - mspeed ; 
+ 
+  if ( placeFree ( x + hspeed , y )  ) x += hspeed ; 
+ 
+  else  if ( placeFree ( x + hspeed , y - 1 )  )  { 
+ x += hspeed ; 
+y --  ; 
+ } 
+  
+  
+  if ( y > gvMap . h ) deleteActor ( id )  ; 
+ 
+  } ;  returnVal . draw = function (  ) {  if (  ! placeFree ( x , y + 4 )  &&  ! held ) drawSprite ( sprSkyDive , wrap ( getFrames (  )  / 4 , 3 , 6 )  , x - camx , y - camy , 0 , flip )  ; 
+ 
+  else drawSprite ( sprSkyDive , min ( abs ( vspeed )  , 2 )  , x - camx , y - camy , 0 , flip )  ; 
+ 
+  if ( debug )  { 
+ setDrawColor ( 0xff0000ff )  ; 
+drawLine ( x - 8 - camx , y - camy , x + 8 - camx , y - camy )  ; 
+drawLine ( x - camx , y - 8 - camy , x - camx , y + 8 - camy )  ; 
+ } 
+  
+  } ;  returnVal . die = function (  ) {  baseMethods . die  (  )  ; 
+ var c = fireWeapon ( ExplodeF2 , x , y , 0 , 0 )  ;
+ c . power = 2 ; 
+ if ( game . difficulty >= 2 )  { 
+ c = fireWeapon ( FireballK , x , y - 4 , 0 , 0 )  ; 
+c . hspeed =  - 2.0 - game . difficulty ; 
+c . vspeed =  - 1.5 ; 
+c = fireWeapon ( FireballK , x , y - 4 , 0 , 0 )  ; 
+c . hspeed = 2.0 + game . difficulty ; 
+c . vspeed =  - 1.5 ; 
+ } 
+  
+  } ;  returnVal . _typeof = function (  ) {  return "SkyDive" ;
+  } ; 
+ } 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . flip = 0 ; 
+ squirrelClassFunction . onGround = false ; 
+ squirrelClassFunction . accel = 0.0 ; 
+ squirrelClassFunction . mspeed = 1.5 ; 
+ squirrelClassFunction . held = false ; 
+ squirrelClassFunction . nodrop = true ; 
+ squirrelClassFunction . touchDamage = 4.0 ; 
+ squirrelClassFunction . nocount = true ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Puffranah =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+     if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
+         squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
+ } 
+ returnVal . anim = "normal" ; 
+ returnVal . an =  { normal :  [ 0 , 1 , 2 , 3 ]  , inhale :  [ 4 , 5 , 6 , 7 ]  , gulp :  [ 8 , 9 , 10 , 11 ]  , full :  [ 12 , 13 , 14 , 15 ]  , burp :  [ 11 , 10 , 9 , 8 , 7 , 6 , 5 , 4 ]  }  ; 
+ returnVal . eatShape = null ; 
+ returnVal . swimTimer = 0 ; 
+ returnVal . caught = false ; 
+ returnVal . struggle = 0 ; 
+ returnVal . target = null ; 
+ returnVal . frame = 0.0 ; 
+ returnVal . flip = 0 ; 
+ returnVal . touchDamage = 1.0 ; 
+ returnVal . health = 4 ; 
+ returnVal . blinkMax = 30.0 ; 
+ returnVal . freezeSprite = sprIceTrapLarge ; 
+ returnVal . searchRadius = 160 ; 
+ returnVal . catchRadius = 56 ; 
+ returnVal . cooldown = 60 ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   (baseConstructor.bind(this))  ( _x , _y , _arr )  ; 
+shape = Rec ( x , y , 12 , 12 )  ; 
+eatShape = Cir ( x , y , 8 )  ; 
+hspeed = 0.5 ; 
+vspeed = randFloat ( 1.0 )  - 0.5 ; 
+swimTimer = randInt ( 480 )  + 120 ; 
+ } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
+target = findPlayer (  )  ; 
+ if ( target == null ) caught = false ; 
+ 
+  if ( target != null && target . hidden || cooldown > 0 ) target = null ; 
+ 
+ touchDamage =  ( anim == "full" ? 1.0 : 0.0 )  ; 
+ switch ( anim )  {  case "normal" : frame += 0.1 ; 
+swimTimer --  ; 
+ if ( swimTimer == 0 )  { 
+ vspeed =  - 0.5 + randFloat ( 1 )  ; 
+ if ( hspeed == 0 ) hspeed = 1 ; 
+ 
+  else hspeed *= 1 / fabs ( hspeed )  ; 
+ 
+ swimTimer = randInt ( 480 )  + 120 ; 
+ } 
+  
+  if ( target != null && inDistance2 ( x , y , target . x , target . y , searchRadius )  )  { 
+  if ( target . x > x ) hspeed += 0.1 ; 
+ 
+  if ( target . x < x ) hspeed -= 0.1 ; 
+ 
+  if ( target . y > y ) vspeed += 0.1 ; 
+ 
+  if ( target . y < y ) vspeed -= 0.1 ; 
+ 
+ swimTimer = 60 ; 
+ } 
+  
+  if ( target != null && inDistance2 ( x , y , target . x , target . y , catchRadius )  && fabs ( y - target . y )  <= 8.0 && cooldown <= 0 )  { 
+ frame = 0.0 ; 
+anim = "inhale" ; 
+ } 
+  
+  if ( cooldown > 0 ) cooldown --  ; 
+ 
+  break ;  case "inhale" : vspeed /= 2.0 ; 
+ if ( frame < 3 ) frame += 0.25 ; 
+ 
+  else  if ( target != null && inDistance2 ( x , y , target . x , target . y , 64 )  &&  (  ( flip == 0 && target . x > x )  ||  ( flip == 1 && target . x < x )  )  )  { 
+  if ( getFrames (  )  % 4 == 0 ) fireWeapon ( DragBubble , x + randInt ( 16 )  - 8 + randInt ( 32 )  *  ( flip == 0 ? 2 :  - 2 )  , y + randInt ( 16 )  - 8 , 2 , id )  ; 
+ 
+  } 
+  
+  else  { 
+ frame = 4.0 ; 
+anim = "burp" ; 
+ } 
+  
+  
+  if ( target != null && hitTest ( eatShape , target . shape )  )  { 
+ caught = true ; 
+struggle = 8 +  ( 8 * game . difficulty )  ; 
+frame = 0.0 ; 
+anim = "gulp" ; 
+popSound ( sndGulp )  ; 
+target . canMove = false ; 
+ } 
+  
+  break ;  case "gulp" :  if ( target != null &&  ( (target[ ( "hidden" ) ] !== undefined) )  ) target . hidden = true ; 
+ 
+  if ( frame < 3.0 ) frame += 0.25 ; 
+ 
+  else  { 
+ frame = 0.0 ; 
+anim = "full" ; 
+ } 
+  
+  if ( target == null ||  ! inDistance2 ( x , y , target . x , target . y , 64 )  )  { 
+ frame = 4.0 ; 
+anim = "burp" ; 
+ } 
+  
+  break ;  case "full" : swimTimer --  ; 
+frame += 0.1 ; 
+ if ( swimTimer == 0 )  { 
+ vspeed =  - 0.5 + randFloat ( 1 )  ; 
+ if ( hspeed == 0 ) hspeed = 1 ; 
+ 
+  else hspeed *= 1 / fabs ( hspeed )  ; 
+ 
+ swimTimer = randInt ( 480 )  + 120 ; 
+ } 
+  
+  if ( getcon ( "left" , "press" , true )  || getcon ( "right" , "press" , true )  || getcon ( "up" , "press" , true )  || getcon ( "down" , "press" )  || getcon ( "jump" , "press" , true )  || getcon ( "shoot" , "press" , true )  || getcon ( "spec1" , "press" )  ) struggle --  ; 
+ 
+  if ( target == null || struggle <= 0 )  { 
+ caught = false ; 
+frame = 0.0 ; 
+anim = "burp" ; 
+ if ( target != null )  { 
+ target . hspeed =  ( flip == 0 ? 4.0 :  - 4.0 )  ; 
+target . canMove = true ; 
+ } 
+  
+  } 
+  
+  break ;  case "burp" :  if ( frame < 7 ) frame += 0.25 ; 
+ 
+  else  { 
+ frame = 0.0 ; 
+anim = "normal" ; 
+cooldown = 60 ; 
+ } 
+  
+ hspeed /= 1.1 ; 
+ break ;  } frame = wrap ( frame , 0 , an [ anim ]  . len (  )  - 1 )  ; 
+ if (  ! inWater ( x , y )  ) vspeed += 0.5 ; 
+ 
+  if ( placeFree ( x + hspeed , y )  ) x += hspeed ; 
+ 
+  else hspeed =  - hspeed ; 
+ 
+  var mspeed = 2.0 ;
+  if ( hspeed > mspeed ) hspeed = mspeed ; 
+ 
+  if ( hspeed <  - mspeed ) hspeed =  - mspeed ; 
+ 
+  if ( vspeed > mspeed ) vspeed = mspeed ; 
+ 
+  if ( vspeed <  - mspeed ) vspeed =  - mspeed ; 
+ 
+  if ( x < 0 ) hspeed = 0.5 ; 
+ 
+  if ( x > gvMap . w ) hspeed =  - 0.5 ; 
+ 
+  if ( placeFree ( x , y + vspeed )  ) y += vspeed ; 
+ 
+  else vspeed =  - vspeed ; 
+ 
+  if ( y < 0 ) vspeed = 0.5 ; 
+ 
+  if ( y > gvMap . h ) vspeed =  - 0.5 ; 
+ 
+  if (  ! frozen )  { 
+  if ( hspeed > 0 ) flip = 0 ; 
+ 
+  if ( hspeed < 0 ) flip = 1 ; 
+ 
+  } 
+  
+ shape . setPos ( x , y )  ; 
+eatShape . setPos ( x , y )  ; 
+ if ( target != null && caught && health > 0 )  { 
+ target . x = x ; 
+target . y = y ; 
+target . hspeed = 0.0 ; 
+target . vspeed = 0.0 ; 
+target . hidden = true ; 
+ } 
+  
+  if ( anim != "normal" && checkActor ( "DeadPlayer" )  )  {     var foreachOutput2 = squirrelForEach( actor [ "DeadPlayer" ]  );     while(true)     {        foreachOutput2.next();        if (foreachOutput2.isDone()) break; i = foreachOutput2.getValue();  { 
+  if ( inDistance2 ( x , y , i . x , i . y , 16 )  )  { 
+ i . x =  - 100 ; 
+i . y =  - 100 ; 
+ } 
+  
+  } 
+     }  }  
+  } ;  returnVal . draw = function (  ) { drawSpriteZ ( 4 , sprPuffranah , an [ anim ]  [ wrap (  ( frozen ? 0 : frame )  , 0 , an [ anim ]  . len (  )  - 1 )  ]  , x - camx , y - camy , 0 , flip , 1 , 1 ,  ( blinking > 0 ? blinking / 10.0 : 1 )  )  ; 
+ if ( debug )  { 
+ drawText ( font , x - camx , y + 24 - camy , anim + "\n" + frame . tostring (  )  + "\n" + health . tostring (  )  )  ; 
+setDrawColor ( 0xf80000ff )  ; 
+drawCircle ( x - camx , y - camy , searchRadius , false )  ; 
+drawCircle ( x - camx , y - camy , catchRadius , false )  ; 
+ } 
+  
+  baseMethods . draw  (  )  ; 
+ } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _element == "water" || _mag == 0 )  return ; 
+  
+  baseMethods . getHurt  ( _by , _mag , _element , _cut , _blast , _stomp )  ; 
+ } ;  returnVal . hurtFire = function (  ) { die (  )  ; 
+popSound ( sndKick , 0 )  ; 
+newActor ( Poof , x + 8 , y )  ; 
+newActor ( Poof , x - 8 , y )  ; 
+ if ( randInt ( 20 )  == 0 )  { 
+  var a = actor [ newActor ( MuffinBlue , x , y )  ]  ;
+ a . vspeed =  - 2 ; 
+ } 
+  
+  } ;  returnVal . die = function (  ) {  baseMethods . die  (  )  ; 
+target = findPlayer (  )  ; 
+ if ( target != null ) target . canMove = true ; 
+ 
+  var c = newActor ( DeadNME , x , y )  ;
+ actor [ c ]  . sprite = sprDeadFish ; 
+actor [ c ]  . vspeed =  - 4.0 ; 
+actor [ c ]  . flip = flip ; 
+actor [ c ]  . hspeed = hspeed ; 
+ if ( flip == 1 ) actor [ c ]  . spin =  - 1 ; 
+ 
+  else actor [ c ]  . spin = 1 ; 
+ 
+ popSound ( sndKick , 0 )  ; 
+newActor ( Poof , x + 8 , y )  ; 
+newActor ( Poof , x - 8 , y )  ; 
+ if ( randInt ( 20 )  == 0 )  { 
+  var a = actor [ newActor ( MuffinBlue , x , y )  ]  ;
+ a . vspeed =  - 2 ; 
+ } 
+  
+  } ;  returnVal . physics = function (  ) {  } ; 
+ } 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . anim = "normal" ; 
+ squirrelClassFunction . an =  { normal :  [ 0 , 1 , 2 , 3 ]  , inhale :  [ 4 , 5 , 6 , 7 ]  , gulp :  [ 8 , 9 , 10 , 11 ]  , full :  [ 12 , 13 , 14 , 15 ]  , burp :  [ 11 , 10 , 9 , 8 , 7 , 6 , 5 , 4 ]  }  ; 
+ squirrelClassFunction . eatShape = null ; 
+ squirrelClassFunction . swimTimer = 0 ; 
+ squirrelClassFunction . caught = false ; 
+ squirrelClassFunction . struggle = 0 ; 
+ squirrelClassFunction . target = null ; 
+ squirrelClassFunction . frame = 0.0 ; 
+ squirrelClassFunction . flip = 0 ; 
+ squirrelClassFunction . touchDamage = 1.0 ; 
+ squirrelClassFunction . health = 4 ; 
+ squirrelClassFunction . blinkMax = 30.0 ; 
+ squirrelClassFunction . freezeSprite = sprIceTrapLarge ; 
+ squirrelClassFunction . searchRadius = 160 ; 
+ squirrelClassFunction . catchRadius = 56 ; 
+ squirrelClassFunction . cooldown = 60 ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Struffle =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+     if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
+         squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
+ } 
+ returnVal . anim = "stand" ; 
+ returnVal . an =  { stand :  [ 0 , 0 , 1 , 1 , 0 , 0 , 1 , 1 , 0 , 0 , 1 , 1 , 0 , 0 , 1 , 1 , 0 , 2 , 0 , 2 ]  , bounce :  [ 4 , 5 , 6 , 7 ]  , hurt :  [ 3 , 3 , 3 , 3 ]  , walk :  [ 8 , 9 , 10 , 11 , 12 , 13 , 14 , 15 ]  }  ; 
+ returnVal . flip = 0 ; 
+ returnVal . frame = 0.0 ; 
+ returnVal . freezeSprite = sprIceTrapTall ; 
+ returnVal . damageMult =  { normal : 1.0 , fire : 1.0 , ice : 1.0 , earth : 1.0 , air : 1.0 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 , star : 10.0 }  ; 
+ returnVal . health = 3 ; 
+ returnVal . blinkMax = 30 ; 
+ returnVal . walkTimer = 10 ; 
+ returnVal . touchDamage = 2 ; 
+ returnVal . friction = 0 ; 
+ returnVal . gravity = 0.1 ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   (baseConstructor.bind(this))  ( _x , _y , _arr )  ; 
+shape = Rec ( x , y , 7 , 12 , 0 , 0 , 3 )  ; 
+ } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
+ if ( active )  { 
+  switch ( anim )  {  case "stand" : frame += 0.1 ; 
+walkTimer --  ; 
+ if ( walkTimer <= 0 )  { 
+ anim = "walk" ; 
+walkTimer = 600 ; 
+ if ( gvPlayer ) hspeed = 1.5 *  ( gvPlayer . x > x ? 1 :  - 1 )  ; 
+ 
+  else  if ( gvPlayer2 ) hspeed = 1.5 *  ( gvPlayer2 . x > x ? 1 :  - 1 )  ; 
+ 
+  else hspeed = choose ( 1.5 ,  - 1.5 )  ; 
+ 
+  
+  } 
+  
+  break ;  case "walk" : frame += 0.2 ; 
+walkTimer --  ; 
+ if ( walkTimer <= 0 )  { 
+ walkTimer = 300 ; 
+anim = "stand" ; 
+hspeed = 0 ; 
+ } 
+  
+  break ;  case "bounce" :  case "hurt" : hspeed = 0 ; 
+frame += 0.2 ; 
+ if ( frame >= 4 )  { 
+ frame = 0.0 ; 
+anim = "stand" ; 
+walkTimer = 60 ; 
+ } 
+  
+  if ( anim == "hurt" )  { 
+  if ( flip == 0 && placeFree ( x - 0.5 , y )  ) x -= 0.5 ; 
+ 
+  if ( flip == 1 && placeFree ( x + 0.5 , y )  ) x += 0.5 ; 
+ 
+  } 
+  
+  break ;  } frame = wrap ( frame , 0 , an [ anim ]  . len (  )  - 1 )  ; 
+ if ( hspeed > 0 ) flip = 0 ; 
+ 
+  if ( hspeed < 0 ) flip = 1 ; 
+ 
+  if (  ! placeFree ( x , y + 2 )  || onPlatform (  - hspeed )  )  { 
+  if ( placeFree ( x + 6 , y + 16 )  &&  ! onPlatform ( 12 )  ) hspeed =  - hspeed ; 
+ 
+  if ( placeFree ( x - 6 , y + 16 )  &&  ! onPlatform (  - 12 )  ) hspeed =  - hspeed ; 
+ 
+  } 
+  
+  if (  ! placeFree ( x + hspeed , y - 10 )  ) hspeed =  - hspeed ; 
+ 
+ shape . setPos ( x , y )  ; 
+ if ( isOnScreen (  )  && randInt ( 1000 )  == 1 ) popSound ( sndPigSnort )  ; 
+ 
+  } 
+  
+  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( gvPlayer ) flip = int ( x > gvPlayer . x )  ; 
+ 
+ anim = "hurt" ; 
+frame = 0.0 ; 
+ if (  ! _stomp )  { 
+  baseMethods . getHurt  ( _by , _mag , _element , _cut , _blast , _stomp )  ; 
+frame = 0.0 ; 
+anim = "hurt" ; 
+popSound ( sndPigSqueal )  ; 
+ } 
+  
+  else  if ( _stomp && gvPlayer && _by == gvPlayer )  { 
+  if ( gvPlayer . anim == "stomp" || gvPlayer . anim == "statue" )  { 
+  baseMethods . getHurt  ( _by , 2 , _element , _cut , _blast , _stomp )  ; 
+frame = 0.0 ; 
+anim = "hurt" ; 
+popSound ( sndPigSqueal )  ; 
+ } 
+  
+  else  { 
+ gvPlayer . vspeed =  - 8.0 ; 
+frame = 0.0 ; 
+anim = "bounce" ; 
+popSound ( sndPigSnort )  ; 
+popSound ( sndSpring )  ; 
+blinking = 10 ; 
+ } 
+  
+  } 
+  
+  else  if ( _stomp && gvPlayer2 && _by == gvPlayer2 )  { 
+  if ( gvPlayer2 . anim == "stomp" || gvPlayer2 . anim == "statue" )  { 
+  baseMethods . getHurt  ( _by , 2 , _element , _cut , _blast , _stomp )  ; 
+frame = 0.0 ; 
+anim = "hurt" ; 
+popSound ( sndPigSqueal )  ; 
+ } 
+  
+  else  { 
+ gvPlayer2 . vspeed =  - 8.0 ; 
+frame = 0.0 ; 
+anim = "bounce" ; 
+popSound ( sndPigSnort )  ; 
+popSound ( sndSpring )  ; 
+blinking = 10 ; 
+ } 
+  
+  } 
+  
+  
+  
+  } ;  returnVal . physics = function (  ) {  if ( placeFree ( x , y + gravity )  &&  ! phantom ) vspeed += gravity ; 
+ 
+  if ( placeFree ( x , y + vspeed )  &&  !  ( onPlatform (  )  && vspeed >= 0 )  ) y += vspeed ; 
+ 
+  else  if (  !  ( onPlatform (  )  && vspeed >= 0 )  )  { 
+  for (  var i = 2 ;
+ i < 8 ; i ++  )  { 
+  if ( placeFree ( x , y +  ( vspeed / i )  )  )  { 
+ y +=  ( vspeed / i )  ; 
+ break ;  } 
+  
+  } 
+ vspeed /= 2 ; 
+ if ( fabs ( vspeed )  < 0.1 ) vspeed = 0.0 ; 
+ 
+  } 
+  
+  
+  if ( hspeed != 0 )  { 
+  if ( placeFree ( x + hspeed , y )  )  { 
+  for (  var i = 0 ;
+ i < 4 ; i ++  )  if (  ! placeFree ( x , y + 4 )  && placeFree ( x + hspeed , y + 1 )  &&  ! inWater (  )  && vspeed >= 0 &&  ! placeFree ( x + hspeed , y + 4 )  )  { 
+ y += 1 ; 
+ } 
+  
+ x += hspeed ; 
+ } 
+  
+  else  { 
+  var didstep = false ;
+  for (  var i = 1 ;
+ i <= max ( 8 , abs ( hspeed )  )  ; i ++  )  { 
+  if ( placeFree ( x + hspeed , y -  ( i )  )  )  { 
+ x += hspeed ; 
+y -=  ( i )  ; 
+ if ( i > 2 )  { 
+  if ( hspeed > 0 ) hspeed -= 0.2 ; 
+ 
+  if ( hspeed < 0 ) hspeed += 0.2 ; 
+ 
+  } 
+  
+ didstep = true ; 
+ break ;  } 
+  
+  } 
+  if ( didstep == false && fabs ( hspeed )  >= 1 ) hspeed -=  ( hspeed / fabs ( hspeed )  )  ; 
+ 
+  else  if ( didstep == false && fabs ( hspeed )  < 1 ) hspeed = 0 ; 
+ 
+  
+  } 
+  
+  } 
+  
+  if ( fabs ( hspeed )  > friction )  { 
+  if ( hspeed > 0 ) hspeed -= friction ; 
+ 
+  if ( hspeed < 0 ) hspeed += friction ; 
+ 
+  } 
+  
+  else hspeed = 0 ; 
+ 
+ shape . setPos ( x , y )  ; 
+xprev = x ; 
+yprev = y ; 
+ } ;  returnVal . draw = function (  ) { drawSprite ( sprStruffle ,  ( frozen ? 0 : an [ anim ]  [ wrap ( frame , 0 , an [ anim ]  . len (  )  - 1 )  ]  )  , x - camx , y - camy , 0 , flip , 1 , 1 ,  ( blinking ? blinking / 10.0 : 1 )  )  ; 
+ baseMethods . draw  (  )  ; 
+ if ( debug )  { 
+ shape . draw (  )  ; 
+drawText ( font , x + 16 - camx , y - camy , vspeed . tostring (  )  )  ; 
+ } 
+  
+  } ;  returnVal . die = function (  ) {  baseMethods . die  (  )  ; 
+ var c = newActor ( DeadNME , x , y )  ;
+ actor [ c ]  . sprite = sprStruffle ; 
+actor [ c ]  . vspeed =  - 4.0 ; 
+actor [ c ]  . flip = flip ; 
+actor [ c ]  . frame = 3 ; 
+ if ( flip == 1 ) actor [ c ]  . spin = 0.5 ; 
+ 
+  else actor [ c ]  . spin =  - 0.5 ; 
+ 
+ popSound ( sndKick , 0 )  ; 
+ if ( randInt ( 20 )  == 0 )  { 
+  var a = actor [ newActor ( MuffinBlue , x , y )  ]  ;
+ a . vspeed =  - 2 ; 
+ } 
+  
+  } ; 
+ } 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . anim = "stand" ; 
+ squirrelClassFunction . an =  { stand :  [ 0 , 0 , 1 , 1 , 0 , 0 , 1 , 1 , 0 , 0 , 1 , 1 , 0 , 0 , 1 , 1 , 0 , 2 , 0 , 2 ]  , bounce :  [ 4 , 5 , 6 , 7 ]  , hurt :  [ 3 , 3 , 3 , 3 ]  , walk :  [ 8 , 9 , 10 , 11 , 12 , 13 , 14 , 15 ]  }  ; 
+ squirrelClassFunction . flip = 0 ; 
+ squirrelClassFunction . frame = 0.0 ; 
+ squirrelClassFunction . freezeSprite = sprIceTrapTall ; 
+ squirrelClassFunction . damageMult =  { normal : 1.0 , fire : 1.0 , ice : 1.0 , earth : 1.0 , air : 1.0 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 , star : 10.0 }  ; 
+ squirrelClassFunction . health = 3 ; 
+ squirrelClassFunction . blinkMax = 30 ; 
+ squirrelClassFunction . walkTimer = 10 ; 
+ squirrelClassFunction . touchDamage = 2 ; 
+ squirrelClassFunction . friction = 0 ; 
+ squirrelClassFunction . gravity = 0.1 ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Crystallo =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+     if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
+         squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
+ } 
+ returnVal . mode = 0 ; 
+ returnVal . flip = 0 ; 
+ returnVal . sharpSide = true ; 
+ returnVal . touchDamage = 2 ; 
+ returnVal . cut = true ; 
+ returnVal . accel = 0.0 ; 
+ returnVal . walkTimer = 30 ; 
+ returnVal . frame = 0.0 ; 
+ returnVal . gravity = 0.2 ; 
+ returnVal . waking = false ; 
+ returnVal . health = 4 ; 
+ returnVal . blinkMax = 30 ; 
+ returnVal . friction = 0.0 ; 
+ returnVal . element = "earth" ; 
+ returnVal . damageMult =  { normal : 1.0 , fire : 1.0 , ice : 1.0 , earth : 0.5 , air : 2.0 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 , star : 10.0 }  ; 
+ returnVal . anim = "stand" ; 
+ returnVal . an =  { stand :  [ 0 ]  , walk :  [ 0 , 1 , 2 , 3 ]  , squish :  [ 4 , 5 , 5 , 5 , 5 ]  , sleep :  [ 6 , 7 , 8 , 7 , 8 , 7 , 7 , 7 ]  , jump :  [ 9 , 10 , 11 ]  , drop :  [ 12 , 13 , 14 , 15 , 16 , 17 , 18 , 17 , 18 , 19 ]  , fall :  [ 19 ]  }  ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = 0 ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   (baseConstructor.bind(this))  ( _x , _y , _arr )  ; 
+shape = Rec ( x , y , 10 , 6 , 0 )  ; 
+mode = _arr ; 
+ if ( mode == 2 ) anim = "sleep" ; 
+ 
+  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
+ if (  ! active )  return ; 
+  
+  var target = findPlayer (  )  ;
+  if ( hspeed > 0 ) flip = 0 ; 
+ 
+  if ( hspeed < 0 ) flip = 1 ; 
+ 
+  if ( mode == 1 && anim != "fall" ) gravity =  - 0.1 ; 
+ 
+  if ( mode == 0 ) gravity = 0.1 ; 
+ 
+  switch ( anim )  {  case "stand" :  case "walk" :  if ( hspeed != 0 ) anim = "walk" ; 
+ 
+ frame += 0.1 ; 
+walkTimer --  ; 
+ if ( target && mode == 1 && fabs ( x - target . x )  < 16 && y < target . y && fabs ( y - target . y )  < 128 )  { 
+ frame = 0.0 ; 
+anim = "drop" ; 
+ } 
+  
+  break ;  case "sleep" : gravity = 0.0 ; 
+ if ( target && inDistance2 ( target . x , target . y , x , y , 64 )  ) waking = true ; 
+ 
+  if ( waking ) frame += 0.2 ; 
+ 
+  if ( frame > an [ anim ]  . len (  )  - 2 )  { 
+ vspeed =  - 3.0 ; 
+ if ( target ) accel = 0.1 *  (  squirrelThreeWaysCompare ( target . x , x )  )  ; 
+ 
+ frame = 0.0 ; 
+anim = "jump" ; 
+mode = 0 ; 
+ } 
+  
+  break ;  case "jump" :  if ( frame < an [ anim ]  . len (  )  - 1 ) frame += 0.1 ; 
+ 
+  if (  ! placeFree ( x , y + 1 )  )  { 
+ hspeed = 0.0 ; 
+accel = 0.0 ; 
+anim = "walk" ; 
+walkTimer = 10 ; 
+ } 
+  
+  break ;  case "drop" :  if ( frame <= an [ anim ]  . len (  )  - 1 ) frame += 0.3 ; 
+ 
+  else anim = "fall" ; 
+ 
+ hspeed = 0.0 ; 
+accel = 0.0 ; 
+ break ;  case "fall" : gravity = 0.1 ; 
+vspeed += gravity ; 
+hspeed = 0.0 ; 
+frame = 0.0 ; 
+ if (  ! placeFree ( x , y + 1 )  || onPlatform (  )  )  { 
+ hspeed = 0.0 ; 
+accel = 0.0 ; 
+anim = "squish" ; 
+frame = 0.0 ; 
+popSound ( sndCrumble )  ; 
+mode = 0 ; 
+shootBullets (  )  ; 
+ } 
+  
+  break ;  case "squish" : touchDamage = 0.0 ; 
+frame += 0.1 ; 
+hspeed = 0.0 ; 
+accel = 0.0 ; 
+ if ( frame >= an [ anim ]  . len (  )  - 1 ) die (  )  ; 
+ 
+  break ;  } frame = wrap ( frame , 0 , an [ anim ]  . len (  )  - 1 )  ; 
+ if ( frame < 0 ) frame = 0 ; 
+ 
+  if ( fabs ( hspeed )  < 1.25 ) hspeed += accel ; 
+ 
+  if ( fabs ( hspeed )  > 1.25 ) hspeed -= accel ; 
+ 
+  if ( walkTimer <= 0 )  { 
+ walkTimer = 120 ; 
+ if ( accel < 0 ) accel = 0.05 ; 
+ 
+  else accel =  - 0.05 ; 
+ 
+  } 
+  
+  if (  ! placeFree ( x , y +  ( 1 *  (  squirrelThreeWaysCompare ( gravity , 0 )  )  )  )  && placeFree ( x +  ( hspeed * 4 )  , y +  ( 8 *  (  squirrelThreeWaysCompare ( gravity , 0 )  )  )  )  ||  ! placeFree ( x +  ( hspeed * 2 )  , y )  &&  ! placeFree ( x +  ( hspeed * 2 )  , y -  ( 8 *  (  squirrelThreeWaysCompare ( gravity , 0 )  )  )  )  )  { 
+ hspeed =  - hspeed ; 
+accel =  - accel ; 
+walkTimer = 240 ; 
+ } 
+  
+  if ( placeFree ( x , y - 2 )  && mode == 1 ) mode = 0 ; 
+ 
+  if ( placeFree ( x , y + 1 )  &&  ! placeFree ( x , y - 1 )  && mode != 1 )  { 
+ mode = 1 ; 
+ if ( anim != "walk" ) anim = "walk" ; 
+ 
+  } 
+  
+  if ( health <= 0 && anim != "squish" )  { 
+ frame = 0.0 ; 
+anim = "squish" ; 
+popSound ( sndCrumble )  ; 
+ } 
+  
+  } ;  returnVal . physics = function (  ) {  if ( placeFree ( x , y + gravity )  &&  ! phantom ) vspeed += gravity ; 
+ 
+  if ( placeFree ( x , y + vspeed )  &&  !  ( onPlatform (  )  && vspeed >= 0 )  ) y += vspeed ; 
+ 
+  else  if (  !  ( onPlatform (  )  && vspeed >= 0 )  )  { 
+  for (  var i = 2 ;
+ i < 8 ; i ++  )  { 
+  if ( placeFree ( x , y +  ( vspeed / i )  )  )  { 
+ y +=  ( vspeed / i )  ; 
+ break ;  } 
+  
+  } 
+ vspeed /= 2 ; 
+ if ( fabs ( vspeed )  < 0.1 ) vspeed = 0.0 ; 
+ 
+  } 
+  
+  
+  if ( hspeed != 0 )  { 
+  if ( placeFree ( x + hspeed , y )  )  { 
+  for (  var i = 0 ;
+ i < 4 ; i ++  )  if (  ! placeFree ( x , y + 4 )  && placeFree ( x + hspeed , y + 1 )  &&  ! inWater (  )  && vspeed >= 0 &&  ! placeFree ( x + hspeed , y + 4 )  )  { 
+ y += 1 ; 
+ } 
+  
+ x += hspeed ; 
+ } 
+  
+  else  { 
+  var didstep = false ;
+  for (  var i = 1 ;
+ i <= max ( 8 , abs ( hspeed )  )  ; i ++  )  { 
+  if ( placeFree ( x + hspeed , y -  ( i )  )  )  { 
+ x += hspeed ; 
+y -=  ( i )  ; 
+ if ( i > 2 )  { 
+  if ( hspeed > 0 ) hspeed -= 0.2 ; 
+ 
+  if ( hspeed < 0 ) hspeed += 0.2 ; 
+ 
+  } 
+  
+ didstep = true ; 
+ break ;  } 
+  
+  } 
+  if ( didstep == false && fabs ( hspeed )  >= 1 ) hspeed -=  ( hspeed / fabs ( hspeed )  )  ; 
+ 
+  else  if ( didstep == false && fabs ( hspeed )  < 1 ) hspeed = 0 ; 
+ 
+  
+  } 
+  
+  } 
+  
+  if ( fabs ( hspeed )  > friction )  { 
+  if ( hspeed > 0 ) hspeed -= friction ; 
+ 
+  if ( hspeed < 0 ) hspeed += friction ; 
+ 
+  } 
+  
+  else hspeed = 0 ; 
+ 
+ shape . setPos ( x , y )  ; 
+xprev = x ; 
+yprev = y ; 
+ } ;  returnVal . shootBullets = function (  ) {  var c ;
+  if ( placeFree ( x , y - 1 )  )  { 
+ c = fireWeapon ( CrystalBullet , x , y , 2 , 0 )  ; 
+c . hspeed = 4.0 ; 
+c . vspeed =  - 2.0 ; 
+c = fireWeapon ( CrystalBullet , x , y , 2 , 0 )  ; 
+c . hspeed =  - 4.0 ; 
+c . vspeed =  - 2.0 ; 
+c = fireWeapon ( CrystalBullet , x , y , 2 , 0 )  ; 
+c . hspeed = 2.0 ; 
+c . vspeed =  - 4.0 ; 
+c = fireWeapon ( CrystalBullet , x , y , 2 , 0 )  ; 
+c . hspeed =  - 2.0 ; 
+c . vspeed =  - 4.0 ; 
+ } 
+  
+  if ( placeFree ( x , y + 1 )  )  { 
+ c = fireWeapon ( CrystalBullet , x , y , 2 , 0 )  ; 
+c . hspeed = 4.0 ; 
+c = fireWeapon ( CrystalBullet , x , y , 2 , 0 )  ; 
+c . hspeed =  - 4.0 ; 
+c = fireWeapon ( CrystalBullet , x , y , 2 , 0 )  ; 
+c . hspeed = 2.0 ; 
+c . vspeed = 2.0 ; 
+c = fireWeapon ( CrystalBullet , x , y , 2 , 0 )  ; 
+c . hspeed =  - 2.0 ; 
+c . vspeed = 2.0 ; 
+ } 
+  
+  } ;  returnVal . draw = function (  ) { drawSprite ( sprCrystallo , an [ anim ]  [ wrap ( frame , 0 , an [ anim ]  . len (  )  - 1 )  ]  , x - camx , y - camy , 0 , flip +  ( mode == 1 && anim != "squish" ? 2 : 0 )  , 1 , 1 ,  ( blinking ? blinking / 10.0 : 1 )  )  ; 
+ if ( debug )  { 
+ drawText ( font , x - camx , y - camy +  ( mode == 1 ? 8 :  - 24 )  , anim + ":" + frame + "\n" + gravity + ":" + vspeed )  ; 
+ } 
+  
+  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( blinking > 0 )  return ; 
+  
+  if ( anim == "squish" )  return ; 
+  
+  var damage = _mag * damageMult [ _element ]  ;
+  if ( _cut ) damage *= damageMult [ "cut" ]  ; 
+ 
+  if ( _blast ) damage *= damageMult [ "blast" ]  ; 
+ 
+  if ( _stomp ) damage *= damageMult [ "stomp" ]  ; 
+ 
+ health -= damage ; 
+ if ( damage > 0 ) blinking = blinkMax ; 
+ 
+  if ( health <= 0 )  { 
+ frozen = 0 ; 
+mapDeleteSolid ( icebox )  ; 
+frame = 0.0 ; 
+anim = "squish" ; 
+popSound ( sndCrumble )  ; 
+ if (  ! _stomp ) shootBullets (  )  ; 
+ 
+  return ; 
+  } 
+  
+  if ( _element == "ice" ) frozen = minFreezeTime +  ( freezeTime * damageMult [ "ice" ]  )  ; 
+ 
+  if ( _element == "fire" )  { 
+ newActor ( Flame , x , y )  ; 
+popSound ( sndFlame , 0 )  ; 
+ } 
+  
+  } ;  returnVal . _typeof = function (  ) {  return "Crystallo" ;
+  } ; 
+ } 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . mode = 0 ; 
+ squirrelClassFunction . flip = 0 ; 
+ squirrelClassFunction . sharpSide = true ; 
+ squirrelClassFunction . touchDamage = 2 ; 
+ squirrelClassFunction . cut = true ; 
+ squirrelClassFunction . accel = 0.0 ; 
+ squirrelClassFunction . walkTimer = 30 ; 
+ squirrelClassFunction . frame = 0.0 ; 
+ squirrelClassFunction . gravity = 0.2 ; 
+ squirrelClassFunction . waking = false ; 
+ squirrelClassFunction . health = 4 ; 
+ squirrelClassFunction . blinkMax = 30 ; 
+ squirrelClassFunction . friction = 0.0 ; 
+ squirrelClassFunction . element = "earth" ; 
+ squirrelClassFunction . damageMult =  { normal : 1.0 , fire : 1.0 , ice : 1.0 , earth : 0.5 , air : 2.0 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 , star : 10.0 }  ; 
+ squirrelClassFunction . anim = "stand" ; 
+ squirrelClassFunction . an =  { stand :  [ 0 ]  , walk :  [ 0 , 1 , 2 , 3 ]  , squish :  [ 4 , 5 , 5 , 5 , 5 ]  , sleep :  [ 6 , 7 , 8 , 7 , 8 , 7 , 7 , 7 ]  , jump :  [ 9 , 10 , 11 ]  , drop :  [ 12 , 13 , 14 , 15 , 16 , 17 , 18 , 17 , 18 , 19 ]  , fall :  [ 19 ]  }  ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+WaspyBoi =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+     if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
+         squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
+ } 
+ returnVal . timer = 0 ; 
+ returnVal . frame = 0.0 ; 
+ returnVal . biting = false ; 
+ returnVal . flip = 0 ; 
+ returnVal . touchDamage = 2.0 ; 
+ returnVal . health = 2 ; 
+ returnVal . pursuitRange = 128 ; 
+ returnVal . element = "air" ; 
+ returnVal . damageMult =  { normal : 1.0 , fire : 1.0 , ice : 1.0 , earth : 2.0 , air : 0.5 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 , star : 10.0 }  ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   (baseConstructor.bind(this))  ( _x , _y )  ; 
+shape = Rec ( x , y , 8 , 6 , 0 )  ; 
+hspeed = 0.5 ; 
+ } ;  returnVal . physics = function (  ) {  } ;  returnVal . animation = function (  ) {  } ;  returnVal . routine = function (  ) {  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
+ if ( active )  { 
+  if (  ! placeFree ( x +  ( hspeed * 2 )  , y )  ) hspeed =  - hspeed ; 
+ 
+  if (  ! placeFree ( x , y +  ( vspeed * 2 )  )  ) vspeed =  - vspeed ; 
+ 
+ timer --  ; 
+ if ( timer <= 0 )  { 
+ timer = 240 ; 
+vspeed =  - 0.5 + randFloat ( 1 )  ; 
+ if ( hspeed == 0 ) hspeed = 1 ; 
+ 
+  else hspeed *= 1 / fabs ( hspeed )  ; 
+ 
+  } 
+  
+  if ( inWater ( x , y )  ) vspeed -= 0.1 ; 
+ 
+ vspeed *= 0.99 ; 
+ if ( y < 0 ) vspeed += 0.5 ; 
+ 
+  var target = findPlayer (  )  ;
+  if ( target != null && inDistance2 ( x , y , target . x , target . y , pursuitRange )  &&  ! inWater ( x , y )  )  { 
+ timer = 240 ; 
+ if ( x < target . x && hspeed < 2 ) hspeed += 0.05 ; 
+ 
+  if ( x > target . x && hspeed >  - 2 ) hspeed -= 0.05 ; 
+ 
+  if ( y < target . y && vspeed < 2 ) vspeed += 0.05 ; 
+ 
+  if ( y > target . y && vspeed >  - 2 ) vspeed -= 0.05 ; 
+ 
+  if (  ! inDistance2 ( x , y , target . x , target . y , 64 )  )  { 
+  if ( x < target . x && hspeed < 2 ) hspeed += 0.05 ; 
+ 
+  if ( x > target . x && hspeed >  - 2 ) hspeed -= 0.05 ; 
+ 
+  if ( y < target . y && vspeed < 2 ) vspeed += 0.05 ; 
+ 
+  if ( y > target . y && vspeed >  - 2 ) vspeed -= 0.05 ; 
+ 
+  } 
+  
+ pursuitRange = 256 ; 
+ } 
+  
+  else pursuitRange = 128 ; 
+ 
+  if ( y > gvMap . h )  { 
+  if ( vspeed > 0 ) vspeed = 0 ; 
+ 
+ vspeed -= 0.1 ; 
+ } 
+  
+  if ( x > gvMap . w ) hspeed =  - 1.0 ; 
+ 
+  if ( x < 0 ) hspeed = 1.0 ; 
+ 
+  if (  ! frozen )  { 
+  if ( placeFree ( x + hspeed , y )  ) x += hspeed ; 
+ 
+  if ( placeFree ( x , y + vspeed )  ) y += vspeed ; 
+ 
+ flip =  ( hspeed < 0 )  . tointeger (  )  ; 
+ } 
+  
+ shape . setPos ( x , y )  ; 
+ } 
+  
+  } ;  returnVal . draw = function (  ) {  if ( frozen )  { 
+ drawSprite ( sprWaspyBoi , 0 , x - camx , y - camy , 0 , flip , 1 , 1 ,  ( blinking ? blinking / 10.0 : 1 )  )  ; 
+ if ( frozen <= 120 )  { 
+  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSpriteZ ( 2 , sprIceTrapSmall , 0 , x - camx -  ( flip == 0 ? 4 :  - 4 )  - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
+ 
+  else drawSpriteZ ( 2 , sprIceTrapSmall , 0 , x - camx -  ( flip == 0 ? 4 :  - 4 )  , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else drawSpriteZ ( 2 , sprIceTrapSmall , 0 , x - camx -  ( flip == 0 ? 4 :  - 4 )  , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else drawSprite ( sprWaspyBoi , getFrames (  )  / 2 , x - camx , y - camy +  (  ( getFrames (  )  / 8 )  % 2 )  , 0 , flip , 1 , 1 ,  ( blinking ? blinking / 10.0 : 1 )  )  ; 
+ 
+  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  baseMethods . getHurt  ( _by , _mag , _element , _cut , _blast , _stomp )  ; 
+ } ;  returnVal . die = function (  ) {  baseMethods . die  (  )  ; 
+popSound ( sndKick , 0 )  ; 
+newActor ( Poof , x + 8 , y )  ; 
+newActor ( Poof , x - 8 , y )  ; 
+ if ( randInt ( 20 )  == 0 )  { 
+  var a = actor [ newActor ( MuffinBlue , x , y )  ]  ;
+ a . vspeed =  - 2 ; 
+ } 
+  
+  } ;  returnVal . _typeof = function (  ) {  return "WaspyBoi" ;
+  } ; 
+ } 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . timer = 0 ; 
+ squirrelClassFunction . frame = 0.0 ; 
+ squirrelClassFunction . biting = false ; 
+ squirrelClassFunction . flip = 0 ; 
+ squirrelClassFunction . touchDamage = 2.0 ; 
+ squirrelClassFunction . health = 2 ; 
+ squirrelClassFunction . pursuitRange = 128 ; 
+ squirrelClassFunction . element = "air" ; 
+ squirrelClassFunction . damageMult =  { normal : 1.0 , fire : 1.0 , ice : 1.0 , earth : 2.0 , air : 0.5 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 , star : 10.0 }  ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Devine =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+     if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
+         squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
+ } 
+ returnVal . touchDamage = 2 ; 
+ returnVal . sharpSide = true ; 
+ returnVal . sharpTop = true ; 
+ returnVal . height = 0 ; 
+ returnVal . maxHeight = 16 ; 
+ returnVal . health = 4 ; 
+ returnVal . blinkMax = 30 ; 
+ returnVal . damageMult =  { normal : 1.0 , fire : 2.0 , ice : 2.0 , earth : 0.5 , air : 0.5 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 , star : 10.0 }  ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   (baseConstructor.bind(this))  ( _x , _y , _arr )  ; 
+ if ( canint ( _arr )  ) maxHeight = int ( _arr )  ; 
+ 
+ shape = Rec ( x , y , 7 , 7 , 0 )  ; 
+ for (  var i = 0 ;
+ i < 16 ; i ++  )  { 
+  if (  ! placeFree ( x , y -  ( 16 * i )  )  )  break ;  
+ height ++  ; 
+ } 
+ shape . h = height * 8 ; 
+shape . oy =  (  - height * 8 )  + 8 ; 
+ } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  baseMethods . getHurt  ( _by , _mag , _element , _cut , _blast , _stomp )  ; 
+ if ( _element == "fire" )  for (  var i = 0 ;
+ i < height ; i ++  ) newActor ( Flame , x , y -  ( 16 * i )  )  ; 
+ 
+  else  if ( health <= 0 )  for (  var i = 0 ;
+ i < height ; i ++  ) newActor ( Poof , x , y -  ( 16 * i )  )  ; 
+ 
+  
+  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
+ if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  )  { 
+  if ( x > gvPlayer . x )  { 
+  if ( gvPlayer . placeFree ( gvPlayer . x - 2 , gvPlayer . y )  ) gvPlayer . x -= 2 ; 
+ 
+ gvPlayer . hspeed -= 0.2 ; 
+ } 
+  
+  if ( x < gvPlayer . x )  { 
+  if ( gvPlayer . placeFree ( gvPlayer . x + 2 , gvPlayer . y )  ) gvPlayer . x += 2 ; 
+ 
+ gvPlayer . hspeed += 0.2 ; 
+ } 
+  
+  } 
+  
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  )  { 
+  if ( x > gvPlayer2 . x )  { 
+  if ( gvPlayer2 . placeFree ( gvPlayer2 . x - 2 , gvPlayer2 . y )  ) gvPlayer2 . x -= 2 ; 
+ 
+ gvPlayer2 . hspeed -= 0.2 ; 
+ } 
+  
+  if ( x < gvPlayer2 . x )  { 
+  if ( gvPlayer2 . placeFree ( gvPlayer2 . x + 2 , gvPlayer2 . y )  ) gvPlayer2 . x += 2 ; 
+ 
+ gvPlayer2 . hspeed += 0.2 ; 
+ } 
+  
+  } 
+  
+  } ;  returnVal . draw = function (  ) {  for (  var i = 0 ;
+ i < height ; i ++  )  { 
+  var frame = 0 ;
+  if ( i == height - 1 ) frame = 0 ; 
+ 
+  else  if ( i == 0 ) frame = 2 ; 
+ 
+  else frame = 1 ; 
+ 
+  
+ drawSprite ( sprDevine , frame , x - camx +  ( frozen ? 0 :  ( frame == 2 ? 0 : sin (  ( getFrames (  )  / 10.0 )  + i )  )  + 0.5 )  , y - camy -  ( i * 16 )  , 0 , 0 , 1 , 1 ,  ( blinking ? blinking / 10.0 : 1 )  )  ; 
+ if ( frozen ) drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy -  ( i * 16 )  )  ; 
+ 
+  } 
+  if ( debug )  { 
+ setDrawColor ( 0xff0000ff )  ; 
+shape . draw (  )  ; 
+ } 
+  
+  } ;  returnVal . _typeof = function (  ) {  return "Devine" ;
+  } ; 
+ } 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . touchDamage = 2 ; 
+ squirrelClassFunction . sharpSide = true ; 
+ squirrelClassFunction . sharpTop = true ; 
+ squirrelClassFunction . height = 0 ; 
+ squirrelClassFunction . maxHeight = 16 ; 
+ squirrelClassFunction . health = 4 ; 
+ squirrelClassFunction . blinkMax = 30 ; 
+ squirrelClassFunction . damageMult =  { normal : 1.0 , fire : 2.0 , ice : 2.0 , earth : 0.5 , air : 0.5 , toxic : 1.0 , shock : 1.0 , water : 1.0 , light : 1.0 , dark : 1.0 , cut : 1.0 , blast : 1.0 , stomp : 1.0 , star : 10.0 }  ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Gooey =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+     if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
+         squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
+ } 
+ returnVal . sprite = null ; 
+ returnVal . touchDamage = 0 ; 
+ returnVal . damageMult =  { normal : 0 , fire : 0 , ice : 0 , earth : 0 , air : 0 , toxic : 0 , shock : 0 , water : 0 , light : 0 , dark : 0 , cut : 0 , blast : 0 , stomp : 0 , star : 0 }  ; 
+ returnVal . notarget = true ; 
+ returnVal . attacking = false ; 
+ returnVal . wasHeld = false ; 
+ returnVal . an =  { stand :  [ 0 , 1 ]  , crouch :  [ 5 ]  , jump :  [ 2 , 3 ]  , fall :  [ 4 , 5 ]  }  ; 
+ returnVal . anim = "stand" ; 
+ returnVal . gravity = 0.05 ; 
+ returnVal . jumpTimer = 180 ; 
+ returnVal . frame = 0.0 ; 
+ returnVal . nocount = true ; 
+ returnVal . flip = 0 ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   (baseConstructor.bind(this))  ( _x , _y , _arr )  ; 
+nocount = true ; 
+sprite = choose ( sprGooBlack , sprGooBlue , sprGooBrown , sprGooCrimson , sprGooCyan , sprGooGray , sprGooGreen , sprGooIce , sprGooOrange , sprGooPink , sprGooPurple , sprGooRed , sprGooTan , sprGooTeal , sprGooWhite , sprGooYellow )  ; 
+ if ( randInt ( 20 )  == 0 ) sprite = choose ( sprOozeyOozebourne , sprRyemanni , sprGooFox )  ; 
+ 
+ shape = Rec ( x , y , 7 , 7 , 0 )  ; 
+jumpTimer = randInt ( 180 )  ; 
+vspeed =  - 1.0 ; 
+ } ;  returnVal . run = function (  ) { health = 100 ; 
+ baseMethods . run  (  )  ; 
+ if (  ! active )  return ; 
+  
+  switch ( anim )  {  case "stand" : frame += 0.1 ; 
+ case "crouch" :  if ( jumpTimer < 5 ) anim = "crouch" ; 
+ 
+  else anim = "stand" ; 
+ 
+  if ( vspeed <  - 1 )  { 
+ frame = 0.0 ; 
+anim = "jump" ; 
+ } 
+  
+  if ( vspeed > 1 )  { 
+ frame = 0.0 ; 
+anim = "fall" ; 
+ } 
+  
+  break ;  case "jump" :  if ( frame < 1 || vspeed > 0 ) frame += 0.1 ; 
+ 
+  if ( held ) frame = 1 ; 
+ 
+  if ( frame >= 2 &&  ! held )  { 
+ frame = 0.0 ; 
+anim = "fall" ; 
+ } 
+  
+  break ;  case "fall" :  if (  ! placeFree ( x , y + 2 )  ) frame += 0.2 ; 
+ 
+  if ( held ) anim = "jump" ; 
+ 
+  if ( frame >= 2 )  { 
+ anim = "stand" ; 
+frame = 0.0 ; 
+ } 
+  
+  break ;  }  if ( jumpTimer > 0 ) jumpTimer --  ; 
+ 
+  if (  ! placeFree ( x , y + 1 )  )  { 
+ vspeed = 0 ; 
+ if ( jumpTimer <= 0 &&  ! held )  { 
+ vspeed =  - 1.0 - randFloat ( 3.0 )  ; 
+hspeed = randFloat ( 4.0 )  - 2.0 ; 
+jumpTimer = randInt ( 180 )  + 240 ; 
+ } 
+  
+  } 
+  
+ wasHeld = held ; 
+holdMe ( 5 )  ; 
+ if ( wasHeld &&  ! held ) attacking = true ; 
+ 
+  if (  ! placeFree ( x , y + 1 )  ||  ( vspeed == 0 && hspeed == 0 )  ) attacking = false ; 
+ 
+  if ( attacking ) fireWeapon ( MeleeHit , x + hspeed , y + vspeed , 1 , id )  ; 
+ 
+  if ( x > xprev && fabs ( x - xprev )  > 0.5 ) flip = 0 ; 
+ 
+  if ( x < xprev && fabs ( x - xprev )  > 0.5 ) flip = 1 ; 
+ 
+  } ;  returnVal . draw = function (  ) {  if (  ! active )  return ; 
+  
+ drawSprite ( sprite , an [ anim ]  [ wrap ( floor ( frame )  , 0 , an [ anim ]  . len (  )  - 1 )  ]  +  ( 6 * flip )  , x - camx , y - camy , 0 , flip )  ; 
+ if ( debug ) drawText ( font , x - camx + 16 , y - 8 - camy , anim + "(" + vspeed + ")" )  ; 
+ 
+  } ;  returnVal . physics = function (  ) { xprev = x ; 
+yprev = y ; 
+ if ( vspeed > 8 ) vspeed = 8.0 ; 
+ 
+  if ( x < 0 )  { 
+ vspeed =  - 2.0 ; 
+hspeed = 2.0 ; 
+ } 
+  
+  if ( x > gvMap . w )  { 
+ vspeed =  - 2.0 ; 
+hspeed =  - 2.0 ; 
+ } 
+  
+  if (  ! placeFree ( x , y - 1 )  ) vspeed = 1.0 ; 
+ 
+  if ( placeFree ( x , y + 1 )  ) vspeed += 0.1 ; 
+ 
+  else hspeed -=  (  squirrelThreeWaysCompare ( hspeed , 0 )  )  * 0.1 ; 
+ 
+  if ( placeFree ( x , y + vspeed )  ) y += vspeed ; 
+ 
+  else vspeed /= 2.0 ; 
+ 
+  var didstep = false ;
+  for (  var i = 0 ;
+ i <= 8 ; i ++  )  { 
+  if ( placeFree ( x + hspeed , y - i )  )  { 
+ x += hspeed ; 
+y -= i ; 
+didstep = true ; 
+ break ;  } 
+  
+  } 
+  if (  ! didstep ) hspeed /= 2.0 ; 
+ 
+ shape . setPos ( x , y )  ; 
+ } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  if ( _blast )  { 
+  var angle = pointAngle ( hitBy . x , hitBy . y , x , y )  ;
+ hspeed = lendirX ( _mag + 1.0 , angle )  ; 
+vspeed = lendirY ( _mag + 1.0 , angle )  - 2.0 ; 
+ } 
+  
+ blinking = 0 ; 
+ } ;  returnVal . hurtInvinc = function (  ) {  } ;  returnVal . hurtPlayer = function ( target = null ) {  } ;  returnVal . _typeof = function (  ) {  return "Gooey" ;
+  } ; 
+ } 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . sprite = null ; 
+ squirrelClassFunction . touchDamage = 0 ; 
+ squirrelClassFunction . damageMult =  { normal : 0 , fire : 0 , ice : 0 , earth : 0 , air : 0 , toxic : 0 , shock : 0 , water : 0 , light : 0 , dark : 0 , cut : 0 , blast : 0 , stomp : 0 , star : 0 }  ; 
+ squirrelClassFunction . notarget = true ; 
+ squirrelClassFunction . attacking = false ; 
+ squirrelClassFunction . wasHeld = false ; 
+ squirrelClassFunction . an =  { stand :  [ 0 , 1 ]  , crouch :  [ 5 ]  , jump :  [ 2 , 3 ]  , fall :  [ 4 , 5 ]  }  ; 
+ squirrelClassFunction . anim = "stand" ; 
+ squirrelClassFunction . gravity = 0.05 ; 
+ squirrelClassFunction . jumpTimer = 180 ; 
+ squirrelClassFunction . frame = 0.0 ; 
+ squirrelClassFunction . nocount = true ; 
+ squirrelClassFunction . flip = 0 ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+Snippin =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+     if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
+         squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
+ } 
+ returnVal . rolling = false ; 
+ returnVal . mode = 0 ; 
+ returnVal . sprite = sprSnailBlue ; 
+ returnVal . direction = 0 ; 
+ returnVal . flip = 0 ; 
+ returnVal . fliph = 0 ; 
+ returnVal . an =  { crawl :  [ 0 , 1 ]  , hide :  [ 2 , 3 ]  , roll :  [ 4 , 5 , 6 , 7 ]  , peek :  [ 8 , 9 , 10 , 9 , 10 , 11 ]  }  ; 
+ returnVal . anim = "crawl" ; 
+ returnVal . frame = 0.0 ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = 0 ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   (baseConstructor.bind(this))  ( _x , _y , _arr )  ; 
+mode = _arr ; 
+ switch ( mode )  {  case 0 : sprite = sprSnailBlue ; 
+ break ;  case 1 : sprite = sprSnailRed ; 
+ break ;  case 2 : sprite = sprSnailGreen ; 
+ break ;  } shape = Rec ( x , y , 4 , 4 , 0 )  ; 
+ for (  var i = 1 ;
+ i <= 16 ; i ++  )  { 
+  if ( placeFree ( x + i , y )  &&  ! placeFree ( x + i + 1 , y )  )  { 
+ x += i ; 
+ return ; 
+  } 
+  
+  if ( placeFree ( x - i , y )  &&  ! placeFree ( x - i - 1 , y )  )  { 
+ x -= i ; 
+ return ; 
+  } 
+  
+  if ( placeFree ( x , y + i )  &&  ! placeFree ( x , y + i + 1 )  )  { 
+ y += i ; 
+ return ; 
+  } 
+  
+  if ( placeFree ( x , y - i )  &&  ! placeFree ( x , y - i - 1 )  )  { 
+ y -= i ; 
+ return ; 
+  } 
+  
+  } 
+  } ;  returnVal . run = function (  ) {  if (  ! active )  { 
+  var target = findPlayer (  )  ;
+  if ( target )  { 
+  if ( x > target . x )  { 
+ flip = 2 ; 
+direction = 180 ; 
+ } 
+  
+  else flip = 0 ; 
+ 
+  } 
+  
+  } 
+  
+  baseMethods . run  (  )  ; 
+ } ;  returnVal . animation = function (  ) {  switch ( anim )  {  case "crawl" : frame =  ( float ( getFrames (  )  )  / 12.0 )  + id ; 
+ break ;  }  } ;  returnVal . physics = function (  ) {  if ( rolling || mode == 0 ) gravity = 0.2 ; 
+ 
+  else gravity = 0.0 ; 
+ 
+ vspeed += gravity ; 
+ if ( placeFree ( x , y + vspeed )  ) y += vspeed ; 
+ 
+  else vspeed /= 2.0 ; 
+ 
+  if (  ! rolling )  { 
+  var didMove = false ;
+  for (  var i = 0 ;
+ i <=  ( mode > 0 ? 3 : 0 )  ; i ++  )  { 
+  if ( placeFree ( x + lendirX ( 2 , direction +  ( 22.5 * i )  )  , y + lendirY ( 2 , direction +  ( 22.5 * i )  )  )  )  { 
+ x += lendirX ( 1 , direction +  ( 22.5 * i )  )  ; 
+y += lendirY ( 1 , direction +  ( 22.5 * i )  )  ; 
+direction +=  ( 22.5 * i )  ; 
+didMove = true ; 
+ break ;  } 
+  
+  else  if ( placeFree ( x + lendirX ( 2 , direction -  ( 22.5 * i )  )  , y + lendirY ( 2 , direction -  ( 22.5 * i )  )  )  )  { 
+ x += lendirX ( 1 , direction -  ( 22.5 * i )  )  ; 
+y += lendirY ( 1 , direction -  ( 22.5 * i )  )  ; 
+direction -=  ( 22.5 * i )  ; 
+didMove = true ; 
+ break ;  } 
+  
+  
+  } 
+  if (  ! didMove && mode > 0 )  { 
+  if ( placeFree ( x + lendirX ( 2 , direction +  ( 90 )  )  , y + lendirY ( 2 , direction +  ( 90 )  )  )  ) direction += 90 ; 
+ 
+  else  if ( placeFree ( x + lendirX ( 2 , direction -  ( 90 )  )  , y + lendirY ( 2 , direction -  ( 90 )  )  )  ) direction -= 90 ; 
+ 
+  else  if ( placeFree ( x + lendirX ( 2 , direction -  ( 180 )  )  , y + lendirY ( 2 , direction -  ( 180 )  )  )  ) direction -= 180 ; 
+ 
+  
+  
+  } 
+  
+  else  if (  ! didMove && mode == 0 )  { 
+ direction += 180 ; 
+flip = int (  ! flip )  * 2 ; 
+ } 
+  
+  
+  if ( hspeed > 0 ) fliph = 0 ; 
+ 
+  if ( hspeed < 0 ) fliph = 1 ; 
+ 
+ direction %= 360 ; 
+ if ( mode > 0 )  { 
+  if (  ( direction == 0 || direction == 180 )  && placeFree ( x , y + 1 )  && placeFree ( x , y - 1 )  )  { 
+  if (  ! placeFree ( x + 2 , y + 2 )  )  { 
+ direction = 90 ; 
+flip = 2 ; 
+ } 
+  
+  if (  ! placeFree ( x - 2 , y + 2 )  )  { 
+ direction = 90 ; 
+flip = 0 ; 
+ } 
+  
+  if (  ! placeFree ( x + 2 , y - 2 )  )  { 
+ direction =  - 90 ; 
+flip = 0 ; 
+ } 
+  
+  if (  ! placeFree ( x - 2 , y - 2 )  )  { 
+ direction =  - 90 ; 
+flip = 2 ; 
+ } 
+  
+  } 
+  
+  else  if (  ( direction == 90 || direction == 270 || direction ==  - 90 )  && placeFree ( x + 1 , y )  && placeFree ( x - 1 , y )  )  { 
+  if (  ! placeFree ( x + 2 , y + 2 )  )  { 
+ direction = 0 ; 
+flip = 0 ; 
+ } 
+  
+  if (  ! placeFree ( x - 2 , y + 2 )  )  { 
+ direction = 180 ; 
+flip = 2 ; 
+ } 
+  
+  if (  ! placeFree ( x + 2 , y - 2 )  )  { 
+ direction = 0 ; 
+flip = 2 ; 
+ } 
+  
+  if (  ! placeFree ( x - 2 , y - 2 )  )  { 
+ direction = 180 ; 
+flip = 0 ; 
+ } 
+  
+  } 
+  
+  
+  } 
+  
+ shape . setPos ( x , y )  ; 
+ } 
+  
+  } ;  returnVal . draw = function (  ) { drawSpriteZ ( 4 , sprite , an [ anim ]  [ wrap ( frame , 0 , an [ anim ]  . len (  )  - 1 )  ]  , x - camx , y - camy , direction ,  ( rolling ? fliph : flip )  )  ; 
+ if ( debug ) drawText ( font , x + 8 - camx , y - camy , str ( direction )  )  ; 
+ 
+  } ;  returnVal . _typeof = function (  ) {  return "Snippin" ;
+  } ; 
+ } 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . rolling = false ; 
+ squirrelClassFunction . mode = 0 ; 
+ squirrelClassFunction . sprite = sprSnailBlue ; 
+ squirrelClassFunction . direction = 0 ; 
+ squirrelClassFunction . flip = 0 ; 
+ squirrelClassFunction . fliph = 0 ; 
+ squirrelClassFunction . an =  { crawl :  [ 0 , 1 ]  , hide :  [ 2 , 3 ]  , roll :  [ 4 , 5 , 6 , 7 ]  , peek :  [ 8 , 9 , 10 , 9 , 10 , 11 ]  }  ; 
+ squirrelClassFunction . anim = "crawl" ; 
+ squirrelClassFunction . frame = 0.0 ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
+PeterFlower =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = PhysAct ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+     if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
+         squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
+ } 
+ returnVal . frame = 0.0 ; 
+ returnVal . an =  { idle :  [ 0 , 1 ]  , close :  [ 2 , 3 ]  , chew :  [ 4 , 5 , 6 , 7 ]  , spit :  [ 3 , 2 ]  }  ; 
+ returnVal . anim = "idle" ; 
+ returnVal . hasPlayer = 0 ; 
+ returnVal . cooldown = 0 ; 
+ returnVal . holdStrength = 8 ; 
+ returnVal . dir = 1 ; 
+ returnVal . target = null ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   (baseConstructor.bind(this))  ( _x , _y , _arr )  ; 
+ if ( _arr != null ) dir = int ( _arr )  ; 
+ 
+ shape = Rec ( x , y -  ( 8 * dir )  , 12 , 8 , 0 )  ; 
+ } ;  returnVal . run = function (  ) {  switch ( hasPlayer )  {  case 0 :  if ( cooldown > 0 )  { 
+ cooldown --  ; 
+ break ;  } 
+  
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  )  { 
+ hasPlayer = 1 ; 
+holdStrength = 16 ; 
+ if ( isOnScreen (  )  && anim == "idle" ) popSound ( sndGulp )  ; 
+ 
+  } 
+  
+  else  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  )  { 
+ hasPlayer = 2 ; 
+holdStrength = 16 ; 
+ if ( isOnScreen (  )  && anim == "idle" ) popSound ( sndGulp )  ; 
+ 
+  } 
+  
+  else  {     var foreachOutput3 = squirrelForEach( gvEnemies );     while(true)     {        foreachOutput3.next();        if (foreachOutput3.isDone()) break; k = foreachOutput3.getKey(); i = foreachOutput3.getValue();  { 
+  if ( checkActor ( k )  &&  squirrelInstanceOf( actor [ k ]  , Enemy)  && hitTest ( shape , actor [ k ]  . shape )  )  { 
+ hasPlayer = 3 ; 
+target = actor [ k ]  . id ; 
+ if ( isOnScreen (  )  && anim == "idle" ) popSound ( sndGulp )  ; 
+ 
+  } 
+  
+  } 
+     }  }  
+  
+  if ( checkActor ( "OneUp" )  )  {     var foreachOutput4 = squirrelForEach( actor [ "OneUp" ]  );     while(true)     {        foreachOutput4.next();        if (foreachOutput4.isDone()) break; i = foreachOutput4.getValue();  if ( hitTest ( shape , i . shape )  )  { 
+ deleteActor ( i . id )  ; 
+anim = "close" ; 
+frame = 0.0 ; 
+ if ( isOnScreen (  )  ) popSound ( sndGulp )  ; 
+ 
+  } 
+  
+     }  }  
+  if ( checkActor ( "Starnyan" )  )  {     var foreachOutput5 = squirrelForEach( actor [ "Starnyan" ]  );     while(true)     {        foreachOutput5.next();        if (foreachOutput5.isDone()) break; i = foreachOutput5.getValue();  if ( hitTest ( shape , i . shape )  )  { 
+ deleteActor ( i . id )  ; 
+anim = "close" ; 
+frame = 0.0 ; 
+ if ( isOnScreen (  )  ) popSound ( sndGulp )  ; 
+ 
+  } 
+  
+     }  }  
+  if ( checkActor ( "MuffinBlue" )  )  {     var foreachOutput6 = squirrelForEach( actor [ "MuffinBlue" ]  );     while(true)     {        foreachOutput6.next();        if (foreachOutput6.isDone()) break; i = foreachOutput6.getValue();  if ( hitTest ( shape , i . shape )  )  { 
+ deleteActor ( i . id )  ; 
+anim = "close" ; 
+frame = 0.0 ; 
+ if ( isOnScreen (  )  ) popSound ( sndGulp )  ; 
+ 
+  } 
+  
+     }  }  
+  if ( checkActor ( "MuffinRed" )  )  {     var foreachOutput7 = squirrelForEach( actor [ "MuffinRed" ]  );     while(true)     {        foreachOutput7.next();        if (foreachOutput7.isDone()) break; i = foreachOutput7.getValue();  if ( hitTest ( shape , i . shape )  )  { 
+ deleteActor ( i . id )  ; 
+anim = "close" ; 
+frame = 0.0 ; 
+ if ( isOnScreen (  )  ) popSound ( sndGulp )  ; 
+ 
+  } 
+  
+     }  }  
+  if ( checkActor ( "SulphurNimbus" )  )  {     var foreachOutput8 = squirrelForEach( actor [ "SulphurNimbus" ]  );     while(true)     {        foreachOutput8.next();        if (foreachOutput8.isDone()) break; i = foreachOutput8.getValue();  if ( hitTest ( shape , i . shape )  )  { 
+ deleteActor ( i . id )  ; 
+anim = "close" ; 
+frame = 0.0 ; 
+ if ( isOnScreen (  )  ) popSound ( sndGulp )  ; 
+ 
+  } 
+  
+     }  }  
+  break ;  case 1 :  if ( gvPlayer && holdStrength > 0 )  { 
+ gvPlayer . canMove = false ; 
+gvPlayer . hurt = 1 + game . difficulty ; 
+gvPlayer . x = x ; 
+gvPlayer . y = y -  ( 16 * dir )  ; 
+gvPlayer . hidden = true ; 
+gvPlayer . hspeed = 0 ; 
+gvPlayer . vspeed = 0 ; 
+ } 
+  
+  if (  ! gvPlayer || holdStrength <= 0 )  { 
+ hasPlayer = 0 ; 
+ if ( gvPlayer )  { 
+ gvPlayer . canMove = true ; 
+gvPlayer . vspeed =  - 4 * dir ; 
+ } 
+  
+ cooldown = 180 ; 
+ } 
+  
+  break ;  case 2 :  if ( gvPlayer2 && holdStrength > 0 )  { 
+ gvPlayer2 . canMove = false ; 
+gvPlayer2 . hurt = 1 + game . difficulty ; 
+gvPlayer2 . x = x ; 
+gvPlayer2 . y = y -  ( 16 * dir )  ; 
+gvPlayer2 . hidden = true ; 
+gvPlayer2 . hspeed = 0 ; 
+gvPlayer2 . vspeed = 0 ; 
+ } 
+  
+  if (  ! gvPlayer2 || holdStrength <= 0 )  { 
+ hasPlayer = 0 ; 
+ if ( gvPlayer2 )  { 
+ gvPlayer2 . canMove = true ; 
+gvPlayer2 . vspeed =  - 4 * dir ; 
+ } 
+  
+ cooldown = 180 ; 
+ } 
+  
+  break ;  case 3 :  if ( checkActor ( target )  && actor [ target ]  . health > 0 )  { 
+ actor [ target ]  . x = shape . x ; 
+actor [ target ]  . y = shape . y ; 
+actor [ target ]  . hspeed = 0 ; 
+actor [ target ]  . vspeed = 0 ; 
+ if ( getFrames (  )  % 15 == 0 ) actor [ target ]  . health -= 1.0 ; 
+ 
+  } 
+  
+  else  { 
+ hasPlayer = 0 ; 
+target = null ; 
+ } 
+  
+  }  if ( checkActor ( "DeadPlayer" )  )  {     var foreachOutput9 = squirrelForEach( actor [ "DeadPlayer" ]  );     while(true)     {        foreachOutput9.next();        if (foreachOutput9.isDone()) break; i = foreachOutput9.getValue();  { 
+  if ( inDistance2 ( x , y , i . x , i . y , 16 )  )  { 
+ i . x =  - 100 ; 
+i . y =  - 100 ; 
+ } 
+  
+  } 
+     }  }  
+  if ( checkActor ( "DeadNME" )  )  {     var foreachOutput10 = squirrelForEach( actor [ "DeadNME" ]  );     while(true)     {        foreachOutput10.next();        if (foreachOutput10.isDone()) break; i = foreachOutput10.getValue();  { 
+  if ( inDistance2 ( x , y , i . x , i . y , 16 )  )  { 
+ i . x =  - 100 ; 
+i . y =  - 100 ; 
+ } 
+  
+  } 
+     }  }  
+  if ( hasPlayer > 0 && hasPlayer < 3 &&  ( getcon ( "up" , "press" , true , hasPlayer )  || getcon ( "down" , "press" , true , hasPlayer )  || getcon ( "left" , "press" , true , hasPlayer )  || getcon ( "right" , "press" , true , hasPlayer )  || getcon ( "jump" , "press" , true , hasPlayer )  || getcon ( "shoot" , "press" , true , hasPlayer )  || getcon ( "spec1" , "press" , true , hasPlayer )  )  ) holdStrength --  ; 
+ 
+  switch ( anim )  {  case "idle" : frame += 0.05 ; 
+ if ( hasPlayer > 0 )  { 
+ frame = 0.0 ; 
+anim = "close" ; 
+ } 
+  
+  break ;  case "close" : frame += 0.25 ; 
+ if ( frame >= 2 )  { 
+ anim = "chew" ; 
+frame = 0.0 ; 
+ } 
+  
+  break ;  case "spit" : frame += 0.1 ; 
+ if ( frame >= 2 ) anim = "idle" ; 
+ 
+  break ;  case "chew" : frame += 0.25 ; 
+ if ( hasPlayer == 0 && frame >= 4 )  { 
+ frame = 0.0 ; 
+anim = "spit" ; 
+ } 
+  
+  break ;  }  } ;  returnVal . draw = function (  ) { drawSpriteZ ( 8 , sprPeterFlower , an [ anim ]  [ wrap ( floor ( frame )  , 0 , an [ anim ]  . len (  )  - 1 )  ]  , x - camx , y - camy , 0 , max (  - dir + 1 , 0 )  )  ; 
+ } ;  returnVal . _typeof = function (  ) {  return "PeterFlower" ;
+  } ; 
+ } 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ squirrelClassFunction . an =  { idle :  [ 0 , 1 ]  , close :  [ 2 , 3 ]  , chew :  [ 4 , 5 , 6 , 7 ]  , spit :  [ 3 , 2 ]  }  ; 
+ squirrelClassFunction . anim = "idle" ; 
+ squirrelClassFunction . hasPlayer = 0 ; 
+ squirrelClassFunction . cooldown = 0 ; 
+ squirrelClassFunction . holdStrength = 8 ; 
+ squirrelClassFunction . dir = 1 ; 
+ squirrelClassFunction . target = null ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = PhysAct;  return squirrelClassFunction; })()) ; 
+Granito =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Enemy ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+     if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
+         squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
+ } 
+ returnVal . frame = 0.0 ; 
+ returnVal . flip = false ; 
+ returnVal . squish = false ; 
+ returnVal . squishTime = 0.0 ; 
+ returnVal . smart = false ; 
+ returnVal . moving = false ; 
+ returnVal . touchDamage = 0.0 ; 
+ returnVal . health = 100.0 ; 
+ returnVal . w = 8 ; 
+ returnVal . h = 8 ; 
+ returnVal . damageMult =  { normal : 0.0 , fire : 0.0 , ice : 0.0 , earth : 0.0 , air : 0.0 , toxic : 0.0 , shock : 0.0 , water : 0.0 , light : 0.0 , dark : 0.0 , cut : 0.0 , blast : 0.0 , stomp : 0.0 , star : 0.0 }  ; 
+ 
+ with ( returnVal ) { 
+  returnVal . constructor = function ( _x , _y , _arr = null ) { if (arguments.length > 0 && arguments[0] === 'DO_NOT_CALL_CONSTRUCTOR') return;
+
+   (baseConstructor.bind(this))  ( _x . tofloat (  )  , _y . tofloat (  )  )  ; 
+shape = Rec ( x , y , 8 , 8 , 0 )  ; 
+smart = bool ( _arr )  ; 
+ } ;  returnVal . routine = function (  ) {  } ;  returnVal . animation = function (  ) {  } ;  returnVal . physics = function (  ) {  } ;  returnVal . run = function (  ) {  baseMethods . run  (  )  ; 
+health = 100 ; 
+ if ( active )  { 
+  var target = findPlayer (  )  ;
+  if (  ! moving )  { 
+  if ( target != null && target && x > target . x ) flip = true ; 
+ 
+ moving = true ; 
+ } 
+  
+  if (  ! squish )  { 
+  if ( placeFree ( x , y + 1 )  ) vspeed += 0.1 ; 
+ 
+  if ( placeFree ( x , y + vspeed )  ) y += vspeed ; 
+ 
+  else vspeed /= 2 ; 
+ 
+  if ( y > gvMap . h + 8 ) die (  )  ; 
+ 
+  if (  ! frozen )  { 
+  if ( flip )  { 
+  if ( placeFree ( x - 1 , y )  ) x -= 1.0 ; 
+ 
+  else  if ( placeFree ( x - 2 , y - 2 )  )  { 
+ x -= 1.0 ; 
+y -= 1.0 ; 
+ } 
+  
+  else  if ( placeFree ( x - 1 , y - 2 )  )  { 
+ x -= 1.0 ; 
+y -= 1.0 ; 
+ } 
+  
+  else flip = false ; 
+ 
+  
+  
+  if ( smart )  if ( placeFree ( x - 6 , y + 14 )  &&  ! placeFree ( x + 2 , y + 14 )  ) flip = false ; 
+ 
+  
+  if ( x <= 0 ) flip = false ; 
+ 
+ hspeed =  - 1.0 ; 
+ } 
+  
+  else  { 
+  if ( placeFree ( x + 1 , y )  ) x += 1.0 ; 
+ 
+  else  if ( placeFree ( x + 1 , y - 1 )  )  { 
+ x += 1.0 ; 
+y -= 1.0 ; 
+ } 
+  
+  else  if ( placeFree ( x + 2 , y - 2 )  )  { 
+ x += 1.0 ; 
+y -= 1.0 ; 
+ } 
+  
+  else flip = true ; 
+ 
+  
+  
+  if ( smart )  if ( placeFree ( x + 6 , y + 14 )  &&  ! placeFree ( x - 2 , y + 14 )  ) flip = true ; 
+ 
+  
+  if ( x >= gvMap . w ) flip = true ; 
+ 
+ hspeed = 1.0 ; 
+ } 
+  
+  } 
+  
+  if ( frozen )  { 
+  var canice = true ;
+  if ( gvPlayer && hitTest ( shape , gvPlayer . shape )  ) canice = false ; 
+ 
+  if ( gvPlayer2 && hitTest ( shape , gvPlayer2 . shape )  ) canice = false ; 
+ 
+  if ( icebox ==  - 1 && canice )  { 
+  if ( health > 0 ) icebox = mapNewSolid ( shape )  ; 
+ 
+  } 
+  
+  } 
+  
+  else  { 
+  if ( icebox !=  - 1 )  { 
+ newActor ( IceChunks , x , y )  ; 
+mapDeleteSolid ( icebox )  ; 
+icebox =  - 1 ; 
+ if ( gvPlayer )  if ( x > gvPlayer . x ) flip = true ; 
+ 
+  else flip = false ; 
+ 
+  
+  } 
+  
+  } 
+  
+  } 
+  
+  else  { 
+ squishTime += 0.025 ; 
+ if ( squishTime >= 1 ) die (  )  ; 
+ 
+  } 
+  
+  if (  ! squish ) shape . setPos ( x , y )  ; 
+ 
+ setDrawColor ( 0xff0000ff )  ; 
+ if ( debug ) shape . draw (  )  ; 
+ 
+  } 
+  
+  } ;  returnVal . draw = function (  ) {  if (  ! active )  return ; 
+  
+  if (  ! squish )  { 
+  if ( frozen )  { 
+  if ( smart ) drawSprite ( sprGranito , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else drawSprite ( sprGranito , 0 , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  if ( frozen <= 120 )  { 
+  if ( floor ( frozen / 4 )  % 2 == 0 ) drawSprite ( sprIceTrapSmall , 0 , x - camx - 1 +  (  ( floor ( frozen / 4 )  % 4 == 0 )  . tointeger (  )  * 2 )  , y - camy - 1 )  ; 
+ 
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else drawSprite ( sprIceTrapSmall , 0 , x - camx , y - camy - 1 )  ; 
+ 
+  } 
+  
+  else  { 
+  if ( smart ) drawSprite ( sprGranito , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else drawSprite ( sprGranito , wrap ( getFrames (  )  / 8 , 0 , 3 )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  } 
+  
+  } 
+  
+  else  { 
+  if ( smart ) drawSprite ( sprGranito , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  else drawSprite ( sprGranito , floor ( 4.8 + squishTime )  , floor ( x - camx )  , floor ( y - camy )  , 0 , flip . tointeger (  )  , 1 , 1 , 1 )  ; 
+ 
+  } 
+  
+  } ;  returnVal . getHurt = function ( _by = 0 , _mag = 1 , _element = "normal" , _cut = false , _blast = false , _stomp = false ) {  } ;  returnVal . hurtblast = function (  ) {  } ;  returnVal . hurtFire = function (  ) {  } ;  returnVal . hurtIce = function (  ) {  } ;  returnVal . _typeof = function (  ) {  return "MoPlat" ;
+  } ; 
+ } 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . frame = 0.0 ; 
+ squirrelClassFunction . flip = false ; 
+ squirrelClassFunction . squish = false ; 
+ squirrelClassFunction . squishTime = 0.0 ; 
+ squirrelClassFunction . smart = false ; 
+ squirrelClassFunction . moving = false ; 
+ squirrelClassFunction . touchDamage = 0.0 ; 
+ squirrelClassFunction . health = 100.0 ; 
+ squirrelClassFunction . w = 8 ; 
+ squirrelClassFunction . h = 8 ; 
+ squirrelClassFunction . damageMult =  { normal : 0.0 , fire : 0.0 , ice : 0.0 , earth : 0.0 , air : 0.0 , toxic : 0.0 , shock : 0.0 , water : 0.0 , light : 0.0 , dark : 0.0 , cut : 0.0 , blast : 0.0 , stomp : 0.0 , star : 0.0 }  ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Enemy;  return squirrelClassFunction; })()) ; 
 
 
 

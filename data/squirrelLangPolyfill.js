@@ -4,6 +4,10 @@ Array.prototype.append = function (val) {
 	return this;
 };
 
+Array.prototype.clear = function () {
+	this.splice(0);
+};
+
 Array.prototype.insert = function (index, item) {
 	this.splice(index, 0, item);
 	return this;
@@ -99,6 +103,10 @@ String.prototype.tointeger = function () {
 	return parseInt(this, 10);
 };
 
+String.prototype.tolower = function () {
+	return this.toLowerCase();
+};
+
 String.prototype.tostring = function () {
 	return this;
 };
@@ -140,6 +148,54 @@ window.fabs = function (num) {
 	if (num < 0)
 		return -num;
 	return num;
+};
+
+window.format = function (str, ...values) {
+	let valuesIndex = 0;
+	while (true) {
+		let indexStart = str.indexOf("%");
+		
+		if (indexStart < 0)
+			return str;
+
+		let indexEnd = indexStart;
+		
+		while (true) {
+			indexEnd++;
+			if (indexEnd === str.length)
+				return str;
+			
+			if (str.charAt(indexEnd) === "s")
+				break;
+			
+			if (str.charAt(indexEnd) === "d")
+				break;
+		}
+		
+		let strA = str.substring(0, indexStart);
+		
+		let strB;
+		
+		if (indexEnd - indexStart > 1) {
+			strB = Math.floor(values[valuesIndex]) + "";
+			valuesIndex++;
+		
+			let padding = parseInt(str.substring(indexStart + 1, indexEnd), 10);
+			while (strB.length < padding)
+				strB = "0" + strB;
+		} else {
+			strB = values[valuesIndex] + "";
+			valuesIndex++;
+		}
+		
+		let strC = str.substring(indexEnd + 1);
+		
+		str = strA + strB + strC;
+	}
+};
+
+window.format.acall = function (array) {
+	return window.format(array[1], ...array.slice(2));
 };
 
 window.getroottable = function () {

@@ -5,7 +5,7 @@ window.superTuxAdvanceWebVersion.squirrelFiles['src/levelend.nut'] = function ()
 
 
 levelEndRunner = 0 ; 
-LevelEnder =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
+LevelEnder =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal = Actor ( 'DO_NOT_CALL_CONSTRUCTOR' ) ; var baseMethods = { ... returnVal }; var baseConstructor = returnVal.constructor;  for (var baseProperty in returnVal) { 
      if (returnVal.hasOwnProperty(baseProperty) && (typeof returnVal[baseProperty]) !== 'function' && squirrelClassFunction[baseProperty] === undefined) 
          squirrelClassFunction[baseProperty] = returnVal[baseProperty]; 
  } 
@@ -27,6 +27,16 @@ levelEndRunner = 0 ;
  
   else startPlay ( game . path + gvNextLevel + ".json" , true , true )  ; 
  
+  if ( game . difficulty == 0 || gvTAStep % game . difficulty == 0 )  { 
+ game . maxHealth ++  ; 
+game . ps . health ++  ; 
+game . ps2 . health ++  ; 
+ } 
+  
+  if ( game . energyBonus <= game . staminaBonus ) game . energyBonus += 1.0 /  ( game . difficulty + 1 )  ; 
+ 
+  else game . staminaBonus += 1.0 /  ( game . difficulty + 1 )  ; 
+ 
  gvIGT = 0 ; 
  } 
   
@@ -40,18 +50,37 @@ levelEndRunner = 0 ;
   } ;  returnVal . _typeof = function (  ) {  return "LevelEnder" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . timer = 180 ; 
- return squirrelClassFunction; })()) ; 
-endGoal =  function ( next = "" , unblock = "" ) {  var clearedLevel ;
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . timer = 180 ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  squirrelClassFunction.SQUIRREL_SUPER_CLASS = Actor;  return squirrelClassFunction; })()) ; 
+endGoal =  function ( speed = 0 , unblock = "" ) {  var clearedLevel ;
  clearedLevel = gvMap . name ; 
-gvNextLevel = next ; 
  if ( levelEndRunner == 0 )  { 
+  if ( gvTimeAttack )  { 
+ gvTAStep ++  ; 
+ if ( gvTAStep < gvTACourse . len (  )  ) gvNextLevel = gvTACourse [ gvTAStep ]  ; 
+ 
+  else  { 
+ game . path = "res/map" ; 
+gvNextLevel = "timeattack-win" ; 
+ } 
+  
+  } 
+  
+  if ( gvPlayer )  { 
  gvPlayer . canMove = false ; 
 gvPlayer . endMode = true ; 
- if ( gvPlayer . hspeed > 2 ) gvPlayer . hspeed = 2.0 ; 
+gvPlayer . invincible = 999 ; 
+ } 
+  
+  if ( gvPlayer2 )  { 
+ gvPlayer2 . canMove = false ; 
+gvPlayer2 . endMode = true ; 
+gvPlayer2 . invincible = 999 ; 
+ } 
+  
+  if (  ( (myTarget[ ( "endSpeed" ) ] !== undefined) )  ) myTarget . endSpeed = speed ; 
  
- gvPlayer . invincible = 999 ; 
- if ( unblock != "" &&  ! game . unblocked . rawin ( unblock )  ) game . unblocked [ unblock ] = true ; 
+  if ( unblock != "" &&  ! game . unblocked . rawin ( unblock )  ) game . unblocked [ unblock ] = true ; 
  
   if (  ! game . completed . rawin ( clearedLevel )  ) game . completed [ clearedLevel ] = true ; 
  
@@ -86,11 +115,32 @@ gvPlayer . endMode = true ;
   else  if ( game . bestEnemies [ clearedLevel ]  < game . enemies ) game . bestEnemies [ clearedLevel ] = game . enemies ; 
  
   
+  if ( gvNumPlayers == 1 &&  ( (gvPlayer[ ( "strokes" ) ] !== undefined) )  )  { 
+  if (  ! game . bestStrokes . rawin ( clearedLevel )  ) game . bestStrokes [ clearedLevel ] = gvPlayer . strokes ; 
+ 
+  else  if ( game . bestStrokes [ clearedLevel ]  > gvPlayer . strokes ) game . bestStrokes [ clearedLevel ] = gvPlayer . strokes ; 
+ 
+  
+  } 
+  
  game . coins += game . levelCoins ; 
 playSound ( sndWin , 0 )  ; 
 stopMusic (  )  ; 
 levelEndRunner = newActor ( LevelEnder , 0 , 0 )  ; 
-saveGame (  )  ; 
+ if ( ghostRecordNew . len (  )  < ghostRecordOld . len (  )  || ghostRecordOld . len (  )  <= 1 )  { 
+  if ( gvNumPlayers == 1 )  { 
+  var timeString = "" ;
+  for (  var i = 0 ;
+ i < ghostRecordNew . len (  )  ; i ++  ) timeString += ghostRecordNew [ i ]  [ 0 ]  + "," + ghostRecordNew [ i ]  [ 1 ]  + "\n" ; 
+ if ( game . path == "res/map/" ) fileWrite ( "ghosts/" + ghostRecordName , timeString )  ; 
+ 
+  else fileWrite ( "ghosts/" + game . path + ghostRecordName , timeString )  ; 
+ 
+  } 
+  
+  } 
+  
+ saveGame (  )  ; 
  } 
   
   }  ; 

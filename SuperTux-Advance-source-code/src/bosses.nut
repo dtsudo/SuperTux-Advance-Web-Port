@@ -9,7 +9,7 @@
 	gravity = 0.0
 	frame = 0.0
 	blinking = 0.0
-	blinkSpeed = 0.2
+	blinkSpeed = 0.8
 	canBeStomped = false
 	ready = false
 
@@ -44,12 +44,16 @@
 	}
 
 	function turnToPlayer() {
-		if(gvPlayer) {
-			if(gvPlayer.x > x) flip = 0
-			else flip = 1
+		local target = null
+		if(gvPlayer && gvPlayer2) {
+			if(distance2(x, y, gvPlayer.x, gvPlayer.y) < distance2(x, y, gvPlayer2.x, gvPlayer2.y)) target = gvPlayer
+			else target = gvPlayer2
 		}
-		else if(gvPlayer2) {
-			if(gvPlayer2.x > x) flip = 0
+		else if(gvPlayer) target = gvPlayer
+		else if(gvPlayer2) target = gvPlayer2
+
+		if(target != null) {
+			if(target.x > x) flip = 0
 			else flip = 1
 		}
 	}
@@ -104,11 +108,11 @@
 		}
 
 		if(getFrames() % 4 == 0) {
-			if(health < healthActual) {
+			if(health < round(healthActual)) {
 				stopSound(sndMenuMove)
 				playSound(sndMenuMove, 0)
 			}
-			health += healthActual <=> health
+			health += round(healthActual) <=> health
 		}
 		if(health > 0) if(!gvBoss) gvBoss = this
 
@@ -133,7 +137,7 @@
 
 	damageMult = {
 		normal = 1.0
-		fire = 1.0
+		fire = 2.0
 		ice = 0.0
 		earth = 1.0
 		air = 1.0
@@ -196,6 +200,10 @@
 				gvPlayer.canMove = false
 				gvPlayer.invincible = 120
 			}
+			if(gvPlayer2) {
+				gvPlayer2.canMove = false
+				gvPlayer2.invincible = 120
+			}
 			fadeMusic(0.25)
 		}
 
@@ -238,20 +246,11 @@
 				else frame -= 0.5
 				break
 		}
-		if(anim != null) frame = wrap(frame, anim[0], anim[1])
+		if(anim != null && 1 in anim) frame = wrap(frame, anim[0], anim[1])
 
 		if(anim != anHurt) {
 			if(hspeed > 0) flip = 0
 			if(hspeed < 0) flip = 1
-		}
-
-		//Draw
-		if(blinking == 0) drawSpriteEx(sprYeti, frame, x - camx, y - camy, 0, flip.tointeger(), 1, 1, 1)
-		else drawSpriteEx(sprYeti, frame, x - camx, y - camy, 0, flip.tointeger(), 1, 1, max(wrap(blinking, 0, 1), (anim == anHurt).tointeger()))
-		if(debug) {
-			setDrawColor(0x008000ff)
-			shape.draw()
-			drawText(font2, x - camx, y - camy, vspeed.tostring())
 		}
 
 		//Set damage resistance
@@ -259,13 +258,24 @@
 		else damageMult.stomp = 1.0
 	}
 
+	function draw() {
+		if(blinking == 0) drawSpriteEx(sprYeti, frame, x - camx, y - camy, 0, flip.tointeger(), 1, 1, 1)
+		else drawSpriteEx(sprYeti, frame, x - camx, y - camy, 0, flip.tointeger(), 1, 1, max(wrap(blinking / 5.0, 0, 1), (anim == anHurt).tointeger()))
+		if(debug) {
+			setDrawColor(0x008000ff)
+			shape.draw()
+			drawText(font2, x - camx, y - camy, vspeed.tostring())
+		}
+	}
+
 	function ruWalkIntoFrame() {
 		phantom = true
 		if(gvPlayer) gvPlayer.canMove = false
+		if(gvPlayer2) gvPlayer2.canMove = false
 		anim = anWalk
 		flip = 1
 		hspeed = -0.5
-		if(x < camx + screenW() - 96) {
+		if(x < xstart - 200) {
 			routine = ruIntroCheer
 			hspeed = 0.0
 			phantom = false
@@ -284,6 +294,7 @@
 			eventTimer = 60
 			routine = ruIdle
 			if(gvPlayer) gvPlayer.canMove = true
+			if(gvPlayer2) gvPlayer2.canMove = true
 			songPlay(musBoss)
 		}
 	}
@@ -330,8 +341,17 @@
 
 		if(floor(frame) == anim[0] + 1 && anim == anJump) {
 			vspeed = -4.0
-			if(gvPlayer) {
-				hspeed = (gvPlayer.x - x) / 64.0
+
+			local target = null
+			if(gvPlayer && gvPlayer2) {
+				if(distance2(x, y, gvPlayer.x, gvPlayer.y) < distance2(x, y, gvPlayer2.x, gvPlayer2.y)) target = gvPlayer
+				else target = gvPlayer2
+			}
+			else if(gvPlayer) target = gvPlayer
+			else if(gvPlayer2) target = gvPlayer2
+
+			if(target != null) {
+				hspeed = (target.x - x) / 64.0
 			}
 		}
 
@@ -425,6 +445,7 @@
 		if(eventTimer <= 0) {
 			setFPS(60)
 			if(gvPlayer) gvPlayer.canMove = true
+			if(gvPlayer2) gvPlayer2.canMove = true
 			deleteActor(id)
 		}
 	}
@@ -451,6 +472,7 @@
 			else hspeed = 1.0
 		}
 		if(target) if(target.rawin("anStomp")) if(target.anim == target.anStomp) health -= 10
+		if(target) if(target.rawin("anStatue")) if(target.anim == target.anStatue) health -= 20
 		if(health > 0) playSound(sndBossHit, 0)
 		else playSound(sndDie, 0)
 	}
@@ -461,7 +483,7 @@
 	}
 
 	function getHurt(_by = 0, _mag = 1, _element = "normal", _cut = false, _blast = false, _stomp = false) {
-		if(blinking > 0) return
+		if(blinking > 0 || _mag == 0 || game.bossHealth <= 0) return
 
 		local damage = _mag * damageMult[_element]
 		if(_cut) damage *= damageMult["cut"]
@@ -506,6 +528,12 @@
 			shape.setPos(x - (timer * speed), y)
 			if(hitTest(shape, gvPlayer.shape)) gvPlayer.hurt = 2
 		}
+		if(gvPlayer2) {
+			shape.setPos(x + (timer * speed), y)
+			if(hitTest(shape, gvPlayer2.shape)) gvPlayer2.hurt = 2
+			shape.setPos(x - (timer * speed), y)
+			if(hitTest(shape, gvPlayer2.shape)) gvPlayer2.hurt = 2
+		}
 
 		//Create effect
 		if(timer % 10 == 0) {
@@ -513,6 +541,14 @@
 			newActor(BigSpark, x - (timer * speed) - speed, y, 1)
 		}
 	}
+}
+
+::Beehemoth <- class extends Boss {
+	//ATTACK IDEAS:
+	// Fly overhead, dropping dust
+	// Line up on Y axis and charge
+	// Summon waspy or ivy to help fight
+	//
 }
 
 ::Nolok <- class extends Boss {

@@ -4,7 +4,7 @@ if (!window.superTuxAdvanceWebVersion.squirrelFiles) window.superTuxAdvanceWebVe
 window.superTuxAdvanceWebVersion.squirrelFiles['src/shapes.nut'] = function () { 
 
 
-Rec =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal . x = 0.0 ; 
+Rec =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal . x = 0.0 ; 
  returnVal . y = 0.0 ; 
  returnVal . w = 0.0 ; 
  returnVal . h = 0.0 ; 
@@ -33,15 +33,15 @@ y = _y . tofloat (  )  + oy ;
   } ;  returnVal . _typeof = function (  ) {  return "Rec" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . x = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . x = 0.0 ; 
  squirrelClassFunction . y = 0.0 ; 
  squirrelClassFunction . w = 0.0 ; 
  squirrelClassFunction . h = 0.0 ; 
  squirrelClassFunction . kind = 0 ; 
  squirrelClassFunction . ox = 0.0 ; 
  squirrelClassFunction . oy = 0.0 ; 
- return squirrelClassFunction; })()) ; 
-Cir =  ((function(){ let squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal . x = 0.0 ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  return squirrelClassFunction; })()) ; 
+Cir =  ((function(){ let squirrelClassFunction; squirrelClassFunction = function ( ) { var returnVal = { constructor: function(){} } ;  returnVal . x = 0.0 ; 
  returnVal . y = 0.0 ; 
  returnVal . r = 0.0 ; 
  returnVal . ox = 0.0 ; 
@@ -66,14 +66,14 @@ y = _y . tofloat (  )  + oy ;
   } ;  returnVal . _typeof = function (  ) {  return "Cir" ;
   } ; 
  } 
- returnVal.constructor(...arguments); return returnVal ;  };  squirrelClassFunction . x = 0.0 ; 
+ returnVal.constructor(...arguments); returnVal.SQUIRREL_CLASS = squirrelClassFunction; return returnVal ;  };  squirrelClassFunction . x = 0.0 ; 
  squirrelClassFunction . y = 0.0 ; 
  squirrelClassFunction . r = 0.0 ; 
  squirrelClassFunction . ox = 0.0 ; 
  squirrelClassFunction . oy = 0.0 ; 
  squirrelClassFunction . w = 0.0 ; 
  squirrelClassFunction . h = 0.0 ; 
- return squirrelClassFunction; })()) ; 
+ squirrelClassFunction.IS_CLASS_DECLARATION = true;  return squirrelClassFunction; })()) ; 
 hitTest =  function ( a , b ) {  switch (  squirrelTypeOf ( a )  )  {  case "Rec" :  switch (  squirrelTypeOf ( b )  )  {  case "Rec" :  if ( abs ( a . x - b . x )  > abs ( a . w + b . w )  )  return false ;
   
   if ( abs ( a . y - b . y )  > abs ( a . h + b . h )  )  return false ;

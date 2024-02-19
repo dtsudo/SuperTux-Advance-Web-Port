@@ -6,7 +6,30 @@
 */
 
 window.k_a = 4;
+window.k_b = 5;
+window.k_c = 6;
+window.k_d = 7;
+window.k_e = 8;
+window.k_f = 9;
+window.k_g = 10;
+window.k_h = 11;
+window.k_i = 12;
+window.k_j = 13;
+window.k_k = 14;
+window.k_l = 15;
+window.k_m = 16;
+window.k_n = 17;
+window.k_o = 18;
+window.k_p = 19;
+window.k_q = 20;
+window.k_r = 21;
+window.k_s = 22;
+window.k_t = 23;
+window.k_u = 24;
+window.k_v = 25;
+window.k_w = 26;
 window.k_x = 27;
+window.k_y = 28;
 window.k_z = 29;
 window.k_1 = 30;
 window.k_2 = 31;
@@ -20,6 +43,7 @@ window.k_9 = 38;
 window.k_0 = 39;
 window.k_enter = 40;
 window.k_escape = 41;
+window.k_backspace = 42;
 window.k_equals = 46;
 window.k_tick = 53;
 window.k_f1 = 58;
@@ -46,7 +70,30 @@ window.js_left = 4;
 	
 	let bruxKeyToJavascriptKeyMapping = {};
 	bruxKeyToJavascriptKeyMapping[window.k_a] = ["a", "A"];
+	bruxKeyToJavascriptKeyMapping[window.k_b] = ["b", "B"];
+	bruxKeyToJavascriptKeyMapping[window.k_c] = ["c", "C"];
+	bruxKeyToJavascriptKeyMapping[window.k_d] = ["d", "D"];
+	bruxKeyToJavascriptKeyMapping[window.k_e] = ["e", "E"];
+	bruxKeyToJavascriptKeyMapping[window.k_f] = ["f", "F"];
+	bruxKeyToJavascriptKeyMapping[window.k_g] = ["g", "G"];
+	bruxKeyToJavascriptKeyMapping[window.k_h] = ["h", "H"];
+	bruxKeyToJavascriptKeyMapping[window.k_i] = ["i", "I"];
+	bruxKeyToJavascriptKeyMapping[window.k_j] = ["j", "J"];
+	bruxKeyToJavascriptKeyMapping[window.k_k] = ["k", "K"];
+	bruxKeyToJavascriptKeyMapping[window.k_l] = ["l", "L"];
+	bruxKeyToJavascriptKeyMapping[window.k_m] = ["m", "M"];
+	bruxKeyToJavascriptKeyMapping[window.k_n] = ["n", "N"];
+	bruxKeyToJavascriptKeyMapping[window.k_o] = ["o", "O"];
+	bruxKeyToJavascriptKeyMapping[window.k_p] = ["p", "P"];
+	bruxKeyToJavascriptKeyMapping[window.k_q] = ["q", "Q"];
+	bruxKeyToJavascriptKeyMapping[window.k_r] = ["r", "R"];
+	bruxKeyToJavascriptKeyMapping[window.k_s] = ["s", "S"];
+	bruxKeyToJavascriptKeyMapping[window.k_t] = ["t", "T"];
+	bruxKeyToJavascriptKeyMapping[window.k_u] = ["u", "U"];
+	bruxKeyToJavascriptKeyMapping[window.k_v] = ["v", "V"];
+	bruxKeyToJavascriptKeyMapping[window.k_w] = ["w", "W"];
 	bruxKeyToJavascriptKeyMapping[window.k_x] = ["x", "X"];
+	bruxKeyToJavascriptKeyMapping[window.k_y] = ["y", "Y"];
 	bruxKeyToJavascriptKeyMapping[window.k_z] = ["z", "Z"];
 	bruxKeyToJavascriptKeyMapping[window.k_1] = ["1", "!"];
 	bruxKeyToJavascriptKeyMapping[window.k_2] = ["2", "@"];
@@ -60,6 +107,7 @@ window.js_left = 4;
 	bruxKeyToJavascriptKeyMapping[window.k_0] = ["0", ")"];
 	bruxKeyToJavascriptKeyMapping[window.k_enter] = ["Enter"];
 	bruxKeyToJavascriptKeyMapping[window.k_escape] = ["Escape"];
+	bruxKeyToJavascriptKeyMapping[window.k_backspace] = ["Backspace"];
 	bruxKeyToJavascriptKeyMapping[window.k_equals] = ["=", "+"];
 	bruxKeyToJavascriptKeyMapping[window.k_tick] = ["`", "~"];
 	bruxKeyToJavascriptKeyMapping[window.k_f1] = ["F1"];
@@ -137,8 +185,13 @@ window.js_left = 4;
 		keysBeingPressed = newArray;
 	};
 	
+	let onBlur = function () {
+		keysBeingPressed = [];
+	};
+	
 	document.addEventListener("keydown", function (e) { keyDownHandler(e); }, false);
 	document.addEventListener("keyup", function (e) { keyUpHandler(e); }, false);
+	window.addEventListener("blur", function () { onBlur(); });
 	
 	let isKeyPressed = function (k) {
 		for (let i = 0; i < keysBeingPressed.length; i++) {

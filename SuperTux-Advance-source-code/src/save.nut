@@ -4,6 +4,10 @@
 	game.file = f
 	gvDoIGT = false
 	game.difficulty = newdif
+	game.state = {
+		pennyton = 0
+		fishmines = 0
+	}
 	if(game.difficulty > 1) game.maxHealth = (4 - game.difficulty) * 4
 	startPlay("res/map/aurora-pennyton.json", true, true)
 }
@@ -11,16 +15,26 @@
 ::newTimeAttack <- function() {
 	local path = game.path
 	local newdif = game.difficulty
+	local tempPlayer1 = game.playerChar
+	local tempPlayer2 = game.playerChar2
 	game = createNewGameObject()
+	game.playerChar = tempPlayer1
+	game.playerChar2 = tempPlayer2
 	game.file = -1
 	gvDoIGT = true
 	game.difficulty = newdif
 	game.path = path
 	if(game.difficulty > 1) game.maxHealth = (4 - game.difficulty) * 4
-	startPlay(game.path + gvTAStart + ".json", true, true)
+	if(fileExists(path + "/text.json")) {
+		gvLangObj = mergeTable(gvLangObj, jsonRead(fileRead(path + "/text.json")))
+		print("Found text.json")
+	}
+	startPlay(game.path + gvTACourse[0] + ".json", true, true)
 	gvLight = 0xffffffff
 	gvLightTarget = 0xffffffff
 	drawWeather = 0
+	gvIGT = 0
+	gvTAStep = 0
 }
 
 ::saveGame <- function() {
@@ -35,12 +49,8 @@
 		while(foundMissing) {
 			foundMissing = false
 			foreach(key, i in game.characters) {
-				if(!(i.normal in getroottable())) {
-					// webBrowserVersionChange: Commented out this line since the transpiler doesn't
-					// support the "delete" keyword.
-					// There shouldn't be any "removed characters" anyway since that would presumably
-					// only happen if you migrated a save file from a different version of the game.
-					// delete game.characters[key]
+				if(!(key in gvCharacters)) {
+					delete game.characters[key]
 					foundMissing = true
 				}
 			}

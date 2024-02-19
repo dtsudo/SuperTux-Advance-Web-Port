@@ -27,11 +27,35 @@
 						break
 
 					case 2: //Right
-						gvPlayer.hspeed = (gvPlayer.hspeed > 4) ? gvPlayer.hspeed : power
+						gvPlayer.hspeed = (gvPlayer.hspeed > power) ? gvPlayer.hspeed : power
 						break
 
 					case 3: //Left
-						gvPlayer.hspeed = (gvPlayer.hspeed < -4) ? gvPlayer.hspeed : -power
+						gvPlayer.hspeed = (gvPlayer.hspeed < -power) ? gvPlayer.hspeed : -power
+						break
+				}
+				if(frame == 0.0) popSound(sndSpring, 0)
+			}
+		}
+
+		if(gvPlayer2) {
+			if(hitTest(shape, gvPlayer2.shape)) {
+				fspeed = 0.2
+				switch(dir) {
+					case 0: //Up
+						gvPlayer2.vspeed = -power
+						break
+
+					case 1: //Down
+						gvPlayer2.vspeed = power
+						break
+
+					case 2: //Right
+						gvPlayer2.hspeed = (gvPlayer2.hspeed > power) ? gvPlayer2.hspeed : power
+						break
+
+					case 3: //Left
+						gvPlayer2.hspeed = (gvPlayer2.hspeed < -power) ? gvPlayer2.hspeed : -power
 						break
 				}
 				if(frame == 0.0) popSound(sndSpring, 0)
@@ -43,7 +67,9 @@
 			frame = 0.0
 			fspeed = 0.0
 		}
+	}
 
+	function draw() {
 		switch(dir) { //Draw sprite based on direction
 			case 0: //Up
 				drawSprite(sprSpring, round(frame), x - camx, y - camy)
@@ -112,12 +138,42 @@
 			}
 		}
 
+		if(gvPlayer2) {
+			if(hitTest(shape, gvPlayer2.shape)) {
+				fspeed = 0.2
+				switch(dir) {
+					case 0: //Up Right
+						gvPlayer2.vspeed = -power * 0.8
+						gvPlayer2.hspeed = power * 0.6
+						break
+
+					case 1: //Down Right
+						gvPlayer2.vspeed = power * 0.7
+						gvPlayer2.hspeed = power * 0.7
+						break
+
+					case 2: //Down Left
+						gvPlayer2.hspeed = -power * 0.7
+						gvPlayer2.vspeed = power * 0.7
+						break
+
+					case 3: //Up Left
+						gvPlayer2.hspeed = -power * 0.6
+						gvPlayer2.vspeed = -power * 0.8
+						break
+				}
+				if(frame == 0.0) popSound(sndSpring, 0)
+			}
+		}
+
 		frame += fspeed
 		if(floor(frame) > 3) {
 			frame = 0.0
 			fspeed = 0.0
 		}
+	}
 
+	function draw() {
 		switch(dir) { //Draw sprite based on direction
 			case 0: //Up
 				drawSprite(sprSpringD, round(frame), x - camx, y - camy)
@@ -157,11 +213,12 @@
 
 ::sinkLevel <- function(rate) { newActor(LevelSinker,0, 0, rate) }
 
-::FireChain <- class extends Actor {
+::FireChain <- class extends PhysAct {
 	r = 0
 	a = 0.0
 	s = 0.0
 	hb = null
+	chainpos = null
 
 	constructor(_x, _y, _arr = null) {
 		base.constructor(_x, _y)
@@ -169,22 +226,29 @@
 		a = _arr[1].tofloat()
 		s = _arr[2].tofloat()
 		hb = (Cir(x, y, 6))
+		chainpos = []
+		shape = Rec(x, y, r * 8, r * 8, 0)
 	}
 
 	function run() {
 		//Rotate chain
 		//s = sin(getFrames() / 5.0) * 4.0 //Save for flamethrower animation
-		if(gvPlayer) if(!inDistance2(x, y, gvPlayer.x, gvPlayer.y, screenW() * 0.8)) return
+		chainpos.clear()
+		shape.setPos(x, y)
 		a += s
+		
+		if(!isOnScreen()) return
 
 		if(r > 0) for(local i = 0; i < r; i++) {
 			hb.setPos(x + (i * 8) * cos((2 * pi) + (a / 60.0 - i * s / 45.0)), y + (i * 8) * sin((2 * pi) + (a / 60.0 - i * s / 45.0)))
-			drawSprite(sprFireball, getFrames() / 4, hb.x - camx, hb.y - camy)
-			drawLightEx(sprLightFire, 0, hb.x - camx, hb.y - camy, 0, 0, 1.0 / 8.0, 1.0 / 8.0)
+			chainpos.push([hb.x, hb.y])
 
 			if((i - 1) % 2 == 0) {
 				if(gvPlayer) if(hitTest(hb, gvPlayer.shape)) {
-					gvPlayer.hurt = 2
+					gvPlayer.hurt = 2 * gvPlayer.damageMult.fire
+				}
+				if(gvPlayer2) if(hitTest(hb, gvPlayer2.shape)) {
+					gvPlayer2.hurt = 2  * gvPlayer2.damageMult.fire
 				}
 			}
 
@@ -193,6 +257,13 @@
 				c.vspeed = -0.25
 				c.hspeed = randFloat(0.5) - 0.25
 			}
+		}
+	}
+
+	function draw() {
+		if(chainpos.len() > 0) for(local i = 0; i < r; i++) {
+			drawSprite(sprFireball, getFrames() / 4, chainpos[i][0] - camx, chainpos[i][1] - camy)
+			drawLight(sprLightFire, 0, chainpos[i][0] - camx, chainpos[i][1] - camy, 0, 0, 1.0 / 8.0, 1.0 / 8.0)
 		}
 
 		if(debug) drawText(font, x - camx, y - camy, wrap(a, 0, 360).tostring())
@@ -230,15 +301,17 @@
 	a = null //Angle
 	l = null //List
 	sa = 0.0 //Start angle
+	g = 0.0 //Growth
 
 	constructor(_x, _y, _arr = null) {
 		x = _x
 		y = _y
 		base.constructor(_x, _y)
-		r = _arr[0].tofloat()
-		c = _arr[1].tointeger()
-		s = _arr[2].tofloat()
-		sa = _arr[4].tofloat()
+		if(0 in _arr) r = _arr[0].tofloat()
+		if(1 in _arr) c = _arr[1].tointeger()
+		if(2 in _arr) s = _arr[2].tofloat()
+		if(4 in _arr) sa = _arr[4].tofloat()
+		if(5 in _arr) g = _arr[5].tofloat()
 
 		local newarr = []
 		a = []
@@ -293,7 +366,9 @@
 	function run() {
 		base.run()
 		shape.setPos(x, y)
+	}
 
+	function draw() {
 		if(w == 1) drawSprite(sprite, 0, x - camx, y - camy)
 		else for(local i = 0; i < w; i++) {
 			if(i == 0) drawSpriteZ(6, sprite, 1, x - (w * 8) + (i * 16) - camx + 8, y - camy)
@@ -362,13 +437,6 @@
 	}
 
 	function run() {
-		drawSpriteEx(sprite, getFrames() / 4, shapeA.x - camx, shapeA.y - camy, angleA, 0, 1, 1, 1)
-		drawSpriteEx(sprite, getFrames() / 4, shapeB.x - camx, shapeB.y - camy, angleB, 0, 1, 1, 1)
-		if(debug) {
-			setDrawColor(color)
-			drawLine(shapeA.x - camx, shapeA.y - camy, shapeB.x - camx, shapeB.y - camy)
-		}
-
 		if(gvPlayer) {
 			if(canWarp) {
 				if(hitTest(shapeA, gvPlayer.shape)) {
@@ -377,7 +445,7 @@
 					theta += (angleB - angleA) + 180
 					gvPlayer.hspeed = lendirX(mag, theta) * 1.5
 					gvPlayer.vspeed = lendirY(mag, theta) * 1.5
-					playerTeleport(shapeB.x + lendirX(gvPlayer.shape.w, angleB), shapeB.y + lendirY(gvPlayer.shape.h, angleB) - gvPlayer.shape.oy)
+					playerTeleport(myTarget, shapeB.x + lendirX(gvPlayer.shape.w, angleB), shapeB.y + lendirY(gvPlayer.shape.h, angleB) - gvPlayer.shape.oy)
 					canWarp = false
 				}
 
@@ -387,7 +455,7 @@
 					theta += (angleA - angleB) + 180
 					gvPlayer.hspeed = lendirX(mag, theta) * 1.5
 					gvPlayer.vspeed = lendirY(mag, theta) * 1.5
-					playerTeleport(shapeA.x + lendirX(gvPlayer.shape.w, angleA), shapeA.y + lendirY(gvPlayer.shape.h, angleA) - gvPlayer.shape.oy)
+					playerTeleport(myTarget, shapeA.x + lendirX(gvPlayer.shape.w, angleA), shapeA.y + lendirY(gvPlayer.shape.h, angleA) - gvPlayer.shape.oy)
 					canWarp = false
 				}
 			}
@@ -395,4 +463,73 @@
 			else if(!hitTest(shapeA, gvPlayer.shape) && !hitTest(shapeB, gvPlayer.shape)) canWarp = true
 		}
 	}
+
+	function draw() {
+		drawSpriteEx(sprite, getFrames() / 4, shapeA.x - camx, shapeA.y - camy, angleA, 0, 1, 1, 1)
+		drawSpriteEx(sprite, getFrames() / 4, shapeB.x - camx, shapeB.y - camy, angleB, 0, 1, 1, 1)
+		if(debug) {
+			setDrawColor(color)
+			drawLine(shapeA.x - camx, shapeA.y - camy, shapeB.x - camx, shapeB.y - camy)
+		}
+	}
+}
+
+::BoostRing <- class extends Actor {
+	shape = null
+	angle = 0
+	hboost = 0
+	vboost = 0
+	touchTimer1 = 0
+	touchTimer2 = 0
+
+	constructor(_x, _y, _arr = null) {
+		base.constructor(_x, _y, _arr)
+
+		if(typeof _arr == "string")
+			_arr = split(_arr, ",")
+		if(typeof _arr == "array") {
+			angle = int(_arr[0])
+			hboost = lendirX(float(_arr[1]), float(_arr[0]))
+			vboost = lendirY(float(_arr[1]), float(_arr[0]))
+		}
+
+		shape = Cir(x, y, 4)
+	}
+
+	function run() {
+		if(gvPlayer && hitTest(shape, gvPlayer.shape) && touchTimer1 == 0) {
+			gvPlayer.x = x
+			gvPlayer.y = y
+			gvPlayer.hspeed = hboost
+			gvPlayer.vspeed = vboost
+			touchTimer1 = 30
+			popSound(sndWoosh)
+		}
+
+		if(gvPlayer2 && hitTest(shape, gvPlayer2.shape) && touchTimer2 == 0) {
+			gvPlayer2.x = x
+			gvPlayer2.y = y
+			gvPlayer2.hspeed = hboost
+			gvPlayer2.vspeed = vboost
+			touchTimer2 = 30
+			popSound(sndWoosh)
+		}
+
+		if(touchTimer1 > 0)
+			touchTimer1--
+		if(touchTimer2 > 0)
+			touchTimer2--
+	}
+
+	function draw() {
+		drawSpriteZ(6, sprBoostRing, 1, x - camx + round(lendirX(6, angle)), y - camy + round(lendirY(6, angle)), angle)
+		drawSpriteZ(0, sprBoostRing, 0, x - camx - round(lendirX(6, angle)), y - camy - round(lendirY(6, angle)), angle)
+
+		if(debug) {
+			setDrawColor(0xff0000ff)
+			drawCircle(x - camx, y - camy, 4, false)
+		}
+	}
+
+	function _typeof() { return "BoostRing" }
 }
